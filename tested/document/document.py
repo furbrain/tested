@@ -3,7 +3,12 @@ class Document(object):
         self.lines = content.splitlines()
     
     @classmethod
-    def openFromFilename(cls,name):        
-        f = open(name,"r")
-        return cls(f.read())
+    def openFromFilename(cls,filename):
+        with open(filename,"r") as f:        
+            return cls(f.read())
+        
+    def saveToFilename(self, filename):
+        with open(filename,"w") as f:
+            f.write("\n".join(self.lines))
+            
         
