@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(name="TestEd",
       version="0.1",
@@ -8,4 +8,6 @@ setup(name="TestEd",
       author="Phil Underwood",
       author_email="beardydoc@gmail.com",
       url="http://github.com/furbrain/tested",
+      test_suite="tests",
+      packages=find_packages(),
       )  
