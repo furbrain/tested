@@ -47,3 +47,8 @@ class TestPython(unittest.TestCase):
     def testParseWorks(self):
         p = PythonPlugin()
         p.parseText(SPECIMEN_CODE)
+        
+    def testNoCandidatesForSecondLine(self):
+        p = PythonPlugin()
+        p.parseText(SPECIMEN_CODE)
+        self.assertEqual([],p.getCandidates(1,""))
