@@ -122,10 +122,11 @@ class TestGetAliasName(unittest.TestCase):
     
 class TestExpressionTreeVisitor(unittest.TestCase):
     def checkExpr(self, expr, result, names=None):
-        visitor = ExpressionTreeVisitor()
+        visitor = ExpressionTreeVisitor(names)
         syntax_tree = ast.parse(expr)
         answer = visitor.getType(syntax_tree)
-        self.assertEqual(answer, result, msg = "%s should return %s, instead returned %s" % (expr, result, answer))
+        message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, names)
+        self.assertEqual(answer, result, msg = message)
         
     def testSingleNumber(self):
         self.checkExpr("1","int")
@@ -187,3 +188,10 @@ class TestExpressionTreeVisitor(unittest.TestCase):
                  ("False or False", 'bool')]
         for expr,res in tests:
             self.checkExpr(expr, res)
+            
+    def testExpressionWithVariables(self):
+        context = {'a':'float', 'b':'int'}
+        self.checkExpr("a","float",names=context)
+        self.checkExpr("b","int",names=context)
+        self.checkExpr("a+b","float",names=context)
+        

@@ -12,12 +12,14 @@ def getAliasName(node):
     return node.asname or node.name
     
 class ExpressionTreeVisitor(ast.NodeVisitor):
-    def __init__(self):
-        self.builtin_constants =  {
+    def __init__(self, names=None):
+        self.names =  {
             'True': 'bool',
             'False': 'bool',
             'None': 'NoneType',
         }
+        if names is not None:
+            self.names.update(names)
         
     def getType(self,expression):
         return self.visit(expression)
@@ -66,8 +68,8 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
             return 'str'
     
     def visit_Name(self, node):
-        if node.id in self.builtin_constants:
-            return self.builtin_constants[node.id]
+        if node.id in self.names:
+            return self.names[node.id]
             
     def visit_UnaryOp(self, node):
         op = type(node.op).__name__
