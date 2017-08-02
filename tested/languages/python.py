@@ -15,7 +15,8 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
     def __init__(self):
         self.builtin_constants =  {
             'True': 'bool',
-            'False':'bool',
+            'False': 'bool',
+            'None': 'NoneType',
         }
         
     def getType(self,expression):
@@ -67,6 +68,25 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
     def visit_Name(self, node):
         if node.id in self.builtin_constants:
             return self.builtin_constants[node.id]
+            
+    def visit_UnaryOp(self, node):
+        op = type(node.op).__name__
+        operand = self.getType(node.operand)
+        if op=="Not":
+            return "bool"
+        if op=="Invert":
+            if operand=="long":
+                return "long"
+            else:
+                return "int"
+        if op in ("UAdd","USub"):
+            if operand in NUMERIC_TYPES:
+                return operand
+            else:
+                return "int"
+                
+    def visit_BoolOp(self, node):
+        return "bool" 
         
     
 class SyntaxTreeVisitor(ast.NodeVisitor):

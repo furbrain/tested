@@ -147,10 +147,12 @@ class TestExpressionTreeVisitor(unittest.TestCase):
     def testUnicodeString(self):
         self.checkExpr("u'abc'","unicode")
         
-    def testBoolea(self):
+    def testBoolean(self):
         self.checkExpr("True","bool")
         self.checkExpr("False","bool")
         
+    def testNone(self):
+        self.checkExpr("None",'NoneType')
         
     def testNumericBinaryOpConversions(self):
         numbers = [('1','int'), ('2.3','float'), ('3L','long')]
@@ -172,3 +174,21 @@ class TestExpressionTreeVisitor(unittest.TestCase):
         for expr in unicode_tests:
             self.checkExpr(expr, 'unicode')
         
+    def testUnaryOps(self):
+        boolean_tests = [("not True", "bool"), ("not False", "bool")]
+        for expr,res in boolean_tests:
+            self.checkExpr(expr,res)
+            
+        numeric_tests = [("~ 4", "int"), 
+                         ("~4L", "long"), 
+                         ("not 4", "bool"), 
+                         ("- (4.3)","float"),
+                         ("- True", "int")]
+        for expr,res in numeric_tests:
+            self.checkExpr(expr,res)
+        
+    def testBooleanOps(self):
+        tests = [("True and False", 'bool'),
+                 ("False or False", 'bool')]
+        for expr,res in tests:
+            self.checkExpr(expr, res)
