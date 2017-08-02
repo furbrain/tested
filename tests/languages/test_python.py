@@ -121,17 +121,12 @@ class TestGetAliasName(unittest.TestCase):
         
     
 class TestExpressionTreeVisitor(unittest.TestCase):
-    def setUp(self):
-        self.visitor = ExpressionTreeVisitor()
-        
-    def checkExpr(self, expr, result):
-        answer = self.getExpressionType(expr)
+    def checkExpr(self, expr, result, names=None):
+        visitor = ExpressionTreeVisitor()
+        syntax_tree = ast.parse(expr)
+        answer = visitor.getType(syntax_tree)
         self.assertEqual(answer, result, msg = "%s should return %s, instead returned %s" % (expr, result, answer))
         
-    def getExpressionType(self,text):
-        syntax_tree = ast.parse(text)
-        return self.visitor.getType(syntax_tree)
-
     def testSingleNumber(self):
         self.checkExpr("1","int")
         
