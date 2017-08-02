@@ -1,5 +1,5 @@
 import unittest
-from tested.languages.python import PythonPlugin, SyntaxTreeVisitor, getAliasName
+from tested.languages.python import PythonPlugin, SyntaxTreeVisitor, ExpressionTreeVisitor, getAliasName
 import os
 import ast
 import collections
@@ -120,4 +120,55 @@ class TestGetAliasName(unittest.TestCase):
         self.assertEqual(getAliasName(sample),"right")
         
     
-    
+class TestExpressionTreeVisitor(unittest.TestCase):
+    def setUp(self):
+        self.visitor = ExpressionTreeVisitor()
+        
+    def checkExpr(self, expr, result):
+        answer = self.getExpressionType(expr)
+        self.assertEqual(answer, result, msg = "%s should return %s, instead returned %s" % (expr, result, answer))
+        
+    def getExpressionType(self,text):
+        syntax_tree = ast.parse(text)
+        return self.visitor.getType(syntax_tree)
+
+    def testSingleNumber(self):
+        self.checkExpr("1","int")
+        
+    def testFloatNumber(self):
+        self.checkExpr("1.0","float")
+
+    def testLongNumber(self):
+        self.checkExpr("1L","long")
+     
+    def testPlainString(self):
+        self.checkExpr("'abc'","str")
+        
+    def testUnicodeString(self):
+        self.checkExpr("u'abc'","unicode")
+        
+    def testBoolea(self):
+        self.checkExpr("True","bool")
+        self.checkExpr("False","bool")
+        
+        
+    def testNumericBinaryOpConversions(self):
+        numbers = [('1','int'), ('2.3','float'), ('3L','long')]
+        for a,b in numbers:
+            for c,d in numbers:
+                expr = a + " + " + c
+                if 'float' in (b,d):
+                    self.checkExpr(expr, "float")
+                elif 'long' in (b,d):
+                    self.checkExpr(expr, "long")
+                else:
+                    self.checkExpr(expr, "int")
+
+    def testStringBinaryOpConversions(self):
+        str_tests = ('"abc" * 3', '"abc" + "def"')
+        for expr in str_tests:
+            self.checkExpr(expr, 'str')
+        unicode_tests = ('u"abc" * 3', '"abc" +u"def"', 'u"abc" + "def"', 'u"abc" + u"def"')
+        for expr in unicode_tests:
+            self.checkExpr(expr, 'unicode')
+        
