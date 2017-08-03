@@ -227,7 +227,16 @@ class TestExpressionTreeVisitor(unittest.TestCase):
             self.checkExpr(expr, 'str')
         unicode_tests = ('u"abc" * 3', '"abc" +u"def"', 'u"abc" + "def"', 'u"abc" + u"def"')
         for expr in unicode_tests:
-            self.checkExpr(expr, 'unicode')
+            self.checkExpr(expr, 'unicode')   
+            
+    def testMixedBinaryConversions(self):
+        list1 = self.getType("[1,2,3,4]")
+        list2 = self.getType("[1,2,3,'a',4]")
+        dct = {'a':list1, 'b':list2}
+        self.checkExpr("a[0]+b[0]","int", names=dct)
+        self.checkExpr("b[0]+b[0]","int,str", names=dct)
+        self.checkExpr("a[0]*b[0]","int", names=dct)
+        self.checkExpr("b[0]*a[0]","int,str", names=dct)
         
     def testUnaryOps(self):
         boolean_tests = [("not True", "bool"), ("not False", "bool")]

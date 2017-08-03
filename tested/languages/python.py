@@ -44,6 +44,7 @@ class InferredList():
     def add(self, other):
         self.element_types.add(other)
     
+    
     def __str__(self):
         return '[%s]' % self.element_types
 
@@ -110,7 +111,9 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
         result = TypeSet()
         for left in self.getType(node.left):
             for right in self.getType(node.right):
-                result.add(self.getBinOpType(left, right, op))
+                new_type = self.getBinOpType(left, right, op)
+                if new_type is not TypeError:
+                    result.add(new_type)
         return result
             
     def getBinOpType(self, left, right, op):
@@ -120,6 +123,7 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
             return self.getHighestPriorityString(left, right)
         if left in STRING_TYPES and right in NUMERIC_TYPES and op=="Mult":
             return left
+        return TypeError
         
     def bothArgsNumeric(self,left,right):
         return left in NUMERIC_TYPES and right in NUMERIC_TYPES
