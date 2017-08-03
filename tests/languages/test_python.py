@@ -1,5 +1,6 @@
 import unittest
-from tested.languages.python import PythonPlugin, SyntaxTreeVisitor, ExpressionTreeVisitor, getAliasName
+from tested.languages.python import PythonPlugin, SyntaxTreeVisitor, ExpressionTreeVisitor
+from tested.languages.python import getAliasName, InferredType, InferredList, TypeSet
 import os
 import ast
 import collections
@@ -119,12 +120,67 @@ class TestGetAliasName(unittest.TestCase):
         sample = self.AliasMock("wrong","right")
         self.assertEqual(getAliasName(sample),"right")
         
+class TestInferredType(unittest.TestCase):
+    def testInitWithSimpleVal(self):
+        it_num = InferredType(1)
+        it_str = InferredType("a")
+        self.assertEqual(str(it_num),"int")
+        self.assertEqual(str(it_str),"str")
+        
+    def testInitWithSimpleType(self): 
+        it_num = InferredType(int)
+        it_str = InferredType(str)
+        self.assertEqual(str(it_num),"int")
+        self.assertEqual(str(it_str),"str")
+        
+    def testEquality(self):
+        it_num = InferredType(int)
+        it_str = InferredType(str)
+        self.assertTrue(it_num==it_num)
+        self.assertTrue(it_num==int)
+        self.assertTrue(it_str==it_str)
+        self.assertTrue(it_str==str)
+
+    def testInequality(self):        
+        it_num = InferredType(int)
+        it_str = InferredType(str)
+        self.assertFalse(it_num==it_str)
+        self.assertFalse(it_num==str)
+        self.assertFalse(it_str==it_num)
+        self.assertFalse(it_str==int)
+        
+class TestTypeSet(unittest.TestCase):
+    def testInitWithSingleVal(self):
+        st = TypeSet(1)
+        self.assertEqual(str(st),"int")
+    
+    def testInitWithSingleType(self):
+        st = TypeSet(int)
+        self.assertEqual(str(st),"int")
+    
+    def testInitWithSingleInferredType(self):
+        st = TypeSet(InferredType(1))
+        self.assertEqual(str(st),"int")
+        
+    def testWithMultipleVals(self):
+        st = TypeSet(1,"a")
+        self.assertEqual(str(st),"int,str")
+        
+    def testWithMixedVals(self):
+        st = TypeSet(int, "a")
+        self.assertEqual(str(st),"int,str")
+        
+    def testMatches(self):
+        st = TypeSet(int, "a")
+        self.assertTrue(st.matches((int,float)))
+        self.assertTrue(st.matches((str,unicode)))
+        self.assertFalse(st.matches((float,unicode)))
     
 class TestExpressionTreeVisitor(unittest.TestCase):
     def checkExpr(self, expr, result, names=None):
         visitor = ExpressionTreeVisitor(names)
         syntax_tree = ast.parse(expr)
-        answer = visitor.getType(syntax_tree)
+        answer = str(visitor.getType(syntax_tree))
         message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, names)
         self.assertEqual(answer, result, msg = message)
         
@@ -190,8 +246,13 @@ class TestExpressionTreeVisitor(unittest.TestCase):
             self.checkExpr(expr, res)
             
     def testExpressionWithVariables(self):
-        context = {'a':'float', 'b':'int'}
+        context = {'a':TypeSet(float), 'b':TypeSet(int)}
         self.checkExpr("a","float",names=context)
         self.checkExpr("b","int",names=context)
         self.checkExpr("a+b","float",names=context)
         
+    def testListWithSingleType(self):
+        self.checkExpr("[1,2,3,4]","[int]")
+        
+    def testListWithMixesTypes(self):
+        self.checkExpr("[1,2,'a',3,4]","[int,str]")
