@@ -230,9 +230,7 @@ class TestExpressionTreeVisitor(unittest.TestCase):
             self.checkExpr(expr, 'unicode')   
             
     def testMixedBinaryConversions(self):
-        list1 = self.getType("[1,2,3,4]")
-        list2 = self.getType("[1,2,3,'a',4]")
-        dct = {'a':list1, 'b':list2}
+        dct = {'a':InferredList(int), 'b':InferredList(int,str)}
         self.checkExpr("a[0]+b[0]","int", names=dct)
         self.checkExpr("b[0]+b[0]","int,str", names=dct)
         self.checkExpr("a[0]*b[0]","int", names=dct)
@@ -261,7 +259,6 @@ class TestExpressionTreeVisitor(unittest.TestCase):
         context = {'a':TypeSet(float), 'b':TypeSet(int)}
         self.checkExpr("a","float",names=context)
         self.checkExpr("b","int",names=context)
-        self.checkExpr("a+b","float",names=context)
         
     def testListWithSingleType(self):
         self.checkExpr("[1,2,3,4]","[int]")
@@ -270,7 +267,5 @@ class TestExpressionTreeVisitor(unittest.TestCase):
         self.checkExpr("[1,2,'a',3,4]","[int,str]")
         
     def testListExtraction(self):
-        lst = self.getType("[1,2,3,4]")
-        self.checkExpr("a[0]", "int", names = {'a':lst})
-        lst = self.getType("[1,2,3,'a',4]")
-        self.checkExpr("a[0]", "int,str", names = {'a':lst})
+        self.checkExpr("[1,2,3,4][0]", "int")
+        self.checkExpr("[1,2,3,'a',4][0]", "int,str")
