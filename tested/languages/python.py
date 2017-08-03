@@ -162,6 +162,13 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
     def visit_BoolOp(self, node):
         return TypeSet(bool)
         
+    def visit_Subscript(self, node):
+        value = self.getType(node.value)
+        slice_type = type(node.slice).__name__
+        if slice_type=="Index":
+            if isinstance(value,InferredList):
+                return value.element_types
+        
     
 class SyntaxTreeVisitor(ast.NodeVisitor):
     def visit_Import(self,node):

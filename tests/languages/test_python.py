@@ -178,11 +178,14 @@ class TestTypeSet(unittest.TestCase):
     
 class TestExpressionTreeVisitor(unittest.TestCase):
     def checkExpr(self, expr, result, names=None):
-        visitor = ExpressionTreeVisitor(names)
-        syntax_tree = ast.parse(expr)
-        answer = str(visitor.getType(syntax_tree))
+        answer = str(self.getType(expr, names))
         message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, names)
         self.assertEqual(answer, result, msg = message)
+        
+    def getType(self, expr, names=None):    
+        visitor = ExpressionTreeVisitor(names)
+        syntax_tree = ast.parse(expr)
+        return visitor.getType(syntax_tree)
         
     def testSingleNumber(self):
         self.checkExpr("1","int")
@@ -256,3 +259,9 @@ class TestExpressionTreeVisitor(unittest.TestCase):
         
     def testListWithMixedTypes(self):
         self.checkExpr("[1,2,'a',3,4]","[int,str]")
+        
+    def testListExtraction(self):
+        lst = self.getType("[1,2,3,4]")
+        self.checkExpr("a[0]", "int", names = {'a':lst})
+        lst = self.getType("[1,2,3,'a',4]")
+        self.checkExpr("a[0]", "int,str", names = {'a':lst})
