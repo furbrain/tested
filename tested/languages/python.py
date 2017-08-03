@@ -173,6 +173,8 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
             if isinstance(value,InferredList):
                 return value.element_types
         
+    def visit_Compare(self, node):
+        return TypeSet(bool)
     
 class SyntaxTreeVisitor(ast.NodeVisitor):
     def visit_Import(self,node):

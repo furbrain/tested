@@ -269,3 +269,8 @@ class TestExpressionTreeVisitor(unittest.TestCase):
     def testListExtraction(self):
         self.checkExpr("[1,2,3,4][0]", "int")
         self.checkExpr("[1,2,3,'a',4][0]", "int,str")
+        
+    def testCompare(self):
+        self.checkExpr("1 < 2", "bool")
+        self.checkExpr("2 > 3", "bool")
+        self.checkExpr('"abc" <= "abc"', "bool")
