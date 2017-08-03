@@ -254,5 +254,5 @@ class TestExpressionTreeVisitor(unittest.TestCase):
     def testListWithSingleType(self):
         self.checkExpr("[1,2,3,4]","[int]")
         
-    def testListWithMixesTypes(self):
+    def testListWithMixedTypes(self):
         self.checkExpr("[1,2,'a',3,4]","[int,str]")

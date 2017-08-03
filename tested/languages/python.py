@@ -36,11 +36,16 @@ class InferredType():
         return hash(self.name)
 
 class InferredList():
-    def __init__(self):
-        self.element_type = TypeSet()
+    def __init__(self, *args):
+        self.element_types = TypeSet()
+        for arg in args:
+            self.add(arg)
+        
+    def add(self, other):
+        self.element_types.add(other)
     
     def __str__(self):
-        return '[%s]' % self.element_type
+        return '[%s]' % self.element_types
 
 class TypeSet():
     def __init__(self, *args):
@@ -84,6 +89,16 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
     def visit_Str(self, node):
         return TypeSet(node.s)
         
+    def visit_Name(self, node):
+        if node.id in self.names:
+            return self.names[node.id]
+            
+    def visit_List(self, node):
+        result = InferredList()
+        for elt in node.elts:
+            result.add(self.getType(elt))
+        return result
+        
     def visit_Expr(self, node):
         return self.visit(node.value)
         
@@ -126,10 +141,6 @@ class ExpressionTreeVisitor(ast.NodeVisitor):
         else:
             return str
     
-    def visit_Name(self, node):
-        if node.id in self.names:
-            return self.names[node.id]
-            
     def visit_UnaryOp(self, node):
         op = type(node.op).__name__
         result = TypeSet()
