@@ -276,3 +276,30 @@ class TestExpressionTreeVisitor(unittest.TestCase):
         self.checkExpr("1 < 2", "bool")
         self.checkExpr("2 > 3", "bool")
         self.checkExpr('"abc" <= "abc"', "bool")
+        
+        
+class TestStatementTypeParser(unittest.TestCase):
+    def checkStatement(self, stmt, result, field="names", names=None):
+        answer = self.parseStatement(stmt, names)[field]
+        message = "%s should return %s: %s, instead returned %s, context is %s" % (stmt, field, result, answer, names)
+        self.assertDictEqual(answer, result)
+
+    def parseStatement(self, stmt, names=None):
+        syntax_tree = ast.parse(stmt)
+        parser = StatementTypeParser(names)
+        return parser.parseStatement(syntax_tree)
+        
+    def testSimpleAssignment(self):
+        self.checkStatement("a=1", {'a':"int"})
+        self.checkStatement("a=1+2.0", {'a':"float"})
+        self.checkStatement("a='abc %d' % 1", {'a':"str"})
+        
+    def testMultipleAssignment(self):
+        self.checkStatement("a,b = 2,3", {'a':'int','b':'int'})
+        self.checkStatement("[a,b] = [2,'abc']", {'a':'int','b':'str'})
+    
+    def testNestedAssignment(self):
+        self.checkStatement("(a,b),c = (1,2),3", {'a':'int','b':'int','c':'int'})
+        
+    def testMultipleTargets(self):
+        self.checkStatement("a = b = 2", {'a':'int','b':'int'})
