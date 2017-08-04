@@ -30,8 +30,8 @@ class InferredType():
         elif inspect.isclass(other):
             return self.type == other
         else:
-            return self.type == type(other)
-            
+            return False
+                        
     def __hash__(self):
         return hash(self.name)
 
@@ -68,8 +68,18 @@ class TypeSet():
     def __str__(self):
         return ','.join(sorted(str(x) for x in self.types))
         
+    def __repr__(self):
+        return "<TypeSet: (%s)>" % self
+        
     def __iter__(self):
         return iter(self.types)
+        
+    def __eq__(self, other):
+        if isinstance(other,TypeSet):
+            return self.types==other.types
+        if isinstance(other,basestring):
+            return str(self)==other
+        return False
         
 class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, names=None):
@@ -122,6 +132,8 @@ class ExpressionTypeParser(ast.NodeVisitor):
         if self.bothArgsStrings(left, right):
             return self.getHighestPriorityString(left, right)
         if left in STRING_TYPES and right in NUMERIC_TYPES and op=="Mult":
+            return left
+        if left in STRING_TYPES and op=="Mod":
             return left
         return TypeError
         

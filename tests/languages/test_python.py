@@ -224,7 +224,7 @@ class TestExpressionTypeParser(unittest.TestCase):
                     self.checkExpr(expr, "int")
 
     def testStringBinaryOpConversions(self):
-        str_tests = ('"abc" * 3', '"abc" + "def"')
+        str_tests = ('"abc" * 3', '"abc" + "def"', '"%d" % 1' )
         for expr in str_tests:
             self.checkExpr(expr, 'str')
         unicode_tests = ('u"abc" * 3', '"abc" +u"def"', 'u"abc" + "def"', 'u"abc" + u"def"')
