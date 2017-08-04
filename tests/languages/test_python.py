@@ -140,6 +140,8 @@ class TestInferredType(unittest.TestCase):
         self.assertTrue(it_num==int)
         self.assertTrue(it_str==it_str)
         self.assertTrue(it_str==str)
+        self.assertFalse(it_num==1)
+        self.assertFalse(it_str=="a")
 
     def testInequality(self):        
         it_num = InferredType(int)
