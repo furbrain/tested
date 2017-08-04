@@ -1,5 +1,5 @@
 import unittest
-from tested.languages.python import PythonPlugin, SyntaxTreeVisitor, ExpressionTreeVisitor
+from tested.languages.python import PythonPlugin, SyntaxTreeVisitor, ExpressionTypeParser, StatementTypeParser
 from tested.languages.python import getAliasName, InferredType, InferredList, TypeSet
 import os
 import ast
@@ -178,16 +178,16 @@ class TestTypeSet(unittest.TestCase):
         self.assertTrue(st.matches((str,unicode)))
         self.assertFalse(st.matches((float,unicode)))
     
-class TestExpressionTreeVisitor(unittest.TestCase):
+class TestExpressionTypeParser(unittest.TestCase):
     def checkExpr(self, expr, result, names=None):
         answer = str(self.getType(expr, names))
         message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, names)
         self.assertEqual(answer, result, msg = message)
         
     def getType(self, expr, names=None):    
-        visitor = ExpressionTreeVisitor(names)
+        parser = ExpressionTypeParser(names)
         syntax_tree = ast.parse(expr)
-        return visitor.getType(syntax_tree)
+        return parser.getType(syntax_tree)
         
     def testSingleNumber(self):
         self.checkExpr("1","int")

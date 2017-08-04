@@ -71,7 +71,7 @@ class TypeSet():
     def __iter__(self):
         return iter(self.types)
         
-class ExpressionTreeVisitor(ast.NodeVisitor):
+class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, names=None):
         self.names =  {
             'True': TypeSet(bool),
