@@ -303,3 +303,8 @@ class TestStatementTypeParser(unittest.TestCase):
         
     def testMultipleTargetAssignment(self):
         self.checkStatement("a = b = 2", {'a':'int','b':'int'})
+        
+    def testReturnValue(self):
+        self.checkStatement("return 'abc'",'str',field="return")
+        self.checkStatement("return 2",'int',field="return")
+        

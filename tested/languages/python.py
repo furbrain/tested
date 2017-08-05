@@ -216,6 +216,9 @@ class StatementTypeParser(ast.NodeVisitor):
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))
         
+    def visit_Return(self, node):
+        return {'return':self.expression_parser.getType(node.value)}
+        
     def visit_Name(self, node):
         return node.id    
         
