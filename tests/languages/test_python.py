@@ -282,7 +282,7 @@ class TestStatementTypeParser(unittest.TestCase):
     def checkStatement(self, stmt, result, field="names", names=None):
         answer = self.parseStatement(stmt, names)[field]
         message = "%s should return %s: %s, instead returned %s, context is %s" % (stmt, field, result, answer, names)
-        self.assertDictEqual(answer, result)
+        self.assertEqual(answer, result)
 
     def parseStatement(self, stmt, names=None):
         syntax_tree = ast.parse(stmt)
@@ -301,5 +301,5 @@ class TestStatementTypeParser(unittest.TestCase):
     def testNestedAssignment(self):
         self.checkStatement("(a,b),c = (1,2),3", {'a':'int','b':'int','c':'int'})
         
-    def testMultipleTargets(self):
+    def testMultipleTargetAssignment(self):
         self.checkStatement("a = b = 2", {'a':'int','b':'int'})
