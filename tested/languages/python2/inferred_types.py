@@ -61,7 +61,7 @@ class TypeSet():
         return any(x in type_list for x in self.types)        
             
     def __str__(self):
-        return ','.join(sorted(str(x) for x in self.types))
+        return ', '.join(sorted(str(x) for x in self.types))
         
     def __repr__(self):
         return "<TypeSet: (%s)>" % self

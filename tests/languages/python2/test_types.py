@@ -48,11 +48,11 @@ class TestTypeSet(unittest.TestCase):
         
     def testWithMultipleVals(self):
         st = TypeSet(1,"a")
-        self.assertEqual(str(st),"int,str")
+        self.assertEqual(str(st),"int, str")
         
     def testWithMixedVals(self):
         st = TypeSet(int, "a")
-        self.assertEqual(str(st),"int,str")
+        self.assertEqual(str(st),"int, str")
         
     def testMatches(self):
         st = TypeSet(int, "a")
@@ -63,7 +63,7 @@ class TestTypeSet(unittest.TestCase):
     def testEquality(self):
         self.assertEqual(TypeSet(int), TypeSet(int))
         self.assertEqual(TypeSet(int, float), TypeSet(int, float))
-        self.assertEqual(TypeSet(int, float),"float,int")
+        self.assertEqual(TypeSet(int, float),"float, int")
         
     def testInequality(self):
         self.assertNotEqual(TypeSet(int), TypeSet(float))

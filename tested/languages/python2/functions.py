@@ -5,7 +5,7 @@ class FunctionType(InferredType):
         self.name = name
         self.args = args
         self.returns = returns
-        self.type = "f(%s) -> %s" % (','.join(args), returns)
+        self.type = "f(%s) -> (%s)" % (', '.join(args), returns)
         
     def __str__(self):
         return self.type

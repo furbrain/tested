@@ -57,11 +57,11 @@ class TestExpressionTypeParser(unittest.TestCase):
             self.checkExpr(expr, 'unicode')   
             
     def testMixedBinaryConversions(self):
-        dct = {'a':InferredList(int), 'b':InferredList(int,str)}
+        dct = {'a':InferredList(int), 'b':InferredList(int, str)}
         self.checkExpr("a[0]+b[0]","int", names=dct)
-        self.checkExpr("b[0]+b[0]","int,str", names=dct)
+        self.checkExpr("b[0]+b[0]","int, str", names=dct)
         self.checkExpr("a[0]*b[0]","int", names=dct)
-        self.checkExpr("b[0]*a[0]","int,str", names=dct)
+        self.checkExpr("b[0]*a[0]","int, str", names=dct)
         
     def testUnaryOps(self):
         boolean_tests = [("not True", "bool"), ("not False", "bool")]
@@ -91,11 +91,11 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[1,2,3,4]","[int]")
         
     def testListWithMixedTypes(self):
-        self.checkExpr("[1,2,'a',3,4]","[int,str]")
+        self.checkExpr("[1,2,'a',3,4]","[int, str]")
         
     def testListExtraction(self):
         self.checkExpr("[1,2,3,4][0]", "int")
-        self.checkExpr("[1,2,3,'a',4][0]", "int,str")
+        self.checkExpr("[1,2,3,'a',4][0]", "int, str")
         
     def testCompare(self):
         self.checkExpr("1 < 2", "bool")
