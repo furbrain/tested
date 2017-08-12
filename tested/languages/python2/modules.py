@@ -1,5 +1,5 @@
 import ast
-from statements import StatementTypeParser
+from statements import StatementBlockTypeParser
 
 class ModuleTypeParser(ast.NodeVisitor):
     def __init__(self, context=None):
@@ -12,7 +12,6 @@ class ModuleTypeParser(ast.NodeVisitor):
         self.visit(syntax_tree)
         
     def visit_Module(self,node):
-        for statement in node.body:
-            parser = StatementTypeParser(self.context)
-            result = parser.parseStatement(statement)
-            self.context.update(result.get('names',{}))
+        parser = StatementBlockTypeParser(self.context)
+        results = parser.parseStatements(node.body)
+        self.context.update(results['names'])

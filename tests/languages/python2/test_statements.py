@@ -1,8 +1,8 @@
 import unittest
 import ast
-from tested.languages.python2 import StatementTypeParser
+from tested.languages.python2 import StatementBlockTypeParser, TypeSet
 
-class TestStatementTypeParser(unittest.TestCase):
+class TestStatementBlockTypeParser(unittest.TestCase):
     def checkStatement(self, stmt, result, field="names", names=None):
         answer = self.parseStatement(stmt, names)[field]
         message = "%s should return %s: %s, instead returned %s, context is %s" % (stmt, field, result, answer, names)
@@ -10,8 +10,8 @@ class TestStatementTypeParser(unittest.TestCase):
 
     def parseStatement(self, stmt, names=None):
         syntax_tree = ast.parse(stmt)
-        parser = StatementTypeParser(names)
-        return parser.parseStatement(syntax_tree)
+        parser = StatementBlockTypeParser(names)
+        return parser.parseStatements([syntax_tree])
         
     def testSimpleAssignment(self):
         self.checkStatement("a=1", {'a':"int"})
@@ -32,3 +32,8 @@ class TestStatementTypeParser(unittest.TestCase):
         self.checkStatement("return 'abc'",'str',field="return")
         self.checkStatement("return 2",'int',field="return")
         
+    def testMultiLineAssignment(self):
+        self.checkStatement("a = 1\nb = 2.0\nc = a+b",{'a':'int','b':'float','c':'float'})
+        
+    def testAugmentedAssignment(self):
+        self.checkStatement("a += 3.0", {'a':'float'}, names = {'a':TypeSet(int)})
