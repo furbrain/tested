@@ -2,7 +2,7 @@ import unittest
 import ast
 from tested.languages.python2 import StatementBlockTypeParser, TypeSet
 
-class TestStatementBlockTypeParser(unittest.TestCase):
+class TestStatementBlockTypeParser__Base(unittest.TestCase):
     def checkStatement(self, stmt, result, field="context", context=None):
         answer = self.parseStatement(stmt, context)[field]
         message = "%s should return %s: %s, instead returned %s, context is %s" % (stmt, field, result, answer, context)
@@ -12,7 +12,8 @@ class TestStatementBlockTypeParser(unittest.TestCase):
         syntax_tree = ast.parse(stmt)
         parser = StatementBlockTypeParser(context)
         return parser.parseStatements([syntax_tree])
-        
+
+class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Base):        
     def testSimpleAssignment(self):
         self.checkStatement("a=1", {'a':"int"})
         self.checkStatement("a=1+2.0", {'a':"float"})
