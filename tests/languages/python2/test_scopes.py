@@ -1,5 +1,5 @@
 import unittest
-from tested.languages.python2.scope import Scope, ScopeList, scopeMatches
+from tested.languages.python2.scopes import Scope, ScopeList, scopeMatches
 
 class TestScopeMatches(unittest.TestCase):
     def testBaseScopeMatches(self):
