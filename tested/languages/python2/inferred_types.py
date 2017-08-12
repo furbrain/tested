@@ -25,6 +25,11 @@ class InferredType():
     def __hash__(self):
         return hash(self.name)
 
+class UnknownType(InferredType):
+    def __init__(self, name):
+        self.name = "Unknown: %s" % name
+        self.type = name
+
 class InferredList():
     def __init__(self, *args):
         self.element_types = TypeSet()
@@ -73,4 +78,6 @@ class TypeSet():
         
     def __ne__(self, other):
         return not self==other
-    
+        
+    def __len__(self):
+        return len(self.types)
