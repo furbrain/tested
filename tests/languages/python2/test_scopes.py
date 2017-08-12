@@ -44,3 +44,15 @@ class TestScopeList(unittest.TestCase):
         dctb = {'b':float}
         self.checkScope([(0,10,0,dcta), (2,8,4,dctb)], (9,0), dcta)
         
+    def testScopeListFailsWithWrongIndent(self):
+        s = ScopeList()
+        dcta = {'a':int}
+        s.addScope(0,10,4,dcta)
+        self.assertIsNone(s.getScope(5,0))
+
+    def testScopeListFailsOutsideArea(self):
+        s = ScopeList()
+        dcta = {'a':int}
+        s.addScope(0,10,0,dcta)
+        self.assertIsNone(s.getScope(12,0))
+        
