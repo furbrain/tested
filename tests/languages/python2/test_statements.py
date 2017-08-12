@@ -38,3 +38,30 @@ class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Ba
         
     def testAugmentedAssignment(self):
         self.checkStatement("a += 3.0", {'a':'float'}, context = {'a':TypeSet(int)})
+        
+class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base):
+    def testBasicFunctionDef(self):
+        self.checkStatement("def f(): pass", {'f':'f() -> NoneType'})
+
+    def testFunctionReturnsNone(self):
+        self.checkStatement("def f(): return None", {'f':'f() -> NoneType'})
+
+    def testFunctionReturnsInt(self):
+        self.checkStatement("def f(): return 1", {'f':'f() -> int'})
+        
+    def testFunctionWithArgs(self):
+        self.checkStatement("def f(a, b): pass", {'f':'f(a,b) -> NoneType'})
+
+    def testFunctionReturnsOneArg(self):
+        self.checkStatement("def f(a): return a", {'f':'f(a) -> Unknown: a'})
+        
+    def testFunctonReturnsEitherArg(self):
+        func = """
+def f(a, b):
+    if a:
+         return a
+    else:
+         return b
+"""
+        self.checkStatement(func, {'f':'f(a,b) -> Unknown: a,Unknown: b'})
+                
