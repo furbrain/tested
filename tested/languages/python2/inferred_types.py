@@ -18,6 +18,9 @@ class InferredType():
             return self.type == other
         else:
             return False
+            
+    def __ne__(self,other):
+        return not self==other
                         
     def __hash__(self):
         return hash(self.name)
@@ -67,4 +70,7 @@ class TypeSet():
         if isinstance(other,basestring):
             return str(self)==other
         return False
+        
+    def __ne__(self, other):
+        return not self==other
     

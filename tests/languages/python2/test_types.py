@@ -18,20 +18,20 @@ class TestInferredType(unittest.TestCase):
     def testEquality(self):
         it_num = InferredType(int)
         it_str = InferredType(str)
-        self.assertTrue(it_num==it_num)
-        self.assertTrue(it_num==int)
-        self.assertTrue(it_str==it_str)
-        self.assertTrue(it_str==str)
-        self.assertFalse(it_num==1)
-        self.assertFalse(it_str=="a")
+        self.assertEqual(it_num, it_num)
+        self.assertEqual(it_num, int)
+        self.assertEqual(it_str, it_str)
+        self.assertEqual(it_str, str)
+        self.assertNotEqual(it_num, 1)
+        self.assertNotEqual(it_str, "a")
 
     def testInequality(self):        
         it_num = InferredType(int)
         it_str = InferredType(str)
-        self.assertFalse(it_num==it_str)
-        self.assertFalse(it_num==str)
-        self.assertFalse(it_str==it_num)
-        self.assertFalse(it_str==int)
+        self.assertNotEqual(it_num, it_str)
+        self.assertNotEqual(it_num, str)
+        self.assertNotEqual(it_str, it_num)
+        self.assertNotEqual(it_str, int)
         
 class TestTypeSet(unittest.TestCase):
     def testInitWithSingleVal(self):
@@ -59,4 +59,15 @@ class TestTypeSet(unittest.TestCase):
         self.assertTrue(st.matches((int,float)))
         self.assertTrue(st.matches((str,unicode)))
         self.assertFalse(st.matches((float,unicode)))
+        
+    def testEquality(self):
+        self.assertEqual(TypeSet(int), TypeSet(int))
+        self.assertEqual(TypeSet(int, float), TypeSet(int, float))
+        self.assertEqual(TypeSet(int, float),"float,int")
+        
+    def testInequality(self):
+        self.assertNotEqual(TypeSet(int), TypeSet(float))
+        self.assertNotEqual(TypeSet(int, float), TypeSet(int))
+        self.assertNotEqual(TypeSet(int, float), "int,float")
+        self.assertNotEqual(TypeSet(int),[])
 
