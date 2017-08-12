@@ -3,20 +3,20 @@ from expressions import ExpressionTypeParser
 from inferred_types import TypeSet
 
 class StatementBlockTypeParser(ast.NodeVisitor):
-    def __init__(self, names=None):
-        self.names = {}
+    def __init__(self, context=None):
+        self.context = {}
         self.returns = TypeSet()
-        if names:
-            self.names.update(names)
+        if context:
+            self.context.update(context)
             
     def getExpressionType(self, node):
-        expression_parser = ExpressionTypeParser(self.names)
+        expression_parser = ExpressionTypeParser(self.context)
         return expression_parser.getType(node)
         
     def parseStatements(self, nodes):
         for node in nodes:
             self.visit(node)          
-        return {'names':self.names, 'return': self.returns}
+        return {'context':self.context, 'return': self.returns}
                     
     def visit_Assign(self, node):
         for target in node.targets:
@@ -31,7 +31,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             for i, subtarget in enumerate(target.elts):
                 self.assignToTarget(subtarget, value_node.elts[i])
         else:
-            self.names[self.visit(target)] = self.getExpressionType(value_node)
+            self.context[self.visit(target)] = self.getExpressionType(value_node)
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))

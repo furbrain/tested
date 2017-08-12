@@ -12,4 +12,4 @@ class ModuleTypeParser(ast.NodeVisitor):
     def visit_Module(self,node):
         parser = StatementBlockTypeParser(self.context)
         results = parser.parseStatements(node.body)
-        self.context.update(results['names'])
+        self.context.update(results['context'])
