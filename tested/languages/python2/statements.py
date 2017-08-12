@@ -39,7 +39,9 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             ctx[name] = TypeSet(UnknownType(name))
             arg_names.append(name)
         if node.args.vararg:
-            ctx[node.args.vararg] = TypeSet(InferredList(UnknownType(node.args.vararg)))
+            list_element_type = UnknownType(node.args.vararg)
+            inferred_list = InferredList(list_element_type)
+            ctx[node.args.vararg] = TypeSet(inferred_list)
         if node.args.kwarg:
             ctx[node.args.kwarg] = TypeSet(InferredDict())
         ctx[node.name] = TypeSet(FunctionType(node.name, arg_names, UnknownType("return")))
