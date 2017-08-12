@@ -2,13 +2,11 @@ import unittest
 from tested.languages.python2 import ModuleTypeParser
 
 class TestModuleTypeParser(unittest.TestCase):
-    def checkModule(self, module, result, names=None, field="context"):
-        if names == None:
-            names = {}
-        parser = ModuleTypeParser(names)
+    def checkModule(self, module, result, field="context"):
+        parser = ModuleTypeParser()
         parser.parseModule(module)
         answer = getattr(parser,field)
-        message = "%s should return %s: %s, instead returned %s, context is %s" % (module, field, result, answer, names)
+        message = "%s should return %s: %s, instead returned %s" % (module, field, result, answer)
         self.assertEqual(answer, result)
 
     def testSimpleAssignment(self):
