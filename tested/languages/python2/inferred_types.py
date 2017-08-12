@@ -52,7 +52,7 @@ class TypeSet():
     def add(self, other):
         if isinstance(other,TypeSet):
             self.types.update(other)
-        elif isinstance(other,InferredType):
+        elif isinstance(other,(InferredType, InferredList)):
             self.types.add(other)
         else:
             self.types.add(InferredType(other))
