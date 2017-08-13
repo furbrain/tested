@@ -39,7 +39,6 @@ class InferredList():
     def add(self, other):
         self.element_types.add(other)
     
-    
     def __str__(self):
         return '[%s]' % self.element_types
 
