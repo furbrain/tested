@@ -36,6 +36,17 @@ class ExpressionTypeParser(ast.NodeVisitor):
             result.add(self.getType(elt))
         return result
         
+    def visit_Call(self, node):
+        func_types = self.visit(node.func)
+        args = [self.visit(arg_node) for arg_node in node.args]
+        result = TypeSet()
+        for func_type in func_types:
+            if hasattr(func_type,'getReturnTypeSet'):
+                result.add(func_type.getReturnTypeSet(args))
+            else:
+                result.add(UnknownType())
+        return result
+                
     def visit_Expr(self, node):
         return self.visit(node.value)
         

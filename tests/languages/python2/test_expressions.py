@@ -1,7 +1,7 @@
 import unittest
 import ast 
 
-from tested.languages.python2 import ExpressionTypeParser, InferredList, TypeSet
+from tested.languages.python2 import ExpressionTypeParser, InferredList, TypeSet, FunctionType, UnknownType
 
 class TestExpressionTypeParser(unittest.TestCase):
     def checkExpr(self, expr, result, context=None):
@@ -108,4 +108,25 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("1 < 2", "bool")
         self.checkExpr("2 > 3", "bool")
         self.checkExpr('"abc" <= "abc"', "bool")
+
+    ### FUNCTION CALLS ###
+    def testSimpleFunctionCall(self):
+        f = FunctionType('f', [], TypeSet(int), "")
+        context = {'f':TypeSet(f)}
+        self.checkExpr("f()", "int", context=context)
+        
+    def testContingentFunctionCall(self):
+        f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a')), "")
+        context = {'f':TypeSet(f)}
+        self.checkExpr("f(1, 'str')", "int", context=context)
+
+        f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('b')), "")
+        context = {'f':TypeSet(f)}
+        self.checkExpr("f(1, 'str')", "str", context=context)
+        
+    def testComplexContingentFunctionCall(self):
+        f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
+        context = {'f':TypeSet(f)}
+        self.checkExpr("f(1, 'str')", "int, str", context=context)
+        
 
