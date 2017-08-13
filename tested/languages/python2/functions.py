@@ -25,7 +25,7 @@ class FunctionType(InferredType):
         type_mapping = {k:v for k,v in zip(self.args, arg_types)}
         for possible_type in self.returns:
             if isinstance(possible_type,UnknownType):
-                return_typeset.add(type_mapping.get(possible_type.type, UnknownType('')))
+                return_typeset.add(type_mapping.get(possible_type.type, UnknownType()))
             else:
                 return_typeset.add(possible_type)
         return return_typeset

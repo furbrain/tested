@@ -26,9 +26,13 @@ class InferredType():
         return hash(self.name)
 
 class UnknownType(InferredType):
-    def __init__(self, name):
-        self.name = "Unknown: %s" % name
-        self.type = name
+    def __init__(self, name=None):
+        if name:
+            self.name = "Unknown: %s" % name
+            self.type = name
+        else:
+            self.name = "Unknown"
+            self.type = ""
 
 class InferredList():
     def __init__(self, *args):
