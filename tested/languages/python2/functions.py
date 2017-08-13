@@ -1,6 +1,6 @@
 import ast
 
-from inferred_types import TypeSet, InferredType, UnknownType
+from .inferred_types import TypeSet, InferredType, UnknownType
 
 class FunctionType(InferredType):
 

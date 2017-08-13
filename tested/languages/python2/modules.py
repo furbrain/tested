@@ -1,5 +1,5 @@
 import ast
-from statements import StatementBlockTypeParser
+from .statements import StatementBlockTypeParser
 
 class ModuleTypeParser(ast.NodeVisitor):
     def __init__(self):

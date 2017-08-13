@@ -1,8 +1,8 @@
 import ast
-from expressions import ExpressionTypeParser
-from inferred_types import TypeSet, UnknownType, InferredList
-from functions import FunctionType
-from scopes import Scope
+from .expressions import ExpressionTypeParser
+from .inferred_types import TypeSet, UnknownType, InferredList
+from .functions import FunctionType
+from .scopes import Scope
 
 class StatementBlockTypeParser(ast.NodeVisitor):
     def __init__(self, context=None):

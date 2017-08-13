@@ -75,7 +75,7 @@ class TypeSet():
     def __eq__(self, other):
         if isinstance(other,TypeSet):
             return self.types==other.types
-        if isinstance(other,basestring):
+        if isinstance(other,str):
             return str(self)==other
         return False
         

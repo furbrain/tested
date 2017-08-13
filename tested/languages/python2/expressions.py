@@ -1,10 +1,10 @@
 import ast
 import types
 
-from inferred_types import TypeSet, InferredList
+from .inferred_types import TypeSet, InferredList
 
-NUMERIC_TYPES = (int,long,float)
-STRING_TYPES = (basestring, unicode, str)
+NUMERIC_TYPES = (int, float)
+STRING_TYPES = (str)
 
 
 class ExpressionTypeParser(ast.NodeVisitor):
@@ -12,7 +12,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         self.names =  {
             'True': TypeSet(bool),
             'False': TypeSet(bool),
-            'None': TypeSet(types.NoneType),
+            'None': TypeSet(type(None)),
         }
         if names is not None:
             self.names.update(names)
@@ -67,7 +67,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         if self.bothArgsNumeric(left,right):
             return self.getHighestPriorityNumber(left, right)
         if self.bothArgsStrings(left, right):
-            return self.getHighestPriorityString(left, right)
+            return str
         if left in STRING_TYPES and right in NUMERIC_TYPES and op=="Mult":
             return left
         if left in STRING_TYPES and op=="Mod":
@@ -83,16 +83,8 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def getHighestPriorityNumber(self, left, right):
         if float in (left,right):
             return float
-        elif long in (left,right):
-            return long
         else:
             return int
-    
-    def getHighestPriorityString(self, left, right):
-        if unicode in (left,right):
-            return unicode
-        else:
-            return str
     
     def visit_UnaryOp(self, node):
         op = type(node.op).__name__
@@ -101,10 +93,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
             if op=="Not":
                 result.add(bool)
             if op=="Invert":
-                if operand==long:
-                    result.add(long)
-                else:
-                    result.add(int)
+                result.add(int)
             if op in ("UAdd","USub"):
                 if operand in NUMERIC_TYPES:
                     result.add(operand)

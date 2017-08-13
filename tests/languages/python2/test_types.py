@@ -57,8 +57,8 @@ class TestTypeSet(unittest.TestCase):
     def testMatches(self):
         st = TypeSet(int, "a")
         self.assertTrue(st.matches((int,float)))
-        self.assertTrue(st.matches((str,unicode)))
-        self.assertFalse(st.matches((float,unicode)))
+        self.assertTrue(st.matches((str,str)))
+        self.assertFalse(st.matches((float,str)))
         
     def testEquality(self):
         self.assertEqual(TypeSet(int), TypeSet(int))

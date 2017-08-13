@@ -1,5 +1,5 @@
 [Plugin]
-Loader=python
+Loader=python3
 Module=tested.tested
 IAge=3
 Name=TestEd

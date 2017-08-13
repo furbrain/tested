@@ -1,5 +1,5 @@
 from gi.repository import GObject, Gedit
-from tested.languages.python2 import StatementBlockTypeParser
+from .tested.languages.python2 import StatementBlockTypeParser
 
 class TestedPlugin(GObject.Object, Gedit.WindowActivatable):
     __gtype_name__ = "TestedPlugin"
