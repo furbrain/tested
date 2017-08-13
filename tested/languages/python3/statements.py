@@ -34,12 +34,12 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         # parse function
         ctx = self.context.copy()
         for arg in node.args.args:
-            name = arg.id
+            name = arg.arg
             ctx[name] = TypeSet(UnknownType(name))
         if node.args.vararg:
-            list_element_type = UnknownType(node.args.vararg)
+            list_element_type = UnknownType(node.args.vararg.arg)
             inferred_list = InferredList(list_element_type)
-            ctx[node.args.vararg] = TypeSet(inferred_list)
+            ctx[node.args.vararg.arg] = TypeSet(inferred_list)
         if node.args.kwarg:
             ctx[node.args.kwarg] = TypeSet(InferredDict())
         function_type = FunctionType.fromASTNode(node)

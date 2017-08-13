@@ -7,7 +7,7 @@ class FunctionType(InferredType):
     @classmethod
     def fromASTNode(cls, node, return_type=None):
         name = node.name
-        arg_names = [arg.id for arg in node.args.args]
+        arg_names = [arg.arg for arg in node.args.args]
         docstring = ast.get_docstring(node)
         if return_type is None:
             return_type = TypeSet(UnknownType('return'))

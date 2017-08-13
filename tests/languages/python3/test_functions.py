@@ -1,8 +1,8 @@
 import unittest
 import ast
 
-from tested.languages.python2.functions import FunctionType
-from tested.languages.python2.inferred_types import TypeSet, UnknownType
+from tested.languages.python3.functions import FunctionType
+from tested.languages.python3.inferred_types import TypeSet, UnknownType
 
 class TestFunctionType(unittest.TestCase):
     def testCreateFromSimpleNode(self):

@@ -1,7 +1,7 @@
 import unittest
 import ast 
 
-from tested.languages.python2 import ExpressionTypeParser, InferredList, TypeSet, FunctionType, UnknownType
+from tested.languages.python3 import ExpressionTypeParser, InferredList, TypeSet, FunctionType, UnknownType
 
 class TestExpressionTypeParser(unittest.TestCase):
     def checkExpr(self, expr, result, context=None):
@@ -22,14 +22,8 @@ class TestExpressionTypeParser(unittest.TestCase):
     def testFloatNumber(self):
         self.checkExpr("1.0","float")
 
-    def testLongNumber(self):
-        self.checkExpr("1L","long")
-     
     def testPlainString(self):
         self.checkExpr("'abc'","str")
-        
-    def testUnicodeString(self):
-        self.checkExpr("u'abc'","unicode")
         
     def testBoolean(self):
         self.checkExpr("True","bool")
@@ -41,14 +35,12 @@ class TestExpressionTypeParser(unittest.TestCase):
     
     ### OPERATIONS ###    
     def testNumericBinaryOpConversions(self):
-        numbers = [('1','int'), ('2.3','float'), ('3L','long')]
+        numbers = [('1','int'), ('2.3','float')]
         for a,b in numbers:
             for c,d in numbers:
                 expr = a + " + " + c
                 if 'float' in (b,d):
                     self.checkExpr(expr, "float")
-                elif 'long' in (b,d):
-                    self.checkExpr(expr, "long")
                 else:
                     self.checkExpr(expr, "int")
 
@@ -56,9 +48,6 @@ class TestExpressionTypeParser(unittest.TestCase):
         str_tests = ('"abc" * 3', '"abc" + "def"', '"%d" % 1' )
         for expr in str_tests:
             self.checkExpr(expr, 'str')
-        unicode_tests = ('u"abc" * 3', '"abc" +u"def"', 'u"abc" + "def"', 'u"abc" + u"def"')
-        for expr in unicode_tests:
-            self.checkExpr(expr, 'unicode')   
             
     def testMixedBinaryConversions(self):
         dct = {'a':InferredList(int), 'b':InferredList(int, str)}
@@ -73,7 +62,6 @@ class TestExpressionTypeParser(unittest.TestCase):
             self.checkExpr(expr,res)
             
         numeric_tests = [("~ 4", "int"), 
-                         ("~4L", "long"), 
                          ("not 4", "bool"), 
                          ("- (4.3)","float"),
                          ("- True", "int")]

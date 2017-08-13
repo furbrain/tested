@@ -4,8 +4,6 @@ import types
 from .inferred_types import TypeSet, InferredList
 
 NUMERIC_TYPES = (int, float)
-STRING_TYPES = (str)
-
 
 class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, names=None):
@@ -29,7 +27,12 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_Name(self, node):
         if node.id in self.names:
             return self.names[node.id]
-            
+    
+    def visit_NameConstant(self, node):
+        if node.value==True: return TypeSet(bool)
+        if node.value==False: return TypeSet(bool)
+        if node.value==None: return TypeSet(type(None))
+           
     def visit_List(self, node):
         result = InferredList()
         for elt in node.elts:
@@ -68,9 +71,9 @@ class ExpressionTypeParser(ast.NodeVisitor):
             return self.getHighestPriorityNumber(left, right)
         if self.bothArgsStrings(left, right):
             return str
-        if left in STRING_TYPES and right in NUMERIC_TYPES and op=="Mult":
+        if left == str and right in NUMERIC_TYPES and op=="Mult":
             return left
-        if left in STRING_TYPES and op=="Mod":
+        if left == str and op=="Mod":
             return left
         return TypeError
         
@@ -78,7 +81,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return left in NUMERIC_TYPES and right in NUMERIC_TYPES
             
     def bothArgsStrings(self, left, right):
-        return left in STRING_TYPES and right in STRING_TYPES
+        return left == str and right == str
         
     def getHighestPriorityNumber(self, left, right):
         if float in (left,right):

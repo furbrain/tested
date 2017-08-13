@@ -1,5 +1,5 @@
 import unittest
-from tested.languages.python2 import ModuleTypeParser
+from tested.languages.python3 import ModuleTypeParser
 
 class TestModuleTypeParser(unittest.TestCase):
     def checkModule(self, module, result, field="context"):

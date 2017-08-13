@@ -1,6 +1,6 @@
 import unittest
 
-from tested.languages.python2 import InferredType, TypeSet
+from tested.languages.python3 import InferredType, TypeSet
 
 class TestInferredType(unittest.TestCase):
     def testInitWithSimpleVal(self):
@@ -58,7 +58,7 @@ class TestTypeSet(unittest.TestCase):
         st = TypeSet(int, "a")
         self.assertTrue(st.matches((int,float)))
         self.assertTrue(st.matches((str,str)))
-        self.assertFalse(st.matches((float,str)))
+        self.assertFalse(st.matches((float,list)))
         
     def testEquality(self):
         self.assertEqual(TypeSet(int), TypeSet(int))

@@ -1,6 +1,6 @@
 import unittest
 import ast
-from tested.languages.python2 import StatementBlockTypeParser, TypeSet
+from tested.languages.python3 import StatementBlockTypeParser, TypeSet
 
 class TestStatementBlockTypeParser__Base(unittest.TestCase):
     def checkStatement(self, stmt, result, field="context", context=None):
