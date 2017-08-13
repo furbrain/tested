@@ -129,4 +129,8 @@ class TestExpressionTypeParser(unittest.TestCase):
         context = {'f':TypeSet(f)}
         self.checkExpr("f(1, 'str')", "int, str", context=context)
         
-
+    def testUnknownResponse(self):
+        f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
+        context = {'f':TypeSet(f)}
+        self.checkExpr("f()", "Unknown", context=context)
+    
