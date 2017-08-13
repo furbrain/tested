@@ -4,16 +4,18 @@ import ast
 from tested.languages.python2 import ExpressionTypeParser, InferredList, TypeSet
 
 class TestExpressionTypeParser(unittest.TestCase):
-    def checkExpr(self, expr, result, names=None):
-        answer = str(self.getType(expr, names))
-        message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, names)
+    def checkExpr(self, expr, result, context=None):
+        answer = str(self.getType(expr, context))
+        message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, context)
         self.assertEqual(answer, result, msg = message)
         
-    def getType(self, expr, names=None):    
-        parser = ExpressionTypeParser(names)
+    def getType(self, expr, context=None):    
+        parser = ExpressionTypeParser(context)
         syntax_tree = ast.parse(expr)
         return parser.getType(syntax_tree)
         
+        
+    ### SIMPLE CASES ###   
     def testSingleNumber(self):
         self.checkExpr("1","int")
         
@@ -35,7 +37,9 @@ class TestExpressionTypeParser(unittest.TestCase):
         
     def testNone(self):
         self.checkExpr("None",'NoneType')
-        
+    
+    
+    ### OPERATIONS ###    
     def testNumericBinaryOpConversions(self):
         numbers = [('1','int'), ('2.3','float'), ('3L','long')]
         for a,b in numbers:
@@ -58,10 +62,10 @@ class TestExpressionTypeParser(unittest.TestCase):
             
     def testMixedBinaryConversions(self):
         dct = {'a':InferredList(int), 'b':InferredList(int, str)}
-        self.checkExpr("a[0]+b[0]","int", names=dct)
-        self.checkExpr("b[0]+b[0]","int, str", names=dct)
-        self.checkExpr("a[0]*b[0]","int", names=dct)
-        self.checkExpr("b[0]*a[0]","int, str", names=dct)
+        self.checkExpr("a[0]+b[0]","int", context=dct)
+        self.checkExpr("b[0]+b[0]","int, str", context=dct)
+        self.checkExpr("a[0]*b[0]","int", context=dct)
+        self.checkExpr("b[0]*a[0]","int, str", context=dct)
         
     def testUnaryOps(self):
         boolean_tests = [("not True", "bool"), ("not False", "bool")]
@@ -81,12 +85,15 @@ class TestExpressionTypeParser(unittest.TestCase):
                  ("False or False", 'bool')]
         for expr,res in tests:
             self.checkExpr(expr, res)
-            
+    
+    ### WITH CONTEXT###        
     def testExpressionWithVariables(self):
         context = {'a':TypeSet(float), 'b':TypeSet(int)}
-        self.checkExpr("a","float",names=context)
-        self.checkExpr("b","int",names=context)
+        self.checkExpr("a","float",context=context)
+        self.checkExpr("b","int",context=context)
         
+        
+    ### LISTS ###    
     def testListWithSingleType(self):
         self.checkExpr("[1,2,3,4]","[int]")
         
