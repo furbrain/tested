@@ -54,17 +54,14 @@ class UnknownType(InferredType):
             self.name = "Unknown"
             self.type = ""
 
-class InferredList():
+class InferredList(InferredType):
     def __init__(self, *args):
-        self.element_types = TypeSet()
+        super().__init__(list)
         for arg in args:
-            self.add(arg)
+            self.add_item(arg)
         
-    def add(self, other):
-        self.element_types.add(other)
-    
     def __str__(self):
-        return '[%s]' % self.element_types
+        return '[%s]' % self.items
 
 class TypeSet():
     def __init__(self, *args):

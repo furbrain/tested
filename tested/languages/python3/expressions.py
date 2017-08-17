@@ -36,7 +36,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_List(self, node):
         result = InferredList()
         for elt in node.elts:
-            result.add(self.getType(elt))
+            result.add_item(self.getType(elt))
         return result
         
     def visit_Call(self, node):
@@ -111,8 +111,9 @@ class ExpressionTypeParser(ast.NodeVisitor):
         value = self.getType(node.value)
         slice_type = type(node.slice).__name__
         if slice_type=="Index":
-            if isinstance(value,InferredList):
-                return value.element_types
+            return value.get_item(0)
+        else:
+            return value
         
     def visit_Compare(self, node):
         return TypeSet(bool)
