@@ -7,6 +7,8 @@ class InferredType():
         else:
             self.type = type(tp)
         self.name = self.type.__name__
+        self.attrs = {}
+        self.items = TypeSet()
         
     def __str__(self):
         return self.name
@@ -24,6 +26,24 @@ class InferredType():
                         
     def __hash__(self):
         return hash(self.name)
+        
+    def get_attr(self, attr):
+        return self.attrs.get(attr,TypeSet(UnknownType()))
+        
+    def add_attr(self, attr, typeset):
+        if attr in self.attrs:
+            self.attrs[attr].add(typeset)
+        else:
+            self.attrs[attr] = typeset
+            
+    def get_item(self, index):
+        if self.items:
+            return self.items
+        else:
+            return TypeSet(UnknownType())
+            
+    def add_item(self, item):
+        self.items.add(item)
 
 class UnknownType(InferredType):
     def __init__(self, name=None):
