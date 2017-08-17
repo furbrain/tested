@@ -2,6 +2,7 @@ import unittest
 import unittest.mock as mock
 import tested.pyweb.module_finder as module_finder
 import io
+import json
 
 HTML_HEADER = b'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'''
@@ -31,9 +32,22 @@ class TestDownload(unittest.TestCase):
 class TestGetModules(unittest.TestCase):
     
     @mock.patch('tested.pyweb.module_finder.get_mod_dict_file')
-    def testOpenCalledCorrectly(self, mock_get_file):
+    def testWithNoPreviousDownload(self, mock_get_file):
+        dct = {'testy':'testy.html'}
+        with mock.patch('tested.pyweb.module_finder.open',mock.mock_open()) as mock_opener:
+            with mock.patch('tested.pyweb.module_finder.download_mod_dict') as downloader:
+                downloader.return_value=dct
+                mock_get_file.return_value="123.json"
+                mock_opener.side_effect=[IOError,io.StringIO()]
+                results = module_finder.get_module_dict()
+                mock_opener.assert_has_calls([mock.call("123.json","r"),mock.call("123.json","w")])
+            
+    @mock.patch('tested.pyweb.module_finder.get_mod_dict_file')
+    def testWithPreviousDownload(self, mock_get_file):
         with mock.patch('tested.pyweb.module_finder.open',mock.mock_open()) as mock_opener:
             mock_get_file.return_value="123.json"
-            mock_opener.side_effect=[IOError,io.StringIO()]
+            dct = {'testy':'testy.html'}
+            mock_opener.side_effect=[io.StringIO(json.dumps(dct))]
             results = module_finder.get_module_dict()
-            mock_opener.assert_has_calls([mock.call("123.json","r"),mock.call("123.json","w")])
+            mock_opener.assert_has_calls([mock.call("123.json","r")])   
+            self.assertEqual(results, dct)         
