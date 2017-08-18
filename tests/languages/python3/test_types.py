@@ -80,7 +80,7 @@ class TestInferredType(unittest.TestCase):
         self.assertEqual(it.get_item(12), TypeSet(UnknownType()))
         
     def testBadCall(self):
-       it = InferredType(int):
+       it = InferredType(int)
        self.assertEqual(it.get_call_return(1), TypeSet(UnknownType()))
     
         
