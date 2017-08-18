@@ -78,6 +78,10 @@ class TestInferredType(unittest.TestCase):
             pass
         it = InferredType(TempClass)
         self.assertEqual(it.get_item(12), TypeSet(UnknownType()))
+        
+    def testBadCall(self):
+       it = InferredType(int):
+       self.assertEqual(it.get_call_return(1), TypeSet(UnknownType()))
     
         
         

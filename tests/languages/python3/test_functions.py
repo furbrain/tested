@@ -15,27 +15,27 @@ class TestFunctionType(unittest.TestCase):
         
     def testSimpleReturnType(self):
         f = FunctionType('f', [], TypeSet(int), "")
-        self.assertEqual(f.getReturnTypeSet([]),"int")
+        self.assertEqual(f.get_call_return([]),"int")
         
     def testMultpleReturnType(self):
         f = FunctionType('f', [], TypeSet(int, float), "")
-        self.assertEqual(f.getReturnTypeSet([]),"float, int")
+        self.assertEqual(f.get_call_return([]),"float, int")
         
     def testContingentReturnType(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a')), "")
-        self.assertEqual(f.getReturnTypeSet([TypeSet(int), TypeSet(float)]), "int")
+        self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "int")
 
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('b')), "")
-        self.assertEqual(f.getReturnTypeSet([TypeSet(int), TypeSet(float)]), "float")
+        self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "float")
         
     def testContingentMultipleReturnType(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
-        self.assertEqual(f.getReturnTypeSet([TypeSet(int), TypeSet(float)]), "float, int")
+        self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "float, int")
 
     def testBadlyMatchedArgsReturnType(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a')), "")
-        self.assertEqual(f.getReturnTypeSet([TypeSet(int)]), "int")
+        self.assertEqual(f.get_call_return([TypeSet(int)]), "int")
     
         f = FunctionType('f', ['a'], TypeSet(UnknownType('a')), "")
-        self.assertEqual(f.getReturnTypeSet([TypeSet(int), TypeSet(float)]), "int")
+        self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "int")
 

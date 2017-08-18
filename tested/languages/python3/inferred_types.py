@@ -9,6 +9,7 @@ class InferredType():
         self.name = self.type.__name__
         self.attrs = {}
         self.items = TypeSet()
+        self.call_response = lambda x: TypeSet(UnknownType())
         
     def __str__(self):
         return self.name
@@ -44,7 +45,13 @@ class InferredType():
             
     def add_item(self, item):
         self.items.add(item)
+        
+    def get_call_return(self, arg_types):
+        return self.call_response(arg_types)
 
+    def set_call_return_func(self, func):
+        self.call_response = func
+        
 class UnknownType(InferredType):
     def __init__(self, name=None):
         if name:

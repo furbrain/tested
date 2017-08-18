@@ -1,7 +1,7 @@
 import ast
 import types
 
-from .inferred_types import TypeSet, InferredList
+from .inferred_types import TypeSet, InferredList, UnknownType
 
 NUMERIC_TYPES = (int, float)
 
@@ -44,10 +44,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         args = [self.visit(arg_node) for arg_node in node.args]
         result = TypeSet()
         for func_type in func_types:
-            if hasattr(func_type,'getReturnTypeSet'):
-                result.add(func_type.getReturnTypeSet(args))
-            else:
-                result.add(UnknownType())
+            result.add(func_type.get_call_return(args))
         return result
                 
     def visit_Expr(self, node):
