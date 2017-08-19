@@ -1,0 +1,3 @@
+sort out instance methods (and note decorators)
+sort out scopes wrt lines
+make decision about whether we have a context for each line - or just scopes
