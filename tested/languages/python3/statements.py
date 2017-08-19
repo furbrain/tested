@@ -3,6 +3,8 @@ from .expressions import ExpressionTypeParser
 from .inferred_types import TypeSet, UnknownType, InferredList
 from .functions import FunctionType
 from .scopes import Scope
+from .classes import ClassType
+
 def parse_statements(statements, context=None):
     if isinstance(statements,str):
         statements = [ast.parse(statements)]
@@ -23,7 +25,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         expression_parser = ExpressionTypeParser(self.context)
         return expression_parser.getType(node)
         
-    def parseStatements(self, nodes):
+    def _parseStatements(self, nodes):
         for node in nodes:
             self.visit(node)          
         return {'context':self.context, 'return': self.returns, 'scopes': self.scopes}
@@ -36,6 +38,13 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         op_node = ast.BinOp(node.target,node.op,node.value)
         self.assignToTarget(node.target,op_node)
         
+    def assignToTarget(self, target, value_node):
+        if self.isSequence(target) and self.isSequence(value_node):
+            for i, subtarget in enumerate(target.elts):
+                self.assignToTarget(subtarget, value_node.elts[i])
+        else:
+            self.context[self.visit(target)] = self.getExpressionType(value_node)
+
     def visit_FunctionDef(self, node):
         #create function type
         # parse function
@@ -59,13 +68,16 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         self.context[node.name] = TypeSet(FunctionType.fromASTNode(node, return_val))
         self.scopes.append(Scope(node.lineno,-1,node.col_offset,results['context']))
         self.scopes.append(results['scopes'])
+        
+    def visit_ClassDef(self, node):
+        class_type = ClassType.fromASTNode(node)
+        ctx = self.context.copy()
+        block_parser = StatementBlockTypeParser(ctx)
+        results = parse_statements(node.body, ctx)
+        self.context[node.name] = TypeSet(ClassType.fromASTNode(node, results['context']))
+        self.scopes.append(Scope(node.lineno,-1,node.col_offset,results['context']))
+        self.scopes.append(results['scopes'])
 
-    def assignToTarget(self, target, value_node):
-        if self.isSequence(target) and self.isSequence(value_node):
-            for i, subtarget in enumerate(target.elts):
-                self.assignToTarget(subtarget, value_node.elts[i])
-        else:
-            self.context[self.visit(target)] = self.getExpressionType(value_node)
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))

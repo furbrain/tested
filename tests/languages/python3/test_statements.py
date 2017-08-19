@@ -63,3 +63,20 @@ def f(a, b):
 """
         self.checkStatement(func, {'f':'f(a, b) -> (Unknown: a, Unknown: b)'})
                 
+                
+class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
+    def testClassCreation(self):
+        self.checkStatement("class A(object): pass", {'A':'A'})
+        
+    def testClassInstanceCreation(self):
+        self.checkStatement("class A(object): pass\ninst = A()", {'A':'A','inst':'A<instance>'})
+    
+    @unittest.skip("refactor first")    
+    def testClassAttributeCreation(self):
+        stmt = "class A(object): pass\nA.b=1"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('b'),'int')        
+        
+        
+    
