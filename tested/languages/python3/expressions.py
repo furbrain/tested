@@ -5,6 +5,12 @@ from .inferred_types import TypeSet, InferredList, UnknownType
 
 NUMERIC_TYPES = (int, float)
 
+def get_expression_type(expression, context):
+    if isinstance(expression,str):
+        expression = ast.parse(expression)
+    parser = ExpressionTypeParser(context)
+    return parser.getType(expression)
+
 class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, names=None):
         self.names =  {

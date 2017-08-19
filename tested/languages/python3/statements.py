@@ -1,5 +1,5 @@
 import ast
-from .expressions import ExpressionTypeParser
+from .expressions import get_expression_type
 from .inferred_types import TypeSet, UnknownType, InferredList
 from .functions import FunctionType
 from .scopes import Scope
@@ -20,11 +20,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         self.scopes = []
         if context:
             self.context.update(context)
-            
-    def getExpressionType(self, node):
-        expression_parser = ExpressionTypeParser(self.context)
-        return expression_parser.getType(node)
-        
+                    
     def parseStatements(self, nodes):
         for node in nodes:
             self.visit(node)          
@@ -43,7 +39,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             for i, subtarget in enumerate(target.elts):
                 self.assignToTarget(subtarget, value_node.elts[i])
         else:
-            self.context[self.visit(target)] = self.getExpressionType(value_node)
+            self.context[self.visit(target)] = get_expression_type(value_node, self.context)
 
     def visit_FunctionDef(self, node):
         #create function type
@@ -83,7 +79,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         return (type(node).__name__ in ("Tuple","List"))
         
     def visit_Return(self, node):
-        self.returns.add(self.getExpressionType(node.value))
+        self.returns.add(get_expression_type(node.value, self.context))
         
     def visit_Name(self, node):
         return node.id

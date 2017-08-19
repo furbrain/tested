@@ -1,20 +1,14 @@
 import unittest
 import ast 
 
-from tested.languages.python3 import ExpressionTypeParser, InferredList, TypeSet, FunctionType, UnknownType, ClassType
+from tested.languages.python3 import get_expression_type, InferredList, TypeSet, FunctionType, UnknownType, ClassType
 
 class TestExpressionTypeParser(unittest.TestCase):
     def checkExpr(self, expr, result, context=None):
-        answer = str(self.getType(expr, context))
+        answer = str(get_expression_type(expr, context))
         message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, context)
         self.assertEqual(answer, result, msg = message)
-        
-    def getType(self, expr, context=None):    
-        parser = ExpressionTypeParser(context)
-        syntax_tree = ast.parse(expr)
-        return parser.getType(syntax_tree)
-        
-        
+                
     ### SIMPLE CASES ###   
     def testSingleNumber(self):
         self.checkExpr("1","int")
