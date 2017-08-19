@@ -11,7 +11,7 @@ def parse_statements(statements, context=None):
     if context is None:
         context = {}
     parser = StatementBlockTypeParser(context)
-    return parser._parseStatements(statements)
+    return parser.parseStatements(statements)
 
 class StatementBlockTypeParser(ast.NodeVisitor):
     def __init__(self, context=None):
@@ -25,7 +25,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         expression_parser = ExpressionTypeParser(self.context)
         return expression_parser.getType(node)
         
-    def _parseStatements(self, nodes):
+    def parseStatements(self, nodes):
         for node in nodes:
             self.visit(node)          
         return {'context':self.context, 'return': self.returns, 'scopes': self.scopes}
