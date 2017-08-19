@@ -4,6 +4,7 @@ from .inferred_types import TypeSet, UnknownType, InferredList
 from .functions import FunctionType
 from .scopes import Scope
 from .classes import ClassType
+from .assignment import assign_to_node
 
 def parse_statements(statements, context=None):
     if isinstance(statements,str):
@@ -39,7 +40,8 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             for i, subtarget in enumerate(target.elts):
                 self.assignToTarget(subtarget, value_node.elts[i])
         else:
-            self.context[self.visit(target)] = get_expression_type(value_node, self.context)
+            assigned_types = get_expression_type(value_node, self.context)
+            assign_to_node(target, assigned_types, self.context)
 
     def visit_FunctionDef(self, node):
         #create function type

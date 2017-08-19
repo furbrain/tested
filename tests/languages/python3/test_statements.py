@@ -32,7 +32,7 @@ class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Ba
         self.checkStatement("a = 1\nb = 2.0\nc = a+b",{'a':'int','b':'float','c':'float'})
         
     def testAugmentedAssignment(self):
-        self.checkStatement("a += 3.0", {'a':'float'}, context = {'a':TypeSet(int)})
+        self.checkStatement("a += 3.0", {'a':'float, int'}, context = {'a':TypeSet(int)})
         
 class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base):
     def testBasicFunctionDef(self):
@@ -71,7 +71,6 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
     def testClassInstanceCreation(self):
         self.checkStatement("class A(object): pass\ninst = A()", {'A':'A','inst':'A<instance>'})
     
-    @unittest.skip("refactor first")    
     def testClassAttributeCreation(self):
         stmt = "class A(object): pass\nA.b=1"
         results = parse_statements(stmt)
