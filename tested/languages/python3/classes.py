@@ -22,4 +22,7 @@ class ClassType(InferredType):
         
         
 class InstanceType(InferredType):
+    def __init__(self, parent):
+        self.parent = parent
+        self.name = "{}<instance>".format(parent)
     pass
