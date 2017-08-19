@@ -1,7 +1,7 @@
 import unittest
 import ast 
 
-from tested.languages.python3 import ExpressionTypeParser, InferredList, TypeSet, FunctionType, UnknownType
+from tested.languages.python3 import ExpressionTypeParser, InferredList, TypeSet, FunctionType, UnknownType, ClassType
 
 class TestExpressionTypeParser(unittest.TestCase):
     def checkExpr(self, expr, result, context=None):
@@ -122,3 +122,9 @@ class TestExpressionTypeParser(unittest.TestCase):
         context = {'f':TypeSet(f)}
         self.checkExpr("f()", "Unknown", context=context)
     
+    def testGetAttribute(self):
+        c = ClassType('C',[],{},'')
+        c.add_attr('a',TypeSet(int))
+        context={'C':TypeSet(c)}
+        self.checkExpr("C.a", "int", context=context)
+        

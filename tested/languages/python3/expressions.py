@@ -46,6 +46,14 @@ class ExpressionTypeParser(ast.NodeVisitor):
         for func_type in func_types:
             result.add(func_type.get_call_return(args))
         return result
+        
+    def visit_Attribute(self, node):
+        result = TypeSet()
+        var_types = self.visit(node.value)
+        result = TypeSet()
+        for var in var_types:
+            result.add(var.get_attr(node.attr))
+        return result
                 
     def visit_Expr(self, node):
         return self.visit(node.value)
