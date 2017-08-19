@@ -3,7 +3,7 @@ import os.path
 import webbrowser
 from gi.repository import GObject, Gedit, Gtk
 
-from .languages.python3 import StatementBlockTypeParser
+from .languages.python3 import parse_statements
 from .pyweb.module_finder import get_module_dict
 
 class TestedPlugin(GObject.Object, Gedit.ViewActivatable):

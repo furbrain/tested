@@ -35,7 +35,9 @@ class InferredType():
         return hash(self.name)
         
     def get_attr(self, attr):
-        return self.attrs.get(attr,TypeSet(UnknownType()))
+        if attr not in self.attrs:
+            self.attrs[attr] = TypeSet(UnknownType())
+        return self.attrs[attr]
         
     def add_attr(self, attr, typeset):
         if attr in self.attrs:
