@@ -1,4 +1,4 @@
-from .inferred_types import InferredType
+from .inferred_types import InferredType, TypeSet
 import ast
 
 class ClassType(InferredType):
@@ -18,11 +18,14 @@ class ClassType(InferredType):
                 self.attrs.update(tp.attrs)
         if context:
             self.attrs.update(context)
-        self.call_response = lambda x: InstanceType(self)
+        self.instance_type = InstanceType(self)
+        self.call_response = lambda x: TypeSet(self.instance_type)
         
         
 class InstanceType(InferredType):
     def __init__(self, parent):
+        super().__init__()
         self.parent = parent
         self.name = "{}<instance>".format(parent)
-    pass
+        self.attrs.update(parent.attrs)
+

@@ -115,3 +115,6 @@ class TypeSet():
         
     def __len__(self):
         return len(self.types)
+        
+    def __getitem__(self, index):
+        return sorted(list(self.types))[index]
