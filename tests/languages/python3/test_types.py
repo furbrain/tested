@@ -4,20 +4,20 @@ from tested.languages.python3 import InferredType, TypeSet, UnknownType
 
 class TestInferredType(unittest.TestCase):
     def testInitWithSimpleVal(self):
-        it_num = InferredType(1)
-        it_str = InferredType("a")
+        it_num = InferredType.fromType(1)
+        it_str = InferredType.fromType("a")
         self.assertEqual(str(it_num),"int")
         self.assertEqual(str(it_str),"str")
         
     def testInitWithSimpleType(self): 
-        it_num = InferredType(int)
-        it_str = InferredType(str)
+        it_num = InferredType.fromType(int)
+        it_str = InferredType.fromType(str)
         self.assertEqual(str(it_num),"int")
         self.assertEqual(str(it_str),"str")
         
     def testEquality(self):
-        it_num = InferredType(int)
-        it_str = InferredType(str)
+        it_num = InferredType.fromType(int)
+        it_str = InferredType.fromType(str)
         self.assertEqual(it_num, it_num)
         self.assertEqual(it_num, int)
         self.assertEqual(it_str, it_str)
@@ -26,8 +26,8 @@ class TestInferredType(unittest.TestCase):
         self.assertNotEqual(it_str, "a")
 
     def testInequality(self):        
-        it_num = InferredType(int)
-        it_str = InferredType(str)
+        it_num = InferredType.fromType(int)
+        it_str = InferredType.fromType(str)
         self.assertNotEqual(it_num, it_str)
         self.assertNotEqual(it_num, str)
         self.assertNotEqual(it_str, it_num)
@@ -37,7 +37,7 @@ class TestInferredType(unittest.TestCase):
         attr_dict = {'int':TypeSet(int),'str':TypeSet(str),'None':TypeSet(None)}
         class TempClass:
             pass
-        it = InferredType(TempClass)
+        it = InferredType.fromType(TempClass)
         for name, tp in attr_dict.items():
             it.add_attr(name, tp)
         for name, tp in attr_dict.items():
@@ -47,7 +47,7 @@ class TestInferredType(unittest.TestCase):
         attr_dict = {'int':TypeSet(int), 'str':TypeSet(str), 'None':TypeSet(None)}
         class TempClass:
             pass
-        it = InferredType(TempClass)
+        it = InferredType.fromType(TempClass)
         for tp in attr_dict.values():
             it.add_attr('multi',tp)
         self.assertEqual(it.get_attr('multi'), TypeSet(int,str,None))  
@@ -55,20 +55,20 @@ class TestInferredType(unittest.TestCase):
     def testUnknownAttribute(self):
         class TempClass:
             pass
-        it = InferredType(TempClass)
+        it = InferredType.fromType(TempClass)
         self.assertEqual(it.get_attr('surprise'), TypeSet(UnknownType()))
         
     def testSingleItem(self):
         class TempClass:
             pass
-        it = InferredType(TempClass)
+        it = InferredType.fromType(TempClass)
         it.add_item(TypeSet(int))
         self.assertEqual(it.get_item(12), TypeSet(int))
 
     def testMultiItem(self):
         class TempClass:
             pass
-        it = InferredType(TempClass)
+        it = InferredType.fromType(TempClass)
         it.add_item(TypeSet(int))
         it.add_item(TypeSet(str))
         self.assertEqual(it.get_item(12),TypeSet(int,str))
@@ -76,11 +76,11 @@ class TestInferredType(unittest.TestCase):
     def testUnknownItem(self):
         class TempClass:
             pass
-        it = InferredType(TempClass)
+        it = InferredType.fromType(TempClass)
         self.assertEqual(it.get_item(12), TypeSet(UnknownType()))
         
     def testBadCall(self):
-       it = InferredType(int)
+       it = InferredType.fromType(int)
        self.assertEqual(it.get_call_return(1), TypeSet(UnknownType()))
     
         
@@ -95,7 +95,7 @@ class TestTypeSet(unittest.TestCase):
         self.assertEqual(str(st),"int")
     
     def testInitWithSingleInferredType(self):
-        st = TypeSet(InferredType(1))
+        st = TypeSet(InferredType.fromType(1))
         self.assertEqual(str(st),"int")
         
     def testWithMultipleVals(self):

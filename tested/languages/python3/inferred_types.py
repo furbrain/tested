@@ -1,22 +1,28 @@
 import inspect
 
 class InferredType():
-    def __init__(self, tp):
-        if inspect.isclass(tp):
-            self.type = tp
+    @classmethod
+    def fromType(cls, object_type):
+        self = cls()
+        if inspect.isclass(object_type):
+            self.type = object_type
         else:
-            self.type = type(tp)
+            self.type = type(object_type)
         self.name = self.type.__name__
+        return self
+
+    def __init__(self):
         self.attrs = {}
         self.items = TypeSet()
         self.call_response = lambda x: TypeSet(UnknownType())
+        self.name=""
         
     def __str__(self):
         return self.name
         
     def __eq__(self, other):
         if isinstance(other,InferredType):
-            return self.type == other.type
+            return self.name == other.name
         elif inspect.isclass(other):
             return self.type == other
         else:
@@ -63,7 +69,8 @@ class UnknownType(InferredType):
 
 class InferredList(InferredType):
     def __init__(self, *args):
-        super().__init__(list)
+        super().__init__()
+        self.name="list"
         for arg in args:
             self.add_item(arg)
         
@@ -82,7 +89,7 @@ class TypeSet():
         elif isinstance(other,(InferredType, InferredList)):
             self.types.add(other)
         else:
-            self.types.add(InferredType(other))
+            self.types.add(InferredType.fromType(other))
             
     def matches(self, type_list):
         return any(x in type_list for x in self.types)        

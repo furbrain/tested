@@ -14,7 +14,7 @@ class FunctionType(InferredType):
         return cls(name, arg_names, return_type, docstring)
         
     def __init__(self, name, args, returns, docstring):
-        super().__init__(None)
+        super().__init__()
         self.name = name
         self.args = args
         self.returns = returns

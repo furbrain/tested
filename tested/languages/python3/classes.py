@@ -11,7 +11,7 @@ class ClassType(InferredType):
         return cls(name, parents, context, docstring)
         
     def __init__(self, name,  parents, context = None, docstring=""):
-        super().__init__(None)
+        super().__init__()
         self.name = name
         for parent in parents:
             for tp in parent:
