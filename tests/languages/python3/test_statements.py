@@ -1,17 +1,12 @@
 import unittest
 import ast
-from tested.languages.python3 import StatementBlockTypeParser, TypeSet
+from tested.languages.python3 import parse_statements, TypeSet, ClassType
 
 class TestStatementBlockTypeParser__Base(unittest.TestCase):
     def checkStatement(self, stmt, result, field="context", context=None):
-        answer = self.parseStatement(stmt, context)[field]
+        answer = parse_statements(stmt, context)[field]
         message = "%s should return %s: %s, instead returned %s, context is %s" % (stmt, field, result, answer, context)
         self.assertEqual(answer, result)
-
-    def parseStatement(self, stmt, context=None):
-        syntax_tree = ast.parse(stmt)
-        parser = StatementBlockTypeParser(context)
-        return parser.parseStatements([syntax_tree])
 
 class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Base):        
     def testSimpleAssignment(self):

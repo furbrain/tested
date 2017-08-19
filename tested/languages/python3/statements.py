@@ -3,6 +3,13 @@ from .expressions import ExpressionTypeParser
 from .inferred_types import TypeSet, UnknownType, InferredList
 from .functions import FunctionType
 from .scopes import Scope
+def parse_statements(statements, context=None):
+    if isinstance(statements,str):
+        statements = [ast.parse(statements)]
+    if context is None:
+        context = {}
+    parser = StatementBlockTypeParser(context)
+    return parser._parseStatements(statements)
 
 class StatementBlockTypeParser(ast.NodeVisitor):
     def __init__(self, context=None):
@@ -44,8 +51,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             ctx[node.args.kwarg] = TypeSet(InferredDict())
         function_type = FunctionType.fromASTNode(node)
         ctx[node.name] = TypeSet(function_type)
-        block_parser = StatementBlockTypeParser(ctx)
-        results = block_parser.parseStatements(node.body)
+        results = parse_statements(node.body, ctx)
         if results['return']:
             return_val = results['return']
         else:
