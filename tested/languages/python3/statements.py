@@ -46,18 +46,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         #create function type
         # parse function
-        ctx = self.context.copy()
-        for arg in node.args.args:
-            name = arg.arg
-            ctx[name] = TypeSet(UnknownType(name))
-        if node.args.vararg:
-            list_element_type = UnknownType(node.args.vararg.arg)
-            inferred_list = InferredList(list_element_type)
-            ctx[node.args.vararg.arg] = TypeSet(inferred_list)
-        if node.args.kwarg:
-            ctx[node.args.kwarg] = TypeSet(InferredDict())
-        function_type = FunctionType.fromASTNode(node)
-        ctx[node.name] = TypeSet(function_type)
+        ctx = self.get_new_context_for_function(node)
         results = parse_statements(node.body, ctx)
         if results['return']:
             return_val = results['return']
@@ -67,6 +56,30 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         self.scopes.append(Scope(node.lineno,-1,node.col_offset,results['context']))
         self.scopes.append(results['scopes'])
         
+    def get_new_context_for_function(self, node):
+        ctx = self.context.copy()
+        self.set_context_for_positional_args(node, ctx)
+        self.set_context_for_varargs(node, ctx)
+        function_type = FunctionType.fromASTNode(node)
+        ctx[node.name] = TypeSet(function_type)
+        return ctx    
+        
+    def set_context_for_positional_args(self, node, context):
+        args_node = node.args
+        for arg in args_node.args:
+            name = arg.arg
+            context[name] = TypeSet(UnknownType(name))
+        
+    def set_context_for_varargs(self, node, context):
+        args_node = node.args
+        if args_node.vararg:
+            list_element_type = UnknownType(args_node.vararg.arg)
+            inferred_list = InferredList(list_element_type)
+            context[args_node.vararg.arg] = TypeSet(inferred_list)
+        if args_node.kwarg:
+            context[args_node.kwarg] = TypeSet(InferredDict())
+
+
     def visit_ClassDef(self, node):
         class_type = ClassType.fromASTNode(node)
         ctx = self.context.copy()
