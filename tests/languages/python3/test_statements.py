@@ -75,7 +75,23 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         stmt = "class A(object): pass\nA.b=1"
         results = parse_statements(stmt)
         ctx = results['context']
-        self.assertEqual(ctx['A'][0].get_attr('b'),'int')        
+        self.assertEqual(ctx['A'][0].get_attr('b'),'int')
         
+    def testInstanceMethodCreation(self):
+        stmt = "class A(object):\n  def im(self):\n    return self"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('im'),'im(self) -> (A<instance>)')
         
+    def testClassMethodCreation(self):
+        stmt = "class A(object):\n  @classmethod\n  def cm(cls):\n    return cls"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('cm'),'cm(cls) -> (A)')
+
+    def testStaticMethodCreation(self):
+        stmt = "class A(object):\n  @staticmethod\n  def sm(a):\n    return a"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('sm'),'sm(a) -> (Unknown: a)')
     

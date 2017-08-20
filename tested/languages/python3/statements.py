@@ -84,11 +84,10 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         class_type = ClassType.fromASTNode(node)
         ctx = self.context.copy()
         block_parser = StatementBlockTypeParser(ctx)
-        results = parse_statements(node.body, ctx)
+        results = parse_class_statements(node.body, ctx, class_type)
         self.context[node.name] = TypeSet(ClassType.fromASTNode(node, results['context']))
         self.scopes.append(Scope(node.lineno,-1,node.col_offset,results['context']))
         self.scopes.append(results['scopes'])
-
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))
@@ -98,3 +97,34 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         
     def visit_Name(self, node):
         return node.id
+        
+def parse_class_statements(statements, context, class_type):
+    parser = ClassBlockParser(context, class_type)
+    return parser.parseStatements(statements)    
+
+#this parser modifies function signatures within a class definition        
+class ClassBlockParser(StatementBlockTypeParser):
+    def __init__(self, context, class_type):
+        super().__init__(context)
+        self.class_type = class_type
+        
+    def set_context_for_positional_args(self, node, context):
+        args_node = node.args
+        if args_node.args:
+            name = args_node.args[0].arg
+            if any(self.node_is_staticmethod(n) for n in node.decorator_list):
+                context[name] = TypeSet(UnknownType(name))
+            elif any(self.node_is_classmethod(n) for n in node.decorator_list):
+                context[name] = TypeSet(self.class_type)
+            else:
+                context[name] = TypeSet(self.class_type.instance_type)
+            for arg in args_node.args[1:]:
+                name = arg.arg
+                context[name] = TypeSet(UnknownType(name))
+                
+    def node_is_staticmethod(self, node):
+        return getattr(node,"id","") == "staticmethod"
+            
+    def node_is_classmethod(self, node):
+        return getattr(node,"id","") == "classmethod"
+    
