@@ -1,6 +1,12 @@
 from collections import namedtuple
+import attr
 
-Scope = namedtuple("Scope", 'line_start line_end indent context')
+@attr.s
+class Scope():
+    line_start= attr.ib()
+    line_end = attr.ib()
+    indent = attr.ib()
+    context = attr.ib()
 
 def scopeMatches(scope, line, indent):
     if scope.line_start <= line <= scope.line_end:
