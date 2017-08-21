@@ -53,8 +53,8 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         else:
             return_val = TypeSet(None)
         self.context[node.name] = TypeSet(FunctionType.fromASTNode(node, return_val))
-        self.scopes.append(Scope(node.lineno,-1,node.col_offset,results['context']))
-        self.scopes.append(results['scopes'])
+        self.scopes.append(Scope(node.name, node.lineno,-1,node.col_offset,results['context']))
+        self.scopes.extend(results['scopes'])
         
     def get_new_context_for_function(self, node):
         ctx = self.context.copy()
@@ -86,8 +86,8 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         block_parser = StatementBlockTypeParser(ctx)
         results = parse_class_statements(node.body, ctx, class_type)
         self.context[node.name] = TypeSet(ClassType.fromASTNode(node, results['context']))
-        self.scopes.append(Scope(node.lineno,-1,node.col_offset,results['context']))
-        self.scopes.append(results['scopes'])
+        self.scopes.append(Scope(node.name, node.lineno,-1,node.col_offset,results['context']))
+        self.scopes.extend(results['scopes'])
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))

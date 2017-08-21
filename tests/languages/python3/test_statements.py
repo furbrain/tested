@@ -77,6 +77,19 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         ctx = results['context']
         self.assertEqual(ctx['A'][0].get_attr('b'),'int')
         
+    def testClassVariableCreation(self):
+        stmt = "class A(object):\n  b=1"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('b'),'int')
+        
+    def testClassVariableDoesNotTransferIntoMethods(self):
+        stmt = "class A(object):\n  b=1\n  def test(a):\n    return b"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (Unknown:)')
+        
+        
     def testInstanceMethodCreation(self):
         stmt = "class A(object):\n  def im(self):\n    return self"
         results = parse_statements(stmt)
