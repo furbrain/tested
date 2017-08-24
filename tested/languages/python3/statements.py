@@ -83,6 +83,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
     def visit_ClassDef(self, node):
         class_type = ClassType.fromASTNode(node)
         ctx = self.context.copy()
+        ctx[node.name] = class_type
         block_parser = StatementBlockTypeParser(ctx)
         results = parse_class_statements(node.body, ctx, class_type)
         self.context[node.name] = TypeSet(ClassType.fromASTNode(node, results['context']))
@@ -105,8 +106,18 @@ def parse_class_statements(statements, context, class_type):
 #this parser modifies function signatures within a class definition        
 class ClassBlockParser(StatementBlockTypeParser):
     def __init__(self, context, class_type):
+        self.outer_context = context
         super().__init__(context)
         self.class_type = class_type
+
+    def get_new_context_for_function(self, node):
+        ctx = self.outer_context.copy()
+        self.set_context_for_positional_args(node, ctx)
+        self.set_context_for_varargs(node, ctx)
+        function_type = FunctionType.fromASTNode(node)
+        ctx[node.name] = TypeSet(function_type)
+        return ctx    
+
         
     def set_context_for_positional_args(self, node, context):
         args_node = node.args

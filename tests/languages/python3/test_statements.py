@@ -84,11 +84,16 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         self.assertEqual(ctx['A'][0].get_attr('b'),'int')
         
     def testClassVariableDoesNotTransferIntoMethods(self):
-        stmt = "class A(object):\n  b=1\n  def test(a):\n    return b"
+        stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b"
         results = parse_statements(stmt)
         ctx = results['context']
-        self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (Unknown:)')
+        self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (NoneType)')
         
+    def testClassNameDoesTransferIntoMethods(self):
+        stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A"
+        results = parse_statements(stmt)
+        ctx = results['context']
+        self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (A)')
         
     def testInstanceMethodCreation(self):
         stmt = "class A(object):\n  def im(self):\n    return self"
