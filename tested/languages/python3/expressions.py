@@ -5,21 +5,15 @@ from .inferred_types import TypeSet, InferredList, UnknownType
 
 NUMERIC_TYPES = (int, float)
 
-def get_expression_type(expression, context):
+def get_expression_type(expression, scope):
     if isinstance(expression,str):
         expression = ast.parse(expression)
-    parser = ExpressionTypeParser(context)
+    parser = ExpressionTypeParser(scope)
     return parser.getType(expression)
 
 class ExpressionTypeParser(ast.NodeVisitor):
-    def __init__(self, names=None):
-        self.names =  {
-            'True': TypeSet(bool),
-            'False': TypeSet(bool),
-            'None': TypeSet(type(None)),
-        }
-        if names is not None:
-            self.names.update(names)
+    def __init__(self, scope):
+        self.scope = scope
         
     def getType(self,expression):
         return self.visit(expression)
@@ -31,8 +25,8 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return TypeSet(node.s)
         
     def visit_Name(self, node):
-        if node.id in self.names:
-            return self.names[node.id]
+        if node.id in self.scope:
+            return self.scope[node.id]
     
     def visit_NameConstant(self, node):
         if node.value==True: return TypeSet(bool)

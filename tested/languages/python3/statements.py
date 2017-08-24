@@ -6,26 +6,25 @@ from .scopes import Scope
 from .classes import ClassType
 from .assignment import assign_to_node
 
-def parse_statements(statements, context=None):
+def parse_statements(statements, scope=None):
     if isinstance(statements,str):
         statements = [ast.parse(statements)]
-    if context is None:
-        context = {}
-    parser = StatementBlockTypeParser(context)
+    parser = StatementBlockTypeParser(scope)
     return parser.parseStatements(statements)
 
 class StatementBlockTypeParser(ast.NodeVisitor):
-    def __init__(self, context=None):
-        self.context = {}
+    def __init__(self, scope=None):
+        if scope is None:
+            self.scope = Scope('__main__',0,0)
+        else:
+            self.scope = scope
         self.returns = TypeSet()
         self.scopes = []
-        if context:
-            self.context.update(context)
                     
     def parseStatements(self, nodes):
         for node in nodes:
             self.visit(node)          
-        return {'context':self.context, 'return': self.returns, 'scopes': self.scopes}
+        return {'return': self.returns, 'scopes': self.scopes, 'last_scope': self.scope}
                     
     def visit_Assign(self, node):
         for target in node.targets:
@@ -40,98 +39,98 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             for i, subtarget in enumerate(target.elts):
                 self.assignToTarget(subtarget, value_node.elts[i])
         else:
-            assigned_types = get_expression_type(value_node, self.context)
-            assign_to_node(target, assigned_types, self.context)
+            assigned_types = get_expression_type(value_node, self.scope)
+            assign_to_node(target, assigned_types, self.scope)
 
     def visit_FunctionDef(self, node):
         #create function type
         # parse function
-        ctx = self.get_new_context_for_function(node)
-        results = parse_statements(node.body, ctx)
+        scope = self.get_new_scope_for_function(node)
+        results = parse_statements(node.body, scope)
         if results['return']:
             return_val = results['return']
         else:
             return_val = TypeSet(None)
-        self.context[node.name] = TypeSet(FunctionType.fromASTNode(node, return_val))
-        self.scopes.append(Scope(node.name, node.lineno,-1,node.col_offset,results['context']))
+        self.scope[node.name] =  TypeSet(FunctionType.fromASTNode(node, return_val))
+        self.scopes.append(scope)
         self.scopes.extend(results['scopes'])
         
-    def get_new_context_for_function(self, node):
-        ctx = self.context.copy()
-        self.set_context_for_positional_args(node, ctx)
-        self.set_context_for_varargs(node, ctx)
+    def get_new_scope_for_function(self, node):
+        scope = Scope(node.name, node.lineno, node.col_offset, parent = self.scope)
+        self.set_scope_for_positional_args(node, scope)
+        self.set_scope_for_varargs(node, scope)
         function_type = FunctionType.fromASTNode(node)
-        ctx[node.name] = TypeSet(function_type)
-        return ctx    
+        scope[node.name] = TypeSet(function_type)
+        print(scope)
+        return scope
         
-    def set_context_for_positional_args(self, node, context):
+    def set_scope_for_positional_args(self, node, scope):
         args_node = node.args
         for arg in args_node.args:
             name = arg.arg
-            context[name] = TypeSet(UnknownType(name))
+            scope[name] = TypeSet(UnknownType(name))
         
-    def set_context_for_varargs(self, node, context):
+    def set_scope_for_varargs(self, node, scope):
         args_node = node.args
         if args_node.vararg:
             list_element_type = UnknownType(args_node.vararg.arg)
             inferred_list = InferredList(list_element_type)
-            context[args_node.vararg.arg] = TypeSet(inferred_list)
+            scope[args_node.vararg.arg] = TypeSet(inferred_list)
         if args_node.kwarg:
-            context[args_node.kwarg] = TypeSet(InferredDict())
+            scope[args_node.kwarg] = TypeSet(InferredDict())
 
 
     def visit_ClassDef(self, node):
-        class_type = ClassType.fromASTNode(node)
-        ctx = self.context.copy()
-        ctx[node.name] = class_type
-        block_parser = StatementBlockTypeParser(ctx)
-        results = parse_class_statements(node.body, ctx, class_type)
-        self.context[node.name] = TypeSet(ClassType.fromASTNode(node, results['context']))
-        self.scopes.append(Scope(node.name, node.lineno,-1,node.col_offset,results['context']))
+        scope = Scope(node.name, node.lineno, node.col_offset, self.scope)
+        class_type = ClassType.fromASTNode(node,scope)
+        results = parse_class_statements(node.body, scope, class_type)
+        self.scope[node.name] = TypeSet(ClassType.fromASTNode(node, scope))
+        self.scopes.append(scope)
         self.scopes.extend(results['scopes'])
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))
         
     def visit_Return(self, node):
-        self.returns.add(get_expression_type(node.value, self.context))
+        self.returns.add(get_expression_type(node.value, self.scope))
         
     def visit_Name(self, node):
         return node.id
         
-def parse_class_statements(statements, context, class_type):
-    parser = ClassBlockParser(context, class_type)
+def parse_class_statements(statements, scope, class_type):
+    parser = ClassBlockParser(scope, class_type)
     return parser.parseStatements(statements)    
 
 #this parser modifies function signatures within a class definition        
 class ClassBlockParser(StatementBlockTypeParser):
-    def __init__(self, context, class_type):
-        self.outer_context = context
-        super().__init__(context)
+    def __init__(self, scope, class_type):
+        self.outer_scope = scope
+        super().__init__(scope)
         self.class_type = class_type
 
-    def get_new_context_for_function(self, node):
-        ctx = self.outer_context.copy()
-        self.set_context_for_positional_args(node, ctx)
-        self.set_context_for_varargs(node, ctx)
+    def get_new_scope_for_function(self, node):
+        scope = Scope(node.name, node.lineno, node.col_offset, self.scope.parent)
+        scope[self.class_type.name] = self.class_type
+        self.set_scope_for_positional_args(node, scope)
+        self.set_scope_for_varargs(node, scope)
         function_type = FunctionType.fromASTNode(node)
-        ctx[node.name] = TypeSet(function_type)
-        return ctx    
+        scope[node.name] = TypeSet(function_type)
+        return scope    
 
         
-    def set_context_for_positional_args(self, node, context):
+    def set_scope_for_positional_args(self, node, scope):
         args_node = node.args
         if args_node.args:
             name = args_node.args[0].arg
             if any(self.node_is_staticmethod(n) for n in node.decorator_list):
-                context[name] = TypeSet(UnknownType(name))
+                scope[name] = TypeSet(UnknownType(name))
             elif any(self.node_is_classmethod(n) for n in node.decorator_list):
-                context[name] = TypeSet(self.class_type)
+                scope[name] = TypeSet(self.class_type)
             else:
-                context[name] = TypeSet(self.class_type.instance_type)
+                scope[name] = TypeSet(self.class_type.instance_type)
             for arg in args_node.args[1:]:
                 name = arg.arg
-                context[name] = TypeSet(UnknownType(name))
+                scope[name] = TypeSet(UnknownType(name))
                 
     def node_is_staticmethod(self, node):
         return getattr(node,"id","") == "staticmethod"

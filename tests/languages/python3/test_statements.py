@@ -1,12 +1,27 @@
 import unittest
 import ast
-from tested.languages.python3 import parse_statements, TypeSet, ClassType
+from tested.languages.python3 import parse_statements, TypeSet, ClassType, Scope
 
 class TestStatementBlockTypeParser__Base(unittest.TestCase):
     def checkStatement(self, stmt, result, field="context", context=None):
-        answer = parse_statements(stmt, context)[field]
+        if field=="context":
+            answer = self.getContext(stmt, context)
+        else:
+            scope = self.make_Scope(context)
+            answer = parse_statements(stmt, scope)[field]
         message = "%s should return %s: %s, instead returned %s, context is %s" % (stmt, field, result, answer, context)
         self.assertEqual(answer, result)
+
+    def getContext(self, stmt, context = None):
+        scope = self.make_Scope(context)
+        return parse_statements(stmt, scope)['last_scope'].get_whole_context()     
+        
+    def make_Scope(self, context = None):
+        if context:
+            return Scope('',0,0,context=context)
+        else:
+            return Scope('',0,0)
+                
 
 class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Base):        
     def testSimpleAssignment(self):
@@ -73,43 +88,36 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
     
     def testClassAttributeCreation(self):
         stmt = "class A(object): pass\nA.b=1"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('b'),'int')
         
     def testClassVariableCreation(self):
         stmt = "class A(object):\n  b=1"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('b'),'int')
         
     def testClassVariableDoesNotTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (NoneType)')
         
     def testClassNameDoesTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (A)')
         
     def testInstanceMethodCreation(self):
         stmt = "class A(object):\n  def im(self):\n    return self"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('im'),'im(self) -> (A<instance>)')
         
     def testClassMethodCreation(self):
         stmt = "class A(object):\n  @classmethod\n  def cm(cls):\n    return cls"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('cm'),'cm(cls) -> (A)')
 
     def testStaticMethodCreation(self):
         stmt = "class A(object):\n  @staticmethod\n  def sm(a):\n    return a"
-        results = parse_statements(stmt)
-        ctx = results['context']
+        ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'][0].get_attr('sm'),'sm(a) -> (Unknown: a)')
     

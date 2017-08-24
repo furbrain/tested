@@ -10,14 +10,14 @@ class ClassType(InferredType):
         docstring = ast.get_docstring(node)
         return cls(name, parents, context, docstring)
         
-    def __init__(self, name,  parents, context = None, docstring=""):
+    def __init__(self, name,  parents, scope = None, docstring=""):
         super().__init__()
         self.name = name
         for parent in parents:
             for tp in parent:
                 self.attrs.update(tp.attrs)
-        if context:
-            self.attrs.update(context)
+        if scope:
+            self.attrs.update(scope.context)
         self.instance_type = InstanceType(self)
         self.call_response = lambda x: TypeSet(self.instance_type)
         
