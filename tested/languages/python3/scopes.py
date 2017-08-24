@@ -18,6 +18,10 @@ class Scope():
 class ScopeList():
     def __init__(self):
         self.scopes = []
+        
+    def add(self, scope):
+        self.scopes.append(scope)
+        
     def addScope(self, name, line_start, line_end, indent, context):
         self.scopes.append(Scope(name, line_start, line_end, indent, context))
         
@@ -26,4 +30,7 @@ class ScopeList():
         if possible_scopes:
             return sorted(possible_scopes, key=lambda x: x.indent)[-1]
         return None
+        
+    def __iter__(self):
+        return iter(self.scopes)
 
