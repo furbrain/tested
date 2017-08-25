@@ -28,3 +28,15 @@ class TestAssignment(unittest.TestCase):
         assign_to_node('l[0]',TypeSet(str),context)
         self.assertEqual(context,{'l':'[int, str]'})
         
+    def testListSliceAssignment(self):
+        context = {'l': TypeSet(InferredList(int))}
+        l2 = TypeSet(InferredList(str))
+        assign_to_node('l[1:2]',l2,context)
+        self.assertEqual(context,{'l':'[int, str]'})
+        
+    def testListSliceTotalAssignment(self):        
+        context = {'l': TypeSet(InferredList(int))}
+        l2 = TypeSet(InferredList(str))
+        assign_to_node('l[:]',l2,context)
+        self.assertEqual(context,{'l':'[int, str]'})
+

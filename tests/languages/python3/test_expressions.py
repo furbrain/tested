@@ -86,6 +86,11 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[1,2,3,4][0]", "int")
         self.checkExpr("[1,2,3,'a',4][0]", "int, str")
         
+    def testListSlice(self):
+        self.checkExpr("[1,2,3,4][:]","[int]")
+        self.checkExpr("[1,2,3,4][1:]","[int]")
+        self.checkExpr("[1,2,3,4][:-1]","[int]")
+        
     def testCompare(self):
         self.checkExpr("1 < 2", "bool")
         self.checkExpr("2 > 3", "bool")

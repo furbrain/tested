@@ -1,6 +1,7 @@
 import ast
 
-from .expressions import get_expression_type, TypeSet
+from .expressions import get_expression_type
+from .inferred_types import TypeSet, InferredList
 
 def assign_to_node(node, value, context):
     if isinstance(node,str):
@@ -32,7 +33,10 @@ class Assigner(ast.NodeVisitor):
             for tp in types:
                 tp.add_item(self.value)
         else:
-            types.add(self.value)
+            for tp in types:
+                for val in self.value:
+                    if isinstance(val, InferredList):
+                        tp.add_item(val.get_item(0))
             
     def visit_Call(self, node):
         #do nothing as does  not affect context or classes
