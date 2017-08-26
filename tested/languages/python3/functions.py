@@ -17,20 +17,9 @@ class FunctionType(InferredType):
         super().__init__()
         self.name = name
         self.args = args
-        self.returns = returns
+        self.return_values = returns
         self.type = "%s(%s) -> (%s)" % (self.name, ', '.join(args), returns)
         self.docstring = docstring
-        self.set_call_return_func(self._getReturnTypeSet)
-    
-    def _getReturnTypeSet(self, arg_types):
-        return_typeset = TypeSet()
-        type_mapping = {k:v for k,v in zip(self.args, arg_types)}
-        for possible_type in self.returns:
-            if isinstance(possible_type,UnknownType):
-                return_typeset =return_typeset.add_type(type_mapping.get(possible_type.type, UnknownType()))
-            else:
-                return_typeset = return_typeset.add_type(possible_type)
-        return return_typeset
         
     def __str__(self):
         return self.type

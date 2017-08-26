@@ -19,7 +19,7 @@ class ClassType(InferredType):
         if scope:
             self.attrs.update(scope.context)
         self.instance_type = InstanceType(self)
-        self.call_response = lambda x: TypeSet(self.instance_type)
+        self.return_values= self.instance_type
         
         
 class InstanceType(InferredType):

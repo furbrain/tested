@@ -39,8 +39,10 @@ class InferredType():
     def __init__(self):
         self.attrs = {}
         self.items = TypeSet()
-        self.call_response = lambda x: TypeSet(UnknownType())
+        self.args = []
+        self.return_values = None
         self.name=""
+        self.docstring=""
         
     def __str__(self):
         return self.name
@@ -87,10 +89,19 @@ class InferredType():
         self.items = self.items.add_type(item)
         
     def get_call_return(self, arg_types):
-        return self.call_response(arg_types)
-
-    def set_call_return_func(self, func):
-        self.call_response = func
+        if "__call__" in self.attrs:
+            return self.attrs['__call__'].get_call_return(arg_types)
+        if self.return_values:
+            return_typeset = TypeSet()
+            type_mapping = {k:v for k,v in zip(self.args, arg_types)}
+            for possible_type in self.return_values:
+                if isinstance(possible_type,UnknownType):
+                    replacement_type = type_mapping.get(possible_type.type, UnknownType())
+                    return_typeset =return_typeset.add_type(replacement_type)
+                else:
+                    return_typeset = return_typeset.add_type(possible_type)
+            return return_typeset
+        return UnknownType()
 
     def add_type(self, other):
         if self==other:
@@ -146,7 +157,7 @@ class TypeSet():
             tp.add_item(item)
         
     def get_call_return(self, arg_types):
-        return TypeSet(*[tp.call_response(arg_types) for tp in self.types])
+        return TypeSet(*[tp.get_call_return(arg_types) for tp in self.types])
 
 
     def __str__(self):
