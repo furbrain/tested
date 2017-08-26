@@ -26,6 +26,6 @@ class InstanceType(InferredType):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.name = "{}<instance>".format(parent)
+        self.name = "<{}>".format(parent)
         self.attrs.update(parent.attrs)
 

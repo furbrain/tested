@@ -84,7 +84,7 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         self.checkStatement("class A(object): pass", {'A':'A'})
         
     def testClassInstanceCreation(self):
-        self.checkStatement("class A(object): pass\ninst = A()", {'A':'A','inst':'A<instance>'})
+        self.checkStatement("class A(object): pass\ninst = A()", {'A':'A','inst':'<A>'})
     
     def testClassAttributeCreation(self):
         stmt = "class A(object): pass\nA.b=1"
@@ -109,7 +109,7 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
     def testInstanceMethodCreation(self):
         stmt = "class A(object):\n  def im(self):\n    return self"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'].get_attr('im'),'im(self) -> (A<instance>)')
+        self.assertEqual(ctx['A'].get_attr('im'),'im(self) -> (<A>)')
         
     def testClassMethodCreation(self):
         stmt = "class A(object):\n  @classmethod\n  def cm(cls):\n    return cls"
