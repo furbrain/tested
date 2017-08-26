@@ -83,7 +83,21 @@ class TestInferredType(unittest.TestCase):
        it = InferredType.fromType(int)
        self.assertEqual(it.get_call_return(1), TypeSet(UnknownType()))
     
+    def testLoadSimpleFuncFromString(self):
+        text = "name() -> (int)"
+        it = InferredType.fromString(text)
+        self.assertEqual(str(it),text)
         
+    def testLoadFromStringGetsCorrectRetun(self):
+        text = "name() -> (int)"
+        it = InferredType.fromString(text)
+        self.assertEqual(it.get_call_return([]),'int')
+
+    def testLoadFromStringGetsCorrectVars(self):
+        text = "name(arg1, arg2) -> (int)"
+        it = InferredType.fromString(text)
+        self.assertEqual(it.args,['arg1','arg2'])
+
         
 class TestTypeSet(unittest.TestCase):
     def testInitWithSingleVal(self):

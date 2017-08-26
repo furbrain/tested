@@ -1,3 +1,15 @@
 make decision about whether we have a context for each line - or just scopes
 Refactor statemnetBlockTypeParser into module, class and function parsers...
 Work python function extractors...
+Refactor code using typesets and inferred functions so either can be used...
+    functions to implement on TypeSet:
+        def get_attr(self, attr):
+        def add_attr(self, attr, typeset):
+        def get_item(self, index):
+        def add_item(self, item):
+        def get_call_return(self, arg_types):
+        def set_call_return_func(self, func): #need to get rid of this eventually
+        
+    functions to implement on InferredType:
+        def add(self, other): # need to find instances of this and change so that it updates local reference...
+        def matches(self, type_list):    
