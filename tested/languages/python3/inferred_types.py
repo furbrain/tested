@@ -48,6 +48,10 @@ class InferredType():
     def __eq__(self, other):
         if isinstance(other,InferredType):
             return self.name == other.name
+        elif isinstance(other, TypeSet) and len(other)==1:
+            return self in other
+        elif isinstance(other, str):
+            return str(self)==other
         elif inspect.isclass(other):
             return self.type == other
         else:
@@ -59,14 +63,17 @@ class InferredType():
     def __hash__(self):
         return hash(self.name)
         
+    def __iter__(self):
+        return iter((self,))
+        
     def get_attr(self, attr):
         if attr not in self.attrs:
-            self.attrs[attr] = TypeSet(UnknownType())
+            self.attrs[attr] = UnknownType()
         return self.attrs[attr]
         
     def add_attr(self, attr, typeset):
         if attr in self.attrs:
-            self.attrs[attr].add(typeset)
+            self.attrs[attr] = self.attrs[attr].add_type(typeset)
         else:
             self.attrs[attr] = typeset
             
@@ -74,16 +81,21 @@ class InferredType():
         if self.items:
             return self.items
         else:
-            return TypeSet(UnknownType())
+            return UnknownType()
             
     def add_item(self, item):
-        self.items.add(item)
+        self.items = self.items.add_type(item)
         
     def get_call_return(self, arg_types):
         return self.call_response(arg_types)
 
     def set_call_return_func(self, func):
         self.call_response = func
+
+    def add_type(self, other):
+        if self==other:
+            return self
+        return TypeSet(self, other)
         
 class UnknownType(InferredType):
     def __init__(self, name=None):
@@ -108,19 +120,35 @@ class TypeSet():
     def __init__(self, *args):
         self.types = set()
         for a in args:
-            self.add(a)
+            self.add_type(a)
 
-    def add(self, other):
+    def add_type(self, other):
         if isinstance(other,TypeSet):
             self.types.update(other)
         elif isinstance(other,(InferredType, InferredList)):
             self.types.add(other)
         else:
             self.types.add(InferredType.fromType(other))
+        return self
             
-    def matches(self, type_list):
-        return any(x in type_list for x in self.types)        
+    def get_attr(self, attr):
+        return TypeSet(*[tp.get_attr(attr) for tp in self.types])
+        
+    def add_attr(self, attr, typeset):
+        for tp in self.types:
+            tp.add_attr(attr, typeset)
+
+    def get_item(self, index):
+        return TypeSet(*[tp.get_item(index) for tp in self.types])
             
+    def add_item(self, item):
+        for tp in self.types:
+            tp.add_item(item)
+        
+    def get_call_return(self, arg_types):
+        return TypeSet(*[tp.call_response(arg_types) for tp in self.types])
+
+
     def __str__(self):
         return ', '.join(sorted(str(x) for x in self.types))
         

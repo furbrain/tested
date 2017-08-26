@@ -1,7 +1,7 @@
 import ast
 import types
 
-from .inferred_types import TypeSet, InferredList, UnknownType
+from .inferred_types import TypeSet, InferredList, InferredType, UnknownType
 
 NUMERIC_TYPES = (int, float)
 
@@ -19,19 +19,19 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return self.visit(expression)
         
     def visit_Num(self, node):
-        return TypeSet(node.n)
+        return InferredType.fromType(node.n)
         
     def visit_Str(self, node):
-        return TypeSet(node.s)
+        return InferredType.fromType(node.s)
         
     def visit_Name(self, node):
         if node.id in self.scope:
             return self.scope[node.id]
     
     def visit_NameConstant(self, node):
-        if node.value==True: return TypeSet(bool)
-        if node.value==False: return TypeSet(bool)
-        if node.value==None: return TypeSet(type(None))
+        if node.value==True: return InferredType.fromType(bool)
+        if node.value==False: return InferredType.fromType(bool)
+        if node.value==None: return InferredType.fromType(type(None))
            
     def visit_List(self, node):
         result = InferredList()
@@ -42,18 +42,12 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_Call(self, node):
         func_types = self.visit(node.func)
         args = [self.visit(arg_node) for arg_node in node.args]
-        result = TypeSet()
-        for func_type in func_types:
-            result.add(func_type.get_call_return(args))
-        return result
+        return func_types.get_call_return(args)
         
     def visit_Attribute(self, node):
         result = TypeSet()
         var_types = self.visit(node.value)
-        result = TypeSet()
-        for var in var_types:
-            result.add(var.get_attr(node.attr))
-        return result
+        return var_types.get_attr(node.attr)
                 
     def visit_Expr(self, node):
         return self.visit(node.value)
@@ -68,7 +62,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
             for right in self.getType(node.right):
                 new_type = self.getBinOpType(left, right, op)
                 if new_type is not TypeError:
-                    result.add(new_type)
+                    result = result.add_type(new_type)
         return result
             
     def getBinOpType(self, left, right, op):
@@ -96,21 +90,21 @@ class ExpressionTypeParser(ast.NodeVisitor):
     
     def visit_UnaryOp(self, node):
         op = type(node.op).__name__
-        result = TypeSet()
-        for operand in self.getType(node.operand):
-            if op=="Not":
-                result.add(bool)
-            if op=="Invert":
-                result.add(int)
-            if op in ("UAdd","USub"):
+        if op=="Not":
+            return InferredType.fromType(bool)
+        if op=="Invert":
+            return InferredType.fromType(int)
+        if op in ("UAdd","USub"):
+            result = TypeSet()
+            for operand in self.getType(node.operand):
                 if operand in NUMERIC_TYPES:
-                    result.add(operand)
+                    result = result.add_type(operand)
                 else:
-                    result.add(int)
-        return result
+                    result = result.add_type(int)
+            return result        
                 
     def visit_BoolOp(self, node):
-        return TypeSet(bool)
+        return InferredType.fromType(bool)
         
     def visit_Subscript(self, node):
         value = self.getType(node.value)
@@ -121,5 +115,5 @@ class ExpressionTypeParser(ast.NodeVisitor):
             return value
         
     def visit_Compare(self, node):
-        return TypeSet(bool)
+        return InferredType.fromType(bool)
 

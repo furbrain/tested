@@ -89,35 +89,35 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
     def testClassAttributeCreation(self):
         stmt = "class A(object): pass\nA.b=1"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('b'),'int')
+        self.assertEqual(ctx['A'].get_attr('b'),'int')
         
     def testClassVariableCreation(self):
         stmt = "class A(object):\n  b=1"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('b'),'int')
+        self.assertEqual(ctx['A'].get_attr('b'),'int')
         
     def testClassVariableDoesNotTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (NoneType)')
+        self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (NoneType)')
         
     def testClassNameDoesTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('test'),'test(self, a) -> (A)')
+        self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (A)')
         
     def testInstanceMethodCreation(self):
         stmt = "class A(object):\n  def im(self):\n    return self"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('im'),'im(self) -> (A<instance>)')
+        self.assertEqual(ctx['A'].get_attr('im'),'im(self) -> (A<instance>)')
         
     def testClassMethodCreation(self):
         stmt = "class A(object):\n  @classmethod\n  def cm(cls):\n    return cls"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('cm'),'cm(cls) -> (A)')
+        self.assertEqual(ctx['A'].get_attr('cm'),'cm(cls) -> (A)')
 
     def testStaticMethodCreation(self):
         stmt = "class A(object):\n  @staticmethod\n  def sm(a):\n    return a"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'][0].get_attr('sm'),'sm(a) -> (Unknown: a)')
+        self.assertEqual(ctx['A'].get_attr('sm'),'sm(a) -> (Unknown: a)')
     

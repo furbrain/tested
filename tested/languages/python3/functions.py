@@ -10,7 +10,7 @@ class FunctionType(InferredType):
         arg_names = [arg.arg for arg in node.args.args]
         docstring = ast.get_docstring(node)
         if return_type is None:
-            return_type = TypeSet(UnknownType('return'))
+            return_type = UnknownType('return')
         return cls(name, arg_names, return_type, docstring)
         
     def __init__(self, name, args, returns, docstring):
@@ -27,9 +27,9 @@ class FunctionType(InferredType):
         type_mapping = {k:v for k,v in zip(self.args, arg_types)}
         for possible_type in self.returns:
             if isinstance(possible_type,UnknownType):
-                return_typeset.add(type_mapping.get(possible_type.type, UnknownType()))
+                return_typeset =return_typeset.add_type(type_mapping.get(possible_type.type, UnknownType()))
             else:
-                return_typeset.add(possible_type)
+                return_typeset = return_typeset.add_type(possible_type)
         return return_typeset
         
     def __str__(self):

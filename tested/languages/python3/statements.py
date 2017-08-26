@@ -1,6 +1,6 @@
 import ast
 from .expressions import get_expression_type
-from .inferred_types import TypeSet, UnknownType, InferredList
+from .inferred_types import TypeSet, UnknownType, InferredList, InferredType
 from .functions import FunctionType
 from .scopes import Scope
 from .classes import ClassType
@@ -50,8 +50,8 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         if results['return']:
             return_val = results['return']
         else:
-            return_val = TypeSet(None)
-        self.scope[node.name] =  TypeSet(FunctionType.fromASTNode(node, return_val))
+            return_val = InferredType.fromType(None)
+        self.scope[node.name] =  FunctionType.fromASTNode(node, return_val)
         self.scopes.append(scope)
         self.scopes.extend(results['scopes'])
         
@@ -60,7 +60,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         self.set_scope_for_positional_args(node, scope)
         self.set_scope_for_varargs(node, scope)
         function_type = FunctionType.fromASTNode(node)
-        scope[node.name] = TypeSet(function_type)
+        scope[node.name] = function_type
         print(scope)
         return scope
         
@@ -68,23 +68,23 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         args_node = node.args
         for arg in args_node.args:
             name = arg.arg
-            scope[name] = TypeSet(UnknownType(name))
+            scope[name] = UnknownType(name)
         
     def set_scope_for_varargs(self, node, scope):
         args_node = node.args
         if args_node.vararg:
             list_element_type = UnknownType(args_node.vararg.arg)
             inferred_list = InferredList(list_element_type)
-            scope[args_node.vararg.arg] = TypeSet(inferred_list)
+            scope[args_node.vararg.arg] = inferred_list
         if args_node.kwarg:
-            scope[args_node.kwarg] = TypeSet(InferredDict())
+            scope[args_node.kwarg] = InferredDict()
 
 
     def visit_ClassDef(self, node):
         scope = Scope(node.name, node.lineno, node.col_offset, self.scope)
         class_type = ClassType.fromASTNode(node,scope)
         results = parse_class_statements(node.body, scope, class_type)
-        self.scope[node.name] = TypeSet(ClassType.fromASTNode(node, scope))
+        self.scope[node.name] = ClassType.fromASTNode(node, scope)
         self.scopes.append(scope)
         self.scopes.extend(results['scopes'])
         
@@ -92,7 +92,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         return (type(node).__name__ in ("Tuple","List"))
         
     def visit_Return(self, node):
-        self.returns.add(get_expression_type(node.value, self.scope))
+        self.returns = self.returns.add_type(get_expression_type(node.value, self.scope))
         
     def visit_Name(self, node):
         return node.id
@@ -114,7 +114,7 @@ class ClassBlockParser(StatementBlockTypeParser):
         self.set_scope_for_positional_args(node, scope)
         self.set_scope_for_varargs(node, scope)
         function_type = FunctionType.fromASTNode(node)
-        scope[node.name] = TypeSet(function_type)
+        scope[node.name] = function_type
         return scope    
 
         
@@ -123,14 +123,14 @@ class ClassBlockParser(StatementBlockTypeParser):
         if args_node.args:
             name = args_node.args[0].arg
             if any(self.node_is_staticmethod(n) for n in node.decorator_list):
-                scope[name] = TypeSet(UnknownType(name))
+                scope[name] = UnknownType(name)
             elif any(self.node_is_classmethod(n) for n in node.decorator_list):
-                scope[name] = TypeSet(self.class_type)
+                scope[name] = self.class_type
             else:
-                scope[name] = TypeSet(self.class_type.instance_type)
+                scope[name] = self.class_type.instance_type
             for arg in args_node.args[1:]:
                 name = arg.arg
-                scope[name] = TypeSet(UnknownType(name))
+                scope[name] = UnknownType(name)
                 
     def node_is_staticmethod(self, node):
         return getattr(node,"id","") == "staticmethod"

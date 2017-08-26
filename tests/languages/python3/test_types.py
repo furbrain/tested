@@ -77,7 +77,7 @@ class TestInferredType(unittest.TestCase):
         class TempClass:
             pass
         it = InferredType.fromType(TempClass)
-        self.assertEqual(it.get_item(12), TypeSet(UnknownType()))
+        self.assertEqual(it.get_item(12), UnknownType())
         
     def testBadCall(self):
        it = InferredType.fromType(int)
@@ -119,12 +119,6 @@ class TestTypeSet(unittest.TestCase):
     def testWithMixedVals(self):
         st = TypeSet(int, "a")
         self.assertEqual(str(st),"int, str")
-        
-    def testMatches(self):
-        st = TypeSet(int, "a")
-        self.assertTrue(st.matches((int,float)))
-        self.assertTrue(st.matches((str,str)))
-        self.assertFalse(st.matches((float,list)))
         
     def testEquality(self):
         self.assertEqual(TypeSet(int), TypeSet(int))
