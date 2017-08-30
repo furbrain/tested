@@ -34,7 +34,7 @@ class InferredType():
         
     def __eq__(self, other):
         if isinstance(other,InferredType):
-            return self.name == other.name
+            return str(self)==str(other)
         elif isinstance(other, TypeSet) and len(other)==1:
             return self in other
         elif isinstance(other, str):
@@ -42,7 +42,7 @@ class InferredType():
         elif inspect.isclass(other):
             return self.type == other
         else:
-            return False
+            return NotImplemented
             
     def __ne__(self,other):
         return not self==other
@@ -162,7 +162,7 @@ class TypeSet():
             return self.types==other.types
         if isinstance(other,str):
             return str(self)==other
-        return False
+        return NotImplemented
         
     def __ne__(self, other):
         return not self==other

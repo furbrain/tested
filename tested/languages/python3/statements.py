@@ -61,7 +61,6 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         self.set_scope_for_varargs(node, scope)
         function_type = FunctionType.fromASTNode(node)
         scope[node.name] = function_type
-        print(scope)
         return scope
         
     def set_scope_for_positional_args(self, node, scope):

@@ -27,16 +27,17 @@ def add_all_magic_functions(scope, tp):
     instance_tp = scope[get_type_name(tp)]
     for tp in (class_tp, instance_tp):
         for return_type, func_list in FUNC_TYPES.items():
-            add_magic_functions(tp, func_list, scope[get_type_name(return_type)])
-            add_magic_functions(instance_tp, func_list, scope[get_type_name(return_type)])
-        add_magic_functions(tp, REFLEX_FUNCS, instance_tp.type)
-        add_magic_functions(tp, UNKNOWN_FUNCS, UnknownType())
+            add_functions(tp, func_list, scope[get_type_name(return_type)])
+            add_functions(instance_tp, func_list, scope[get_type_name(return_type)])
+        add_functions(tp, REFLEX_FUNCS, instance_tp)
+        add_functions(tp, UNKNOWN_FUNCS, UnknownType())
     
         
-def add_magic_functions(tp, function_list, return_type):
+def add_functions(tp, function_list, return_type, is_magic=True):
     for func in function_list.split():
-        func_name = "__{}__".format(func)
-        if hasattr(tp.type,func_name):
-            function = FunctionType.fromFunction(getattr(tp.type,func_name), return_type)
-            tp.add_attr(func_name, function)
+        if is_magic:
+            func = "__{}__".format(func)
+        if hasattr(tp.type,func):
+            function = FunctionType.fromFunction(getattr(tp.type,func), return_type)
+            tp.add_attr(func, function)
 

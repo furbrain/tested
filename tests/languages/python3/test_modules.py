@@ -1,5 +1,4 @@
 import unittest
-import pprint
 import attr
 from tested.languages.python3 import ModuleTypeParser, LineNumberGetter
 
@@ -47,7 +46,6 @@ class TestModuleTypeParser(unittest.TestCase):
         return parser.parseModule(SPECIMEN_CODE)
         
     def getScopeStarting(self, scopes, line_start):
-        pprint.pprint(scopes)
         possible_scopes = [x for x in scopes if x.line_start == line_start]
         return possible_scopes[0].get_whole_context()
 

@@ -4,7 +4,10 @@ import inspect
 from .inferred_types import TypeSet, InferredType, UnknownType
 
 def get_parameters(function):
-    signature = inspect.signature(function)
+    try:
+        signature = inspect.signature(function)
+    except ValueError:
+        return[]
     params = signature.parameters
     return params.keys()
 
