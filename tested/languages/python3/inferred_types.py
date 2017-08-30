@@ -68,6 +68,9 @@ class InferredType():
     def __iter__(self):
         return iter((self,))
         
+    def has_attr(self, attr):
+        return attr in self.attrs
+        
     def get_attr(self, attr):
         if attr not in self.attrs:
             self.attrs[attr] = UnknownType()

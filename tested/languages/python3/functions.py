@@ -1,6 +1,12 @@
 import ast
+import inspect
 
 from .inferred_types import TypeSet, InferredType, UnknownType
+
+def get_parameters(function):
+    signature = inspect.signature(function)
+    params = signature.parameters
+    return params.keys()
 
 class FunctionType(InferredType):
 
@@ -11,6 +17,13 @@ class FunctionType(InferredType):
         docstring = ast.get_docstring(node)
         if return_type is None:
             return_type = UnknownType('return')
+        return cls(name, arg_names, return_type, docstring)
+
+    @classmethod
+    def fromFunction(cls, function, return_type):
+        name = function.__name__
+        arg_names = get_parameters(function)
+        docstring = function.__doc__
         return cls(name, arg_names, return_type, docstring)
         
     def __init__(self, name, args, returns, docstring):
