@@ -25,42 +25,42 @@ class TestStatementBlockTypeParser__Base(unittest.TestCase):
 
 class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Base):        
     def testSimpleAssignment(self):
-        self.checkStatement("a=1", {'a':"int"})
-        self.checkStatement("a=1+2.0", {'a':"float"})
-        self.checkStatement("a='abc %d' % 1", {'a':"str"})
+        self.checkStatement("a=1", {'a':"<int>"})
+        self.checkStatement("a=1+2.0", {'a':"<float>"})
+        self.checkStatement("a='abc %d' % 1", {'a':"<str>"})
         
     def testMultipleAssignment(self):
-        self.checkStatement("a,b = 2,3", {'a':'int','b':'int'})
-        self.checkStatement("[a,b] = [2,'abc']", {'a':'int','b':'str'})
+        self.checkStatement("a,b = 2,3", {'a':'<int>','b':'<int>'})
+        self.checkStatement("[a,b] = [2,'abc']", {'a':'<int>','b':'<str>'})
     
     def testNestedAssignment(self):
-        self.checkStatement("(a,b),c = (1,2),3", {'a':'int','b':'int','c':'int'})
+        self.checkStatement("(a,b),c = (1,2),3", {'a':'<int>','b':'<int>','c':'<int>'})
         
     def testMultipleTargetAssignment(self):
-        self.checkStatement("a = b = 2", {'a':'int','b':'int'})
+        self.checkStatement("a = b = 2", {'a':'<int>','b':'<int>'})
         
     def testReturnValue(self):
-        self.checkStatement("return 'abc'",'str',field="return")
-        self.checkStatement("return 2",'int',field="return")
+        self.checkStatement("return 'abc'",'<str>',field="return")
+        self.checkStatement("return 2",'<int>',field="return")
         
     def testMultiLineAssignment(self):
-        self.checkStatement("a = 1\nb = 2.0\nc = a+b",{'a':'int','b':'float','c':'float'})
+        self.checkStatement("a = 1\nb = 2.0\nc = a+b",{'a':'<int>','b':'<float>','c':'<float>'})
         
     def testAugmentedAssignment(self):
-        self.checkStatement("a += 3.0", {'a':'float, int'}, context = {'a':TypeSet(int)})
+        self.checkStatement("a += 3.0", {'a':'<float>, <int>'}, context = {'a':TypeSet(1)})
         
 class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base):
     def testBasicFunctionDef(self):
-        self.checkStatement("def f(): pass", {'f':'f() -> (NoneType)'})
+        self.checkStatement("def f(): pass", {'f':'f() -> (None)'})
 
     def testFunctionReturnsNone(self):
-        self.checkStatement("def f(): return None", {'f':'f() -> (NoneType)'})
+        self.checkStatement("def f(): return None", {'f':'f() -> (None)'})
 
     def testFunctionReturnsInt(self):
-        self.checkStatement("def f(): return 1", {'f':'f() -> (int)'})
+        self.checkStatement("def f(): return 1", {'f':'f() -> (<int>)'})
         
     def testFunctionWithArgs(self):
-        self.checkStatement("def f(a, b): pass", {'f':'f(a, b) -> (NoneType)'})
+        self.checkStatement("def f(a, b): pass", {'f':'f(a, b) -> (None)'})
 
     def testFunctionReturnsOneArg(self):
         self.checkStatement("def f(a): return a", {'f':'f(a) -> (Unknown: a)'})
@@ -89,17 +89,17 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
     def testClassAttributeCreation(self):
         stmt = "class A(object): pass\nA.b=1"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'].get_attr('b'),'int')
+        self.assertEqual(ctx['A'].get_attr('b'),'<int>')
         
     def testClassVariableCreation(self):
         stmt = "class A(object):\n  b=1"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'].get_attr('b'),'int')
+        self.assertEqual(ctx['A'].get_attr('b'),'<int>')
         
     def testClassVariableDoesNotTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (NoneType)')
+        self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (None)')
         
     def testClassNameDoesTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A"

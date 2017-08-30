@@ -52,13 +52,13 @@ class TestModuleTypeParser(unittest.TestCase):
         return possible_scopes[0].get_whole_context()
 
     def testSimpleAssignment(self):
-        self.checkModule("a = 1",{'a':'int'})
+        self.checkModule("a = 1",{'a':'<int>'})
         
     def testContingentAssignment(self):
-        self.checkModule("a=1\nb=a",{'a':'int','b':'int'})
+        self.checkModule("a=1\nb=a",{'a':'<int>','b':'<int>'})
         
     def testComplexAssignment(self):
-        self.checkModule("a=1\nb=2.5\nc=a*b",{'a':'int','b':'float','c':'float'})
+        self.checkModule("a=1\nb=2.5\nc=a*b",{'a':'<int>','b':'<float>','c':'<float>'})
         
     def testModuleScope(self):
         scopes = self.setUpSpecimenModule()

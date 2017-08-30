@@ -6,8 +6,8 @@ class TestInferredType(unittest.TestCase):
     def testInitWithSimpleVal(self):
         it_num = InferredType.fromType(1)
         it_str = InferredType.fromType("a")
-        self.assertEqual(str(it_num),"int")
-        self.assertEqual(str(it_str),"str")
+        self.assertEqual(str(it_num),"<int>")
+        self.assertEqual(str(it_str),"<str>")
         
     def testInitWithSimpleType(self): 
         it_num = InferredType.fromType(int)
@@ -82,27 +82,12 @@ class TestInferredType(unittest.TestCase):
     def testBadCall(self):
        it = InferredType.fromType(int)
        self.assertEqual(it.get_call_return(1), TypeSet(UnknownType()))
-    
-    def testLoadSimpleFuncFromString(self):
-        text = "name() -> (int)"
-        it = InferredType.fromString(text)
-        self.assertEqual(str(it),text)
-        
-    def testLoadFromStringGetsCorrectRetun(self):
-        text = "name() -> (int)"
-        it = InferredType.fromString(text)
-        self.assertEqual(it.get_call_return([]),'int')
-
-    def testLoadFromStringGetsCorrectVars(self):
-        text = "name(arg1, arg2) -> (int)"
-        it = InferredType.fromString(text)
-        self.assertEqual(it.args,['arg1','arg2'])
 
         
 class TestTypeSet(unittest.TestCase):
     def testInitWithSingleVal(self):
         st = TypeSet(1)
-        self.assertEqual(str(st),"int")
+        self.assertEqual(str(st),"<int>")
     
     def testInitWithSingleType(self):
         st = TypeSet(int)
@@ -110,15 +95,15 @@ class TestTypeSet(unittest.TestCase):
     
     def testInitWithSingleInferredType(self):
         st = TypeSet(InferredType.fromType(1))
-        self.assertEqual(str(st),"int")
+        self.assertEqual(str(st),"<int>")
         
     def testWithMultipleVals(self):
         st = TypeSet(1,"a")
-        self.assertEqual(str(st),"int, str")
+        self.assertEqual(str(st),"<int>, <str>")
         
     def testWithMixedVals(self):
         st = TypeSet(int, "a")
-        self.assertEqual(str(st),"int, str")
+        self.assertEqual(str(st),"<str>, int")
         
     def testEquality(self):
         self.assertEqual(TypeSet(int), TypeSet(int))

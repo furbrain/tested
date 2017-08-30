@@ -1,42 +1,48 @@
 import unittest
 
-from tested.languages.python3 import assign_to_node, TypeSet, ClassType, InferredList
+from tested.languages.python3 import assign_to_node, TypeSet, ClassType, InferredList, get_global_scope
+
+
 
 class TestAssignment(unittest.TestCase):
+    def setUp(self):
+        self.int = get_global_scope()['<int>']
+        self.str = get_global_scope()['<str>']
+        
     def testSimpleAssignment(self):
         context = {}
-        assign_to_node('a',TypeSet(int),context)
-        self.assertEqual({'a':'int'}, context)
+        assign_to_node('a',TypeSet(self.int),context)
+        self.assertEqual({'a':'<int>'}, context)
         
     def testClassMemberAssignment(self):
         context = {'C':TypeSet(ClassType('C',[],{},''))}
-        assign_to_node('C.x',TypeSet(int),context)
-        self.assertEqual(context['C'][0].get_attr('x'), 'int')
+        assign_to_node('C.x',TypeSet(self.int),context)
+        self.assertEqual(context['C'][0].get_attr('x'), '<int>')
         
     def testComplexClassMemberAssignment(self):
         a = ClassType('A',[],{},'')
-        a.add_attr('x', TypeSet(int))
+        a.add_attr('x', TypeSet(self.int))
         b = ClassType('B',[],{},'')        
         context = {'C':TypeSet(a,b)}
-        assign_to_node('C.x',TypeSet(str),context)
-        self.assertEqual(a.get_attr('x'),'int, str')
-        self.assertEqual(b.get_attr('x'),'str')
+        assign_to_node('C.x',TypeSet(self.str),context)
+        self.assertEqual(a.get_attr('x'),'<int>, <str>')
+        self.assertEqual(b.get_attr('x'),'<str>')
         
     def testListIndexAssigment(self):
         """Test assignment to a list index works"""
-        context = {'l': TypeSet(InferredList(int))}
-        assign_to_node('l[0]',TypeSet(str),context)
-        self.assertEqual(context,{'l':'[int, str]'})
+        context = {'l': TypeSet(InferredList(self.int))}
+        assign_to_node('l[0]',TypeSet(self.str),context)
+        self.assertEqual(context,{'l':'[<int>, <str>]'})
         
     def testListSliceAssignment(self):
-        context = {'l': TypeSet(InferredList(int))}
-        l2 = TypeSet(InferredList(str))
+        context = {'l': TypeSet(InferredList(self.int))}
+        l2 = TypeSet(InferredList(self.str))
         assign_to_node('l[1:2]',l2,context)
-        self.assertEqual(context,{'l':'[int, str]'})
+        self.assertEqual(context,{'l':'[<int>, <str>]'})
         
     def testListSliceTotalAssignment(self):        
-        context = {'l': TypeSet(InferredList(int))}
-        l2 = TypeSet(InferredList(str))
+        context = {'l': TypeSet(InferredList(self.int))}
+        l2 = TypeSet(InferredList(self.str))
         assign_to_node('l[:]',l2,context)
-        self.assertEqual(context,{'l':'[int, str]'})
+        self.assertEqual(context,{'l':'[<int>, <str>]'})
 

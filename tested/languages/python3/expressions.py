@@ -1,9 +1,9 @@
 import ast
 import types
 
-from .inferred_types import TypeSet, InferredList, InferredType, UnknownType
+from .inferred_types import TypeSet, InferredList, InferredType, UnknownType, get_type_name
+from .builtins import get_built_in_for_literal
 
-NUMERIC_TYPES = (int, float)
 
 def get_expression_type(expression, scope):
     if isinstance(expression,str):
@@ -14,24 +14,27 @@ def get_expression_type(expression, scope):
 class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, scope):
         self.scope = scope
+        self.float = get_built_in_for_literal(1.1)
+        self.int = get_built_in_for_literal(1)
+        self.str = get_built_in_for_literal('a')
+        self.bool = get_built_in_for_literal(True)
+        self.NUMERIC_TYPES = (self.int, self.float)
         
     def getType(self,expression):
         return self.visit(expression)
         
     def visit_Num(self, node):
-        return InferredType.fromType(node.n)
+        return get_built_in_for_literal(node.n)
         
     def visit_Str(self, node):
-        return InferredType.fromType(node.s)
+        return get_built_in_for_literal(node.s)
         
     def visit_Name(self, node):
         if node.id in self.scope:
             return self.scope[node.id]
     
     def visit_NameConstant(self, node):
-        if node.value==True: return InferredType.fromType(bool)
-        if node.value==False: return InferredType.fromType(bool)
-        if node.value==None: return InferredType.fromType(type(None))
+        return get_built_in_for_literal(node.value)
            
     def visit_List(self, node):
         result = InferredList()
@@ -69,42 +72,42 @@ class ExpressionTypeParser(ast.NodeVisitor):
         if self.bothArgsNumeric(left,right):
             return self.getHighestPriorityNumber(left, right)
         if self.bothArgsStrings(left, right):
-            return str
-        if left == str and right in NUMERIC_TYPES and op=="Mult":
+            return self.str
+        if left == self.str and right in self.NUMERIC_TYPES and op=="Mult":
             return left
-        if left == str and op=="Mod":
+        if left == self.str and op=="Mod":
             return left
         return TypeError
         
     def bothArgsNumeric(self,left,right):
-        return left in NUMERIC_TYPES and right in NUMERIC_TYPES
+        return left in self.NUMERIC_TYPES and right in self.NUMERIC_TYPES
             
     def bothArgsStrings(self, left, right):
-        return left == str and right == str
+        return left == self.str and right == self.str
         
     def getHighestPriorityNumber(self, left, right):
-        if float in (left,right):
-            return float
+        if self.float in (left,right):
+            return self.float
         else:
-            return int
+            return self.int
     
     def visit_UnaryOp(self, node):
         op = type(node.op).__name__
         if op=="Not":
-            return InferredType.fromType(bool)
+            return self.bool
         if op=="Invert":
-            return InferredType.fromType(int)
+            return self.int
         if op in ("UAdd","USub"):
             result = TypeSet()
             for operand in self.getType(node.operand):
-                if operand in NUMERIC_TYPES:
+                if operand in self.NUMERIC_TYPES:
                     result = result.add_type(operand)
                 else:
-                    result = result.add_type(int)
+                    result = result.add_type(self.int)
             return result        
                 
     def visit_BoolOp(self, node):
-        return InferredType.fromType(bool)
+        return self.bool
         
     def visit_Subscript(self, node):
         value = self.getType(node.value)
@@ -115,5 +118,5 @@ class ExpressionTypeParser(ast.NodeVisitor):
             return value
         
     def visit_Compare(self, node):
-        return InferredType.fromType(bool)
+        return self.bool
 

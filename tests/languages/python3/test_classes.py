@@ -1,8 +1,13 @@
 import unittest
-from tested.languages.python3 import ClassType, TypeSet, InstanceType, Scope
+from tested.languages.python3 import ClassType, TypeSet, InstanceType, Scope, get_global_scope
 
 
 class TestClasses(unittest.TestCase):
+    def setUp(self):
+        self.int = get_global_scope()['<int>']
+        self.str = get_global_scope()['<str>']
+
+
     def makeClass(self, name, parents = None, context=None):
         if parents is None:
             parents = []
@@ -16,14 +21,14 @@ class TestClasses(unittest.TestCase):
         c = self.makeClass('c')
         
     def testCreateClassWithContext(self):
-        c = self.makeClass('c', context = {'i':TypeSet(int)})
-        self.assertEqual(c.get_attr('i'),"int")
+        c = self.makeClass('c', context = {'i':TypeSet(self.int)})
+        self.assertEqual(c.get_attr('i'),"<int>")
         
     def testCreateInheritedClassWithContext(self):
-        c1 = self.makeClass('c1', context = {'i':TypeSet(int)})
-        c2 = self.makeClass('c2',parents = [TypeSet(c1)], context = {'s':TypeSet(str)})
-        self.assertEqual(c2.get_attr('i'),"int")        
-        self.assertEqual(c2.get_attr('i'),"int")
+        c1 = self.makeClass('c1', context = {'i':TypeSet(self.int)})
+        c2 = self.makeClass('c2',parents = [TypeSet(c1)], context = {'s':TypeSet(self.str)})
+        self.assertEqual(c2.get_attr('i'),"<int>")        
+        self.assertEqual(c2.get_attr('i'),"<int>")
         
     def testClassCreatesInstance(self):
         c1 = self.makeClass('c1')
@@ -36,9 +41,9 @@ class TestClasses(unittest.TestCase):
         self.assertNotEqual(i1,i2)
         
     def testInstanceInheritsContext(self):
-        c = self.makeClass('c',context = {'i':TypeSet(int)})
+        c = self.makeClass('c',context = {'i':TypeSet(self.int)})
         instance = c.get_call_return([])
-        self.assertEqual(instance[0].get_attr('i'),"int")
+        self.assertEqual(instance[0].get_attr('i'),"<int>")
         
     def testInstancesSameObjects(self):
         c = self.makeClass('c')
