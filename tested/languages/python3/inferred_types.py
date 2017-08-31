@@ -61,6 +61,9 @@ class InferredType():
             self.attrs[attr] = UnknownType()
         return self.attrs[attr]
         
+    def set_attr(self, attr, typeset):
+        self.attrs[attr] = typeset
+        
     def add_attr(self, attr, typeset):
         if attr in self.attrs:
             self.attrs[attr] = self.attrs[attr].add_type(typeset)

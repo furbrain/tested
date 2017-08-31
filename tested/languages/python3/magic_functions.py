@@ -39,5 +39,5 @@ def add_functions(tp, function_list, return_type, is_magic=True):
             func = "__{}__".format(func)
         if hasattr(tp.type,func):
             function = FunctionType.fromFunction(getattr(tp.type,func), return_type)
-            tp.add_attr(func, function)
+            tp.set_attr(func, function)
 
