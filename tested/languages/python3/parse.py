@@ -11,7 +11,7 @@ def get_suggestions(context, line, line_number):
     identifier = get_last_whole_identifier(line)
     obj,_,prefix = identifier.rpartition('.')
     if obj:
-        scope = expressions.get_expression_type(obj)    
+        scope = expressions.get_expression_type(obj,scope).get_all_attrs()
     return [x for x in scope if x.startswith(prefix)]
     
 def get_last_whole_identifier(line):
