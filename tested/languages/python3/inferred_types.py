@@ -99,6 +99,9 @@ class InferredType():
             return self
         return TypeSet(self, other)
         
+    def get_all_attrs(self):
+        return self.attrs.copy()
+        
 class UnknownType(InferredType):
     def __init__(self, name=None):
         if name:
@@ -150,6 +153,11 @@ class TypeSet():
     def get_call_return(self, arg_types):
         return TypeSet(*[tp.get_call_return(arg_types) for tp in self.types])
 
+    def get_all_attrs(self):
+        res = {}
+        for tp in self.types:
+            res.update(tp.get_all_attrs())
+        return res
 
     def __str__(self):
         return ', '.join(sorted(str(x) for x in self.types))
