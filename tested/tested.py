@@ -1,9 +1,10 @@
 import json
 import os.path
 import webbrowser
-from gi.repository import GObject, Gedit, Gtk
+from gi.repository import GObject, Gedit, Gtk, GtkSource
 
-from .languages.python3 import parse_statements
+from .languages import python3
+from .languages.python3 import parse_text, get_suggestions
 from .pyweb.module_finder import get_module_dict
 
 class TestedPlugin(GObject.Object, Gedit.ViewActivatable):
@@ -15,10 +16,15 @@ class TestedPlugin(GObject.Object, Gedit.ViewActivatable):
         GObject.Object.__init__(self)
         self.active = False
         self.modules_dict = get_module_dict()
+        self.context = None
 
     def do_activate(self):
         self.view.connect("populate-popup",self.add_to_popup)
-
+        self.buffer = self.view.get_buffer()
+        self.completion = CompletionProvider(python3)
+        completions = self.view.get_completion()
+        completions.add_provider(self.completion)
+        
     def do_deactivate(self):
         pass
 
@@ -64,3 +70,58 @@ class TestedPlugin(GObject.Object, Gedit.ViewActivatable):
         print("Opening {}".format(url))
         webbrowser.open(url, new=2)
         
+    def update_context(self):
+        try:
+            self.context = parse_text(self.buffer.get_text())
+        except SyntaxError:
+            pass
+                    
+class CompletionProvider(GObject.Object, GtkSource.CompletionProvider):
+    def __init__(self, module):
+        GObject.Object.__init__(self)
+        self.doc_context = None
+        self.parser = module.parse_text
+        self.suggester = module.get_suggestions
+        
+    def do_get_name(self):
+        return "PyComplete"
+        
+    def get_icon(self):
+        return None
+        
+    def get_icon_name(self):
+        return None
+        
+    def get_gicon(self):
+        return None
+        
+    def get_all_text(self, iterator):
+        buffer = iterator.get_buffer()
+        start = buffer.get_start_iter()
+        end = buffer.get_end_iter()
+        return buffer.get_text(start, end, True)
+        
+    def do_populate(self, context):
+        pos = context.get_iter()[1]
+        try:
+            self.doc_context = self.parser(self.get_all_text(pos))
+        except SyntaxError:
+            pass
+        if self.doc_context:
+            line_no = pos.get_line()
+            line_start = pos.get_buffer().get_iter_at_line(line_no)
+            line = line_start.get_text(pos)
+            suggestions = self.suggester(self.doc_context, line, line_no)
+            sugs = [self.createProposal(x) for x in suggestions]
+            context.add_proposals(self, sugs, True)
+        
+    def createProposal(self, text):
+        prop = GtkSource.CompletionItem(label=text, text=text)
+        return prop
+    
+    def get_activation(self):
+        return 0
+        
+    def match(self, context):
+        return False
+
