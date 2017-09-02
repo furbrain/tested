@@ -26,6 +26,9 @@ class Scope():
         
     def __setitem__(self, key, value):
         self.context[key] = value
+        
+    def __iter__(self):
+        return iter(self.context)
 
     def matches(self, line, indent):
         if self.line_start <= line <= self.line_end:
