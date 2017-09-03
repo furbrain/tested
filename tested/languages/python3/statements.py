@@ -13,11 +13,8 @@ def parse_statements(statements, scope=None):
     return parser.parseStatements(statements)
 
 class StatementBlockTypeParser(ast.NodeVisitor):
-    def __init__(self, scope=None):
-        if scope is None:
-            self.scope = Scope('__main__',0,0)
-        else:
-            self.scope = scope
+    def __init__(self, scope):
+        self.scope = scope
         self.returns = TypeSet()
         self.scopes = []
                     
