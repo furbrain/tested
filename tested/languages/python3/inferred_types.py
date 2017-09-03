@@ -104,6 +104,7 @@ class InferredType():
         
 class UnknownType(InferredType):
     def __init__(self, name=None):
+        super().__init__()
         if name:
             self.name = "Unknown: %s" % name
             self.type = name
@@ -154,12 +155,17 @@ class TypeSet():
         return TypeSet(*[tp.get_call_return(arg_types) for tp in self.types])
 
     def get_all_attrs(self):
-        res = {}
+        results = {}
         for tp in self.types:
-            res.update(tp.get_all_attrs())
-        return res
+            new_attrs = tp.get_all_attrs()
+            for key, value in new_attrs.items():
+                if key in results: 
+                    results[key] = results[key].add_type(value)
+                else:
+                    results[key] = value
+        return results
 
-    def __str__(self):
+    def  __str__(self):
         return ', '.join(sorted(str(x) for x in self.types))
         
     def __repr__(self):

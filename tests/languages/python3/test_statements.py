@@ -99,7 +99,7 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
     def testClassVariableDoesNotTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b"
         ctx = self.getContext(stmt)
-        self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (None)')
+        self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (Unknown)')
         
     def testClassNameDoesTransferIntoMethods(self):
         stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A"

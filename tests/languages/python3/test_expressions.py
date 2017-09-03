@@ -78,7 +78,10 @@ class TestExpressionTypeParser(unittest.TestCase):
         context = {'a':self.float, 'b':self.int}
         self.checkExpr("a","<float>",context=context)
         self.checkExpr("b","<int>",context=context)
-        
+    
+    def testExpressionWithUnknownVariable(self):
+        context = {'a':self.float, 'b':self.int}
+        self.checkExpr("c","Unknown", context=context)
         
     ### LISTS ###    
     def testListWithSingleType(self):

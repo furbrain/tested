@@ -32,6 +32,8 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_Name(self, node):
         if node.id in self.scope:
             return self.scope[node.id]
+        else:
+            return UnknownType()
     
     def visit_NameConstant(self, node):
         return get_built_in_for_literal(node.value)
