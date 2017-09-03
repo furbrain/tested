@@ -1,8 +1,10 @@
 import unittest
-from tested.languages.python3 import get_global_scope, get_built_in_for_literal
+import unittest.mock
+import tested.languages.python3.builtins
+from tested.languages.python3 import get_built_in_for_literal
 from tested.languages.python3.inferred_types import get_type_name
 from tested.languages.python3.magic_functions import FUNC_TYPES, UNKNOWN_FUNCS, REFLEX_FUNCS
-
+get_global_scope = tested.languages.python3.builtins.get_global_scope
 class BasicTypeBase(unittest.TestCase):
     def setUp(self):
         self.instance_type = get_built_in_for_literal(self.target_instance)
@@ -76,7 +78,6 @@ class TestComplexLiteral(BasicTypeBase):
         self.assertEqual(self.get_return_value(self.class_type,'conjugate'), self.instance_type)
 
     def testAbs(self):
-        print(self.instance_type.attrs)
         self.assertEqual(self.get_return_value(self.instance_type,'__abs__'), get_built_in_for_literal(1.2))
 
 class TestStrLiteral(BasicTypeBase):
@@ -104,3 +105,27 @@ class TestNoneLiteral(BasicTypeBase):
         pass #doesn't work proper for None
 
 del BasicTypeBase
+
+class TestGetBuiltInForLiteral(unittest.TestCase):
+    def testGetSimpleTypes(self):
+        for literal in (1, 2.0, True, "abc", b"abc"):
+            tp = get_built_in_for_literal(literal)
+            self.assertEqual(tp,'<{}>'.format(type(literal).__name__))
+            
+    def testUnknownClass(self):
+        class Temp:
+            pass
+        t = Temp()
+        with self.assertRaises(AttributeError):
+            get_built_in_for_literal(t)
+    
+class TestGetGlobalScope(unittest.TestCase):
+    @unittest.mock.patch('tested.languages.python3.builtins.create_scope')
+    def testCreateScopeCalledOnceOnly(self, mock_create):
+        tested.languages.python3.builtins._scope = None #reset scope
+        mock_create.ret_val = {'l':'something'}
+        f = get_global_scope()
+        g = get_global_scope()
+        tested.languages.python3.builtins._scope = None #reset scope
+        self.assertEqual(mock_create.call_count,1)
+

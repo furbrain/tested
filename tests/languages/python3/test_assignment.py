@@ -45,4 +45,10 @@ class TestAssignment(unittest.TestCase):
         l2 = TypeSet(InferredList(self.str))
         assign_to_node('l[:]',l2,context)
         self.assertEqual(context,{'l':'[<int>, <str>]'})
+        
+    def testCallResultAssignmentDoesNothing(self):
+        context = {'l': self.int}
+        assign_to_node('l()',self.str,context)
+        self.assertEqual(context,{'l':'<int>'})
+    
 
