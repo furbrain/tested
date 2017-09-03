@@ -1,6 +1,6 @@
 import unittest
 
-from tested.languages.python3 import assign_to_node, TypeSet, ClassType, InferredList, get_global_scope
+from tested.languages.python3 import assign_to_node, TypeSet, ClassType, InferredList, InferredDict, get_global_scope
 
 
 
@@ -8,6 +8,7 @@ class TestAssignment(unittest.TestCase):
     def setUp(self):
         self.int = get_global_scope()['<int>']
         self.str = get_global_scope()['<str>']
+        self.float = get_global_scope()['<float>']
         
     def testSimpleAssignment(self):
         context = {}
@@ -31,7 +32,7 @@ class TestAssignment(unittest.TestCase):
     def testListIndexAssigment(self):
         """Test assignment to a list index works"""
         context = {'l': TypeSet(InferredList(self.int))}
-        assign_to_node('l[0]',TypeSet(self.str),context)
+        assign_to_node('l[0]', self.str, context)
         self.assertEqual(context,{'l':'[<int>, <str>]'})
         
     def testListSliceAssignment(self):
@@ -45,6 +46,11 @@ class TestAssignment(unittest.TestCase):
         l2 = TypeSet(InferredList(self.str))
         assign_to_node('l[:]',l2,context)
         self.assertEqual(context,{'l':'[<int>, <str>]'})
+
+    def testDictIndexAssignment(self):
+        context = {'d': InferredDict([self.str],[self.int])}
+        assign_to_node("d['abc']", self.float, context)
+        self.assertEqual(context,{'d':'{<str>: <float>, <int>}'})
         
     def testCallResultAssignmentDoesNothing(self):
         context = {'l': self.int}

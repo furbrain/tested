@@ -48,6 +48,12 @@ class ExpressionTypeParser(ast.NodeVisitor):
         items = [self.getType(elt) for elt in node.elts]
         return InferredTuple(*items)
         
+    def visit_Dict(self, node):
+        keys = [self.getType(key) for key in node.keys]
+        items = [self.getType(value) for value in node.values]
+        return InferredDict(keys, items)
+            
+        
     def visit_Call(self, node):
         func_types = self.visit(node.func)
         args = [self.visit(arg_node) for arg_node in node.args]

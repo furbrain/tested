@@ -112,7 +112,12 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("(1,'a',2.0)[1:2]", "[<float>, <int>, <str>]")
         self.checkExpr("(1,'a')[:]", "[<int>, <str>]")
         
+    ### DICTS ###
+    def testDict(self):
+        self.checkExpr("{1: 'abc', 2.0: [1,2]}", "{<float>, <int>: <str>, [<int>]}")
         
+    def testDictIndex(self):
+        self.checkExpr("{1: 'abc', 2.0: [1,2]}[1]", "<str>, [<int>]")
         
     ### Comparison ###    
     def testCompare(self):

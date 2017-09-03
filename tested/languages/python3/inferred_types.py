@@ -152,7 +152,18 @@ class InferredTuple(InferredType):
     def get_slice(self):
         return InferredList(*self.items)
             
+class InferredDict(InferredType):
+    def __init__(self, keys, values):
+        super().__init__()
+        self.keys = TypeSet(*keys)
+        self.items = TypeSet(*values)
 
+    def __str__(self):
+        return "{{{!s}: {!s}}}".format(self.keys, self.items)
+
+    def get_key(self):
+        return self.keys
+        
 class TypeSet():
     def __init__(self, *args):
         self.types = set()

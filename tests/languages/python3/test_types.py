@@ -1,6 +1,7 @@
 import unittest
 
-from tested.languages.python3 import InferredType, TypeSet, UnknownType, FunctionType
+from tested.languages.python3.inferred_types import InferredType, InferredTuple, InferredDict, TypeSet, UnknownType 
+from tested.languages.python3.functions import FunctionType
 
 class TestInferredType(unittest.TestCase):
     def setUp(self):
@@ -90,6 +91,7 @@ class TestInferredType(unittest.TestCase):
         self.test_type.add_attr('c',it_str)
         self.assertEqual(self.test_type.get_all_attrs(),{'a':'<int>', 'b':'<str>', 'c':'<int>, <str>'})
        
+       
 class TestInferredTuple(unittest.TestCase):
     def setUp(self):
         self.int = InferredType.fromType(int)
@@ -109,7 +111,23 @@ class TestInferredTuple(unittest.TestCase):
     def testSlice(self):
         self.assertEqual(self.tuple.get_slice(), '[float, int, str]')
             
+class TestInferredDict(unittest.TestCase):
+    def setUp(self):
+        self.int = InferredType.fromType(int)
+        self.str = InferredType.fromType(str)
+        self.float = InferredType.fromType(float)
+        self.dict = InferredDict(keys = [self.int, self.float], values = [self.str, self.float])
+
+    def testInit(self):
+        self.assertEqual(self.dict, '{float, int: float, str}')
         
+    def testValues(self):
+        self.assertEqual(self.dict.get_item(0), 'float, str')
+
+    def testKeys(self):
+        self.assertEqual(self.dict.get_key(), 'float, int')
+        
+
 class TestTypeSet(unittest.TestCase):
     def setUp(self):
         class TempClass1:
