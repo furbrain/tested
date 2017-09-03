@@ -1,7 +1,7 @@
 import ast
 import types
 
-from .inferred_types import TypeSet, InferredList, InferredType, UnknownType, get_type_name
+from .inferred_types import TypeSet, InferredList, InferredTuple, InferredDict, InferredType, UnknownType, get_type_name
 from .builtins import get_built_in_for_literal
 
 
@@ -43,6 +43,10 @@ class ExpressionTypeParser(ast.NodeVisitor):
         for elt in node.elts:
             result.add_item(self.getType(elt))
         return result
+        
+    def visit_Tuple(self, node):
+        items = [self.getType(elt) for elt in node.elts]
+        return InferredTuple(*items)
         
     def visit_Call(self, node):
         func_types = self.visit(node.func)
@@ -114,8 +118,15 @@ class ExpressionTypeParser(ast.NodeVisitor):
         value = self.getType(node.value)
         slice_type = type(node.slice).__name__
         if slice_type=="Index":
-            return value.get_item(0)
+            index = node.slice.value
+            index_type = type(node.slice.value).__name__
+            if index_type=="Num":
+                return value.get_item(index.n)
+            else:
+                return value.get_item(self.getType(index))
         else:
+            if hasattr(value, 'get_slice'):
+                return value.get_slice()
             return value
         
     def visit_Compare(self, node):

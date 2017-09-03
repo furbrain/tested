@@ -130,6 +130,28 @@ class InferredList(InferredType):
         
     def __str__(self):
         return '[%s]' % self.items
+        
+class InferredTuple(InferredType):
+    def __init__(self, *args):
+        super().__init__()
+        self.name="tuple"
+        self.items = list(args)
+        
+    def __str__(self):
+        item_names = [str(x) for x in self.items]
+        return"({})".format(', '.join(item_names))
+        
+    def get_item(self, index):
+        if isInferredType(index):
+            return TypeSet(*self.items)
+        try:
+            return self.items[index]
+        except IndexError:
+            return UnknownType()
+            
+    def get_slice(self):
+        return InferredList(*self.items)
+            
 
 class TypeSet():
     def __init__(self, *args):

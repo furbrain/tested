@@ -90,6 +90,25 @@ class TestInferredType(unittest.TestCase):
         self.test_type.add_attr('c',it_str)
         self.assertEqual(self.test_type.get_all_attrs(),{'a':'<int>', 'b':'<str>', 'c':'<int>, <str>'})
        
+class TestInferredTuple(unittest.TestCase):
+    def setUp(self):
+        self.int = InferredType.fromType(int)
+        self.str = InferredType.fromType(str)
+        self.float = InferredType.fromType(float)
+        self.tuple = InferredTuple(self.int, self.str, self.float)
+        
+    def testInit(self):
+        self.assertEqual(self.tuple, '(int, str, float)')
+        
+    def testIndex(self):
+        self.assertEqual(self.tuple.get_item(0), self.int)
+        self.assertEqual(self.tuple.get_item(1), self.str)
+        self.assertEqual(self.tuple.get_item(2), self.float)
+        self.assertEqual(self.tuple.get_item(self.int), TypeSet(self.int, self.str, self.float))
+        
+    def testSlice(self):
+        self.assertEqual(self.tuple.get_slice(), '[float, int, str]')
+            
         
 class TestTypeSet(unittest.TestCase):
     def setUp(self):

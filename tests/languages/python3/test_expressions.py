@@ -95,10 +95,26 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[1,2,3,'a',4][0]", "<int>, <str>")
         
     def testListSlice(self):
-        self.checkExpr("[1,2,3,4][:]","[<int>]")
-        self.checkExpr("[1,2,3,4][1:]","[<int>]")
-        self.checkExpr("[1,2,3,4][:-1]","[<int>]")
+        self.checkExpr("[1,2,3,4][:]", "[<int>]")
+        self.checkExpr("[1,2,3,4][1:]", "[<int>]")
+        self.checkExpr("[1,2,3,4][:-1]", "[<int>]")
+    
+    ### TUPLES ###
+    def testTuple(self):
+        self.checkExpr("(1,2,3,4)","(<int>, <int>, <int>, <int>)")
+        self.checkExpr("(1,'a')", "(<int>, <str>)")
         
+    def testTupleExtraction(self):
+        self.checkExpr("(1,'a')[0]", "<int>")
+        self.checkExpr("(1,'a')[1]", "<str>")
+        
+    def testTupleSlice(self):
+        self.checkExpr("(1,'a',2.0)[1:2]", "[<float>, <int>, <str>]")
+        self.checkExpr("(1,'a')[:]", "[<int>, <str>]")
+        
+        
+        
+    ### Comparison ###    
     def testCompare(self):
         self.checkExpr("1 < 2", "<bool>")
         self.checkExpr("2 > 3", "<bool>")
