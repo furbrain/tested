@@ -10,6 +10,9 @@ def get_type_name(obj):
         else:
             return '<{}>'.format(type(obj).__name__)
 
+def isInferredType(obj):
+    return isinstance(obj,(InferredType, TypeSet))
+
 class InferredType():
     @classmethod
     def fromType(cls, object_type):
@@ -54,6 +57,7 @@ class InferredType():
         return iter((self,))
         
     def has_attr(self, attr):
+        assert(isinstance(attr,str))
         return attr in self.attrs
         
     def get_attr(self, attr):
@@ -62,9 +66,11 @@ class InferredType():
         return self.attrs[attr]
         
     def set_attr(self, attr, typeset):
+        assert(isInferredType(typeset))
         self.attrs[attr] = typeset
         
     def add_attr(self, attr, typeset):
+        assert(isInferredType(typeset))
         if attr in self.attrs:
             self.attrs[attr] = self.attrs[attr].add_type(typeset)
         else:
@@ -77,9 +83,11 @@ class InferredType():
             return UnknownType()
             
     def add_item(self, item):
+        assert(isInferredType(item))
         self.items = self.items.add_type(item)
         
     def get_call_return(self, arg_types):
+        assert(all(isInferredType(x) for x in arg_types))        
         if "__call__" in self.attrs:
             return self.attrs['__call__'].get_call_return(arg_types)
         if self.return_values:
@@ -95,6 +103,7 @@ class InferredType():
         return UnknownType()
 
     def add_type(self, other):
+        assert(isInferredType(other))
         if self==other:
             return self
         return TypeSet(self, other)
@@ -141,6 +150,7 @@ class TypeSet():
         return TypeSet(*[tp.get_attr(attr) for tp in self.types])
         
     def add_attr(self, attr, typeset):
+        assert(isInferredType(typeset))
         for tp in self.types:
             tp.add_attr(attr, typeset)
 
@@ -148,10 +158,12 @@ class TypeSet():
         return TypeSet(*[tp.get_item(index) for tp in self.types])
             
     def add_item(self, item):
+        assert(isInferredType(item))
         for tp in self.types:
             tp.add_item(item)
         
     def get_call_return(self, arg_types):
+        assert(all(isInferredType(x) for x in arg_types))
         return TypeSet(*[tp.get_call_return(arg_types) for tp in self.types])
 
     def get_all_attrs(self):
