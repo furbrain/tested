@@ -1,6 +1,6 @@
 import unittest
 import attr
-from tested.languages.python3 import ModuleTypeParser, LineNumberGetter
+from tested.languages.python3 import ModuleTypeParser, LineNumberGetter, Scope
 
 SPECIMEN_CODE = """
 #!/usr/bin/env python
@@ -78,6 +78,27 @@ class TestModuleTypeParser(unittest.TestCase):
         self.assertIn('arg1',ctx)
         self.assertIn('antelope',ctx)
         self.assertIn('late_variable',ctx)
+        
+    def testFindFullScopes(self):
+        #a = 1
+        #def b(f):
+        #    pass
+        #c=2
+        scope_list = [Scope('__main__',0,0, line_end=4), Scope('def',2,0)]
+        lines = [(0,0),(1,0),(2,4),(3,0)]
+        parser=ModuleTypeParser()
+        new_scopes = list(parser.find_full_scopes(scope_list, lines, 4))
+        self.assertEqual(new_scopes[1].line_end,3)
+
+    def testFindFullScopesHangingScope(self):
+        #a = 1
+        #def b(f):
+        #    pass
+        scope_list = [Scope('__main__',0,0, line_end=3), Scope('def',2,0)]
+        lines = [(0,0),(1,0),(2,4)]
+        parser=ModuleTypeParser()
+        new_scopes = list(parser.find_full_scopes(scope_list, lines, 3))
+        self.assertEqual(new_scopes[1].line_end,3)
             
 class TestLineNumberGetter(unittest.TestCase):
     def checkLineNumbers(self, text, expected):
