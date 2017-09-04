@@ -1,8 +1,9 @@
 import ast
-import types
+import warnings
 
 from .inferred_types import TypeSet, InferredList, InferredTuple, InferredDict, InferredType, UnknownType, get_type_name
 from .builtins import get_built_in_for_literal
+
 
 
 def get_expression_type(expression, scope):
@@ -20,9 +21,13 @@ class ExpressionTypeParser(ast.NodeVisitor):
         self.bool = get_built_in_for_literal(True)
         self.NUMERIC_TYPES = (self.int, self.float)
         
-    def getType(self,expression):
-        return self.visit(expression)
-        
+    def getType(self, expression):
+        result = self.visit(expression)
+        if result is None:
+            warnings.warn("Unimplemented code: {}".format(ast.dump(expression)))
+            return UnknownType()
+        return result
+                
     def visit_Num(self, node):
         return get_built_in_for_literal(node.n)
         
@@ -43,6 +48,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         for elt in node.elts:
             result.add_item(self.getType(elt))
         return result
+
         
     def visit_Tuple(self, node):
         items = [self.getType(elt) for elt in node.elts]
@@ -53,21 +59,20 @@ class ExpressionTypeParser(ast.NodeVisitor):
         items = [self.getType(value) for value in node.values]
         return InferredDict(keys, items)
             
-        
     def visit_Call(self, node):
-        func_types = self.visit(node.func)
-        args = [self.visit(arg_node) for arg_node in node.args]
+        func_types = self.getType(node.func)
+        args = [self.getType(arg_node) for arg_node in node.args]
         return func_types.get_call_return(args)
         
     def visit_Attribute(self, node):
-        base_var = self.visit(node.value)
+        base_var = self.getType(node.value)
         return base_var.get_attr(node.attr)
                 
     def visit_Expr(self, node):
-        return self.visit(node.value)
+        return self.getType(node.value)
         
     def visit_Module(self, node):
-        return self.visit(node.body[0])
+        return self.getType(node.body[0])
             
     def visit_BinOp(self, node):
         op = type(node.op).__name__
