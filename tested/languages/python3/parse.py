@@ -10,11 +10,17 @@ def get_suggestions(context, line, line_number):
     scope = context.getScope(line_number, indent)
     identifier = get_last_whole_identifier(line)
     obj,_,prefix = identifier.rpartition('.')
+    if obj=='' and prefix=='':
+        return []
     if obj:
         scope = expressions.get_expression_type(obj,scope).get_all_attrs()
     return [x for x in scope if x.startswith(prefix)]
     
 def get_last_whole_identifier(line):
+    if line.endswith('.'):
+       return get_last_whole_identifier(line[:-1])+'.'
+    if not 'a'.isidentifier():
+        return ''
     for i in range(len(line)):
         try:
             result = ast.parse(line[i:], mode='eval')

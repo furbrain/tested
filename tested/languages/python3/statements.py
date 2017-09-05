@@ -1,10 +1,11 @@
 import ast
 from .expressions import get_expression_type
-from .inferred_types import TypeSet, UnknownType, InferredList, InferredType
+from .inferred_types import TypeSet, UnknownType, InferredList
 from .functions import FunctionType
 from .scopes import Scope
 from .classes import ClassType
 from .assignment import assign_to_node
+from .builtins import get_built_in_for_literal
 
 def parse_statements(statements, scope=None):
     if isinstance(statements,str):
@@ -47,7 +48,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         if results['return']:
             return_val = results['return']
         else:
-            return_val = InferredType.fromType(None)
+            return_val = get_built_in_for_literal(None)
         self.scope[node.name] =  FunctionType.fromASTNode(node, return_val)
         self.scopes.append(scope)
         self.scopes.extend(results['scopes'])
@@ -88,7 +89,10 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         return (type(node).__name__ in ("Tuple","List"))
         
     def visit_Return(self, node):
-        self.returns = self.returns.add_type(get_expression_type(node.value, self.scope))
+        if node.value:
+            self.returns = self.returns.add_type(get_expression_type(node.value, self.scope))
+        else:
+            self.returns = self.returns.add_type(get_built_in_for_literal(None))
         
     def visit_Name(self, node):
         return node.id

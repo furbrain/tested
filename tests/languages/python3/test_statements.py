@@ -50,11 +50,15 @@ class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Ba
         self.checkStatement("a += 3.0", {'a':'<float>, <int>'}, context = {'a':TypeSet(1)})
         
 class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base):
-    def testBasicFunctionDef(self):
+    def testBasicFunctionWithImplicitNone(self):
         self.checkStatement("def f(): pass", {'f':'f() -> (None)'})
 
     def testFunctionReturnsNone(self):
         self.checkStatement("def f(): return None", {'f':'f() -> (None)'})
+
+    def testFunctionReturnsSemiImplicitNone(self):
+        self.checkStatement("def f(): return", {'f':'f() -> (None)'})
+        self.checkStatement("def f():\n  if x:\n    return\n  else:\n    return 1", {'f':'f() -> (<int>, None)'})
 
     def testFunctionReturnsInt(self):
         self.checkStatement("def f(): return 1", {'f':'f() -> (<int>)'})

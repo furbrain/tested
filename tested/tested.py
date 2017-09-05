@@ -1,11 +1,14 @@
 import json
 import os.path
 import webbrowser
+import warnings
 from gi.repository import GObject, Gedit, Gtk, GtkSource
 
 from .languages import python3
 from .languages.python3 import parse_text, get_suggestions
 from .pyweb.module_finder import get_module_dict
+
+warnings.simplefilter('once',UserWarning)
 
 class TestedPlugin(GObject.Object, Gedit.ViewActivatable):
     __gtype_name__ = "TestedPlugin"
@@ -82,7 +85,7 @@ class CompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         self.doc_context = None
         self.parser = module.parse_text
         self.suggester = module.get_suggestions
-        
+                
     def do_get_name(self):
         return "PyComplete"
         
