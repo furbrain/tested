@@ -32,7 +32,7 @@ class Scope():
 
     def matches(self, line, indent):
         if self.line_start <= line <= self.line_end:
-            if indent >= self.indent:
+            if indent > self.indent:
                 return True
         return False
         

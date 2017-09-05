@@ -17,9 +17,11 @@ def get_suggestions(context, line, line_number):
     return [x for x in scope if x.startswith(prefix)]
     
 def get_last_whole_identifier(line):
+    if line=='':
+        return ''
     if line.endswith('.'):
        return get_last_whole_identifier(line[:-1])+'.'
-    if not 'a'.isidentifier():
+    if not (line[-1].isidentifier() or line[-1] in (']','}',')')):
         return ''
     for i in range(len(line)):
         try:

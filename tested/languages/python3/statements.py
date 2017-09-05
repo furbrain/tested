@@ -93,10 +93,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             self.returns = self.returns.add_type(get_expression_type(node.value, self.scope))
         else:
             self.returns = self.returns.add_type(get_built_in_for_literal(None))
-        
-    def visit_Name(self, node):
-        return node.id
-        
+
 def parse_class_statements(statements, scope, class_type):
     parser = ClassBlockParser(scope, class_type)
     return parser.parseStatements(statements)    

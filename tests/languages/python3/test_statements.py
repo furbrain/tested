@@ -91,37 +91,57 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         self.checkStatement("class A(object): pass\ninst = A()", {'A':'A','inst':'<A>'})
     
     def testClassAttributeCreation(self):
-        stmt = "class A(object): pass\nA.b=1"
+        stmt = "class A(object): pass\nA.b=1\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('b'),'<int>')
+        self.assertEqual(ctx['a'].get_attr('b'),'<int>')
         
     def testClassVariableCreation(self):
-        stmt = "class A(object):\n  b=1"
+        stmt = "class A(object):\n  b=1\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('b'),'<int>')
+        self.assertEqual(ctx['a'].get_attr('b'),'<int>')
         
     def testClassVariableDoesNotTransferIntoMethods(self):
-        stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b"
+        stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return b\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (Unknown)')
+        self.assertEqual(ctx['a'].get_attr('test'),'test(self, a) -> (Unknown)')
         
     def testClassNameDoesTransferIntoMethods(self):
-        stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A"
+        stmt = "class A(object):\n  b=1\n  def test(self, a):\n    return A\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('test'),'test(self, a) -> (A)')
+        self.assertEqual(ctx['a'].get_attr('test'),'test(self, a) -> (A)')
         
     def testInstanceMethodCreation(self):
-        stmt = "class A(object):\n  def im(self):\n    return self"
+        stmt = "class A(object):\n  def im(self):\n    return self\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('im'),'im(self) -> (<A>)')
+        self.assertEqual(ctx['a'].get_attr('im'),'im(self) -> (<A>)')
         
     def testClassMethodCreation(self):
-        stmt = "class A(object):\n  @classmethod\n  def cm(cls):\n    return cls"
+        stmt = "class A(object):\n  @classmethod\n  def cm(cls):\n    return cls\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('cm'),'cm(cls) -> (A)')
+        self.assertEqual(ctx['a'].get_attr('cm'),'cm(cls) -> (A)')
 
     def testStaticMethodCreation(self):
-        stmt = "class A(object):\n  @staticmethod\n  def sm(a):\n    return a"
+        stmt = "class A(object):\n  @staticmethod\n  def sm(a):\n    return a\na=A()"
         ctx = self.getContext(stmt)
         self.assertEqual(ctx['A'].get_attr('sm'),'sm(a) -> (Unknown: a)')
-    
+        self.assertEqual(ctx['a'].get_attr('sm'),'sm(a) -> (Unknown: a)')
+        
+    def testClassInheritance(self):
+        stmt = "class A(object):\n  i=1\nclass B(A):\n  s='abc'\na=A()\nb=B()"
+        ctx = self.getContext(stmt)
+        self.assertEqual(ctx['A'].get_attr('i'),'<int>')
+        self.assertEqual(ctx['a'].get_attr('i'),'<int>')
+        self.assertEqual(ctx['B'].get_attr('i'),'<int>')
+        self.assertEqual(ctx['b'].get_attr('i'),'<int>')
+        self.assertFalse(ctx['A'].has_attr('s'))
+        self.assertFalse(ctx['a'].has_attr('s'))
+        self.assertEqual(ctx['B'].get_attr('s'),'<str>')
+        self.assertEqual(ctx['b'].get_attr('s'),'<str>')
+
+

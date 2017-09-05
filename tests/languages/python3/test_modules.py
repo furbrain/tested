@@ -22,7 +22,7 @@ class BaseClass(AncestorClass):
             return arg5+arg6
             
     def __init__(self, arg7):
-        self.member_variable = arg8
+        self.member_variable = arg7
                 
     def instance_method(self,arg8,arg9):
         self.contingent_member_variable = arg8
@@ -99,6 +99,12 @@ class TestModuleTypeParser(unittest.TestCase):
         parser=ModuleTypeParser()
         new_scopes = list(parser.find_full_scopes(scope_list, lines, 3))
         self.assertEqual(new_scopes[1].line_end,3)
+
+    def testClassMethodScopeIsComplete(self):
+        scopes = self.setUpSpecimenModule()
+        ctx = self.getScopeStarting(scopes, 22)
+        self.assertTrue('__init__' in ctx['self'].get_all_attrs())
+
             
 class TestLineNumberGetter(unittest.TestCase):
     def checkLineNumbers(self, text, expected):

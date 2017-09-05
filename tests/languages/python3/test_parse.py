@@ -62,3 +62,11 @@ class TestGetLastWholeIdentifier(unittest.TestCase):
     def testComplexExample(self):
         self.checkResponse("abc()[de:fg].fl", "abc()[de:fg].fl")
         
+    def testEndsWithComma(self):
+        self.checkResponse('a,', '')
+        
+    def testEndsWithSpace(self):
+        self.checkResponse('abc ', '')
+        
+    def testEndsWithPeriod(self):
+        self.checkResponse('abc.', 'abc.')

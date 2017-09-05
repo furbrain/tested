@@ -5,4 +5,6 @@ implement basic library in pseudocode...
 Basic types implemented DONE
 Need to implement relevant classes and builtin functions -- and file class also
 implement dict and list comprehensions
+self is not aware of other methods
+order completions alphabetically
 

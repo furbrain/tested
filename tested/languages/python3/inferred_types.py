@@ -186,6 +186,9 @@ class TypeSet():
         assert(isInferredType(typeset))
         for tp in self.types:
             tp.add_attr(attr, typeset)
+            
+    def has_attr(self, attr):
+        return any(tp.has_attr(attr) for tp in self.types)
 
     def get_item(self, index):
         return TypeSet(*[tp.get_item(index) for tp in self.types])

@@ -1,4 +1,5 @@
 from .inferred_types import InferredType, TypeSet
+from .expressions import get_expression_type
 import ast
 
 class ClassType(InferredType):
@@ -6,7 +7,7 @@ class ClassType(InferredType):
     @classmethod
     def fromASTNode(cls, node, context = None):
         name=node.name
-        parents = []
+        parents = [get_expression_type(x, context) for x in node.bases]
         docstring = ast.get_docstring(node)
         return cls(name, parents, context, docstring)
         
