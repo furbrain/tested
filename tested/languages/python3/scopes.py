@@ -9,6 +9,7 @@ class Scope():
     parent = attr.ib(default=None)
     line_end = attr.ib(default=-1)
     context = attr.ib(default=attr.Factory(dict))
+    children = attr.ib(default=attr.Factory(list))
 
     def __getitem__(self, key):
         if key in self.context:
@@ -41,6 +42,15 @@ class Scope():
         if self.parent:
             new_ctx.update(self.parent.get_whole_context())
         return new_ctx
+        
+    def add_child(self, child):
+        self.children.append(child)
+        
+    def get_all_children(self):
+        results = [self]
+        for x in self.children:
+            results.append(x.get_all_children())
+        return results
 
 class ScopeList():
     def __init__(self):
