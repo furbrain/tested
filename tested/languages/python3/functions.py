@@ -1,7 +1,11 @@
 import ast
 import inspect
 
-from .inferred_types import TypeSet, InferredType, UnknownType
+from .inferred_types import TypeSet, InferredType, InferredList, UnknownType
+from .builtins import get_built_in_for_literal
+from .expressions import get_expression_type
+from .statements import StatementBlockTypeParser
+from .scopes import Scope
 
 def get_parameters(function):
     try:
@@ -14,13 +18,32 @@ def get_parameters(function):
 class FunctionType(InferredType):
 
     @classmethod
-    def fromASTNode(cls, node, return_type=None):
+    def fromASTNode(cls, node, scope=None):
+        if scope is None:
+            scope=Scope('__test__',0,-1)
         name = node.name
         arg_names = [arg.arg for arg in node.args.args]
         docstring = ast.get_docstring(node)
-        if return_type is None:
-            return_type = UnknownType('return')
-        return cls(name, arg_names, return_type, docstring)
+        self = cls(name, arg_names, UnknownType('return'), docstring)
+        self.scope = Scope(node.name, node.lineno, node.col_offset, parent = scope)
+        args_node = node.args
+        for arg in args_node.args:
+            name = arg.arg
+            self.scope[name] = UnknownType(name)
+
+        if args_node.vararg:
+            list_element_type = UnknownType(args_node.vararg.arg)
+            inferred_list = InferredList(list_element_type)
+            self.scope[args_node.vararg.arg] = inferred_list
+        if args_node.kwarg:
+            self.scope[args_node.kwarg] = InferredDict()
+        self.scope[node.name] = self
+        parser = FunctionParser(self.scope)
+        results = parser.parseFunction(node.body)
+        scope.add_child(self.scope)
+        if results['return']:
+            self.return_values = results['return']
+        return self
 
     @classmethod
     def fromFunction(cls, function, return_type):
@@ -34,8 +57,21 @@ class FunctionType(InferredType):
         self.name = name
         self.args = args
         self.return_values = returns
-        self.type = "%s(%s) -> (%s)" % (self.name, ', '.join(args), returns)
+        self.type = "FUNCTION"
         self.docstring = docstring
         
     def __str__(self):
-        return self.type
+        return "%s(%s) -> (%s)" % (self.name, ', '.join(self.args), self.return_values)
+        
+class FunctionParser(StatementBlockTypeParser):
+    def parseFunction(self, nodes):
+        #create function type
+        # parse function
+        return self.parseStatements(nodes)
+            
+    def visit_Return(self, node):
+        if node.value:
+            self.returns = self.returns.add_type(get_expression_type(node.value, self.scope))
+        else:
+            self.returns = self.returns.add_type(get_built_in_for_literal(None))
+

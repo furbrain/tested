@@ -1,7 +1,6 @@
 import ast
 from .expressions import get_expression_type
 from .inferred_types import TypeSet, UnknownType, InferredList
-from .functions import FunctionType
 from .scopes import Scope
 from .classes import ClassType
 from .assignment import assign_to_node
@@ -40,15 +39,8 @@ class StatementBlockTypeParser(ast.NodeVisitor):
             assign_to_node(target, assigned_types, self.scope)
 
     def visit_FunctionDef(self, node):
-        #create function type
-        # parse function
-        scope = self.get_new_scope_for_function(node)
-        results = parse_statements(node.body, scope)
-        if results['return']:
-            return_val = results['return']
-        else:
-            return_val = get_built_in_for_literal(None)
-        self.scope[node.name] =  FunctionType.fromASTNode(node, return_val)
+        from .functions import FunctionType
+        self.scope[node.name] =  FunctionType.fromASTNode(node, self.scope)
         
     def get_new_scope_for_function(self, node):
         scope = Scope(node.name, node.lineno, node.col_offset, parent = self.scope)
@@ -83,12 +75,6 @@ class StatementBlockTypeParser(ast.NodeVisitor):
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))
         
-    def visit_Return(self, node):
-        if node.value:
-            self.returns = self.returns.add_type(get_expression_type(node.value, self.scope))
-        else:
-            self.returns = self.returns.add_type(get_built_in_for_literal(None))
-
 def parse_class_statements(statements, scope, class_type):
     parser = ClassBlockParser(scope, class_type)
     return parser.parseStatements(statements)    

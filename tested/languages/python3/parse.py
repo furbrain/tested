@@ -8,6 +8,7 @@ def parse_text(text):
 def get_suggestions(context, line, line_number):
     indent = len(line) - len(line.lstrip(' '))
     scope = context.getScope(line_number, indent)
+    #    return [str(scope)]
     identifier = get_last_whole_identifier(line)
     obj,_,prefix = identifier.rpartition('.')
     if obj=='' and prefix=='':
