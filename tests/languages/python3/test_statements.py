@@ -70,7 +70,7 @@ class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base
         self.checkStatement("def f(a, *b): return b", {'f':'f(a) -> ([Unknown: b])'})
         
     def testFunctionWithKwArgs(self):
-        self.checkStatement("def f(a, **b): return b", {'f':'f(a) -> ([Unknown: b])'})
+        self.checkStatement("def f(a, **b): return b", {'f':'f(a) -> ({<str>: Unknown})'})
         
     def testFunctonReturnsEitherArg(self):
         func = """

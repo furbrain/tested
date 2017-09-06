@@ -64,7 +64,7 @@ class FunctionType(InferredType):
             inferred_list = InferredList(list_element_type)
             scope[node.args.vararg.arg] = inferred_list
         if node.args.kwarg:
-            scope[node.args.kwarg] = InferredDict()
+            scope[node.args.kwarg.arg] = InferredDict(keys=[get_built_in_for_literal('abc')], values=[UnknownType()])
         scope[node.name] = self
         return scope
 
