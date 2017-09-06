@@ -69,6 +69,9 @@ class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base
     def testFunctionWithVarargs(self):
         self.checkStatement("def f(a, *b): return b", {'f':'f(a) -> ([Unknown: b])'})
         
+    def testFunctionWithKwArgs(self):
+        self.checkStatement("def f(a, **b): return b", {'f':'f(a) -> ([Unknown: b])'})
+        
     def testFunctonReturnsEitherArg(self):
         func = """
 def f(a, b):

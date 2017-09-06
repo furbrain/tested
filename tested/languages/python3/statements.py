@@ -41,33 +41,8 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         from .functions import FunctionType
         self.scope[node.name] =  FunctionType.fromASTNode(node, self.scope)
         
-    def get_new_scope_for_function(self, node):
-        scope = Scope(node.name, node.lineno, node.col_offset, parent = self.scope)
-        self.set_scope_for_positional_args(node, scope)
-        self.set_scope_for_varargs(node, scope)
-        function_type = FunctionType.fromASTNode(node)
-        scope[node.name] = function_type
-        return scope
-        
-    def set_scope_for_positional_args(self, node, scope):
-        args_node = node.args
-        for arg in args_node.args:
-            name = arg.arg
-            scope[name] = UnknownType(name)
-        
-    def set_scope_for_varargs(self, node, scope):
-        args_node = node.args
-        if args_node.vararg:
-            list_element_type = UnknownType(args_node.vararg.arg)
-            inferred_list = InferredList(list_element_type)
-            scope[args_node.vararg.arg] = inferred_list
-        if args_node.kwarg:
-            scope[args_node.kwarg] = InferredDict()
-
-
     def visit_ClassDef(self, node):
         from .classes import ClassType
-        print("processing {}".format(node.name))
         self.scope[node.name] = ClassType.fromASTNode(node, self.scope)
         
     def isSequence(self, node):

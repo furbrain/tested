@@ -42,10 +42,6 @@ class InstanceType(InferredType):
         self.name = "<{}>".format(parent)
         self.attrs.update(parent.attrs)
 
-def parse_class_statements(statements, scope, class_type):
-    parser = ClassBlockParser(scope, class_type)
-    return parser.parseStatements(statements)    
-
 #this parser modifies function signatures within a class definition        
 class ClassBlockParser(StatementBlockTypeParser):
     def __init__(self, scope, class_type):
@@ -55,30 +51,3 @@ class ClassBlockParser(StatementBlockTypeParser):
     def visit_FunctionDef(self, node):
         from .functions import FunctionType
         self.scope[node.name] =  FunctionType.fromASTNode(node, self.scope.parent, owning_class=self.class_type)
-
-
-    def get_new_scope_for_function(self, node):
-        scope = Scope(node.name, node.lineno, node.col_offset, self.scope.parent)
-        scope[self.class_type.name] = self.class_type
-        self.set_scope_for_positional_args(node, scope)
-        self.set_scope_for_varargs(node, scope)
-        function_type = FunctionType.fromASTNode(node)
-        scope[node.name] = function_type
-        return scope    
-
-        
-    def set_scope_for_positional_args(self, node, scope):
-        args_node = node.args
-        if args_node.args:
-            name = args_node.args[0].arg
-            if any(self.node_is_staticmethod(n) for n in node.decorator_list):
-                scope[name] = UnknownType(name)
-            elif any(self.node_is_classmethod(n) for n in node.decorator_list):
-                scope[name] = self.class_type
-            else:
-                scope[name] = self.class_type.instance_type
-            for arg in args_node.args[1:]:
-                name = arg.arg
-                scope[name] = UnknownType(name)
-                
-

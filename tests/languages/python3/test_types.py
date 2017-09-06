@@ -108,6 +108,9 @@ class TestInferredTuple(unittest.TestCase):
         self.assertEqual(self.tuple.get_item(2), self.float)
         self.assertEqual(self.tuple.get_item(self.int), TypeSet(self.int, self.str, self.float))
         
+    def testBadIndex(self):
+        self.assertEqual(self.tuple.get_item(3), UnknownType())    
+        
     def testSlice(self):
         self.assertEqual(self.tuple.get_slice(), '[float, int, str]')
             
