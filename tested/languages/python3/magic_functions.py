@@ -1,4 +1,3 @@
-from .functions import FunctionType
 from .inferred_types import UnknownType, get_type_name
 
 BOOL_FUNCS = '''bool contains eq ge gt le lt ne'''
@@ -38,6 +37,7 @@ def add_functions(tp, function_list, return_type, is_magic=True):
         if is_magic:
             func = "__{}__".format(func)
         if hasattr(tp.type,func):
+            from .functions import FunctionType
             function = FunctionType.fromFunction(getattr(tp.type,func), return_type)
             tp.set_attr(func, function)
 
