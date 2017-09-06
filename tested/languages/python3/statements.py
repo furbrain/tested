@@ -17,12 +17,11 @@ class StatementBlockTypeParser(ast.NodeVisitor):
     def __init__(self, scope):
         self.scope = scope
         self.returns = TypeSet()
-        self.scopes = []
                     
     def parseStatements(self, nodes):
         for node in nodes:
             self.visit(node)          
-        return {'return': self.returns, 'scopes': self.scopes, 'last_scope': self.scope}
+        return {'return': self.returns}
                     
     def visit_Assign(self, node):
         for target in node.targets:
@@ -50,8 +49,6 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         else:
             return_val = get_built_in_for_literal(None)
         self.scope[node.name] =  FunctionType.fromASTNode(node, return_val)
-        self.scopes.append(scope)
-        self.scopes.extend(results['scopes'])
         
     def get_new_scope_for_function(self, node):
         scope = Scope(node.name, node.lineno, node.col_offset, parent = self.scope)
@@ -82,8 +79,6 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         class_type = ClassType.fromASTNode(node,scope)
         results = parse_class_statements(node.body, scope, class_type)
         self.scope[node.name] = ClassType.fromASTNode(node, scope)
-        self.scopes.append(scope)
-        self.scopes.extend(results['scopes'])
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))

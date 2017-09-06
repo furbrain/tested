@@ -14,7 +14,8 @@ class TestStatementBlockTypeParser__Base(unittest.TestCase):
 
     def getContext(self, stmt, context = None):
         scope = self.make_Scope(context)
-        return parse_statements(stmt, scope)['last_scope'].get_whole_context()     
+        parse_statements(stmt, scope)
+        return scope.get_whole_context()     
         
     def make_Scope(self, context = None):
         if context:

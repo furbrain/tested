@@ -14,8 +14,7 @@ class ModuleTypeParser(ast.NodeVisitor):
         self.scope = Scope('__main__', line_start = 0, indent = -1,line_end =len(self.text.splitlines()))
         results = parse_statements(node.body, self.scope)
         lines = LineNumberGetter().process_text(node)
-        self.scope_list = self.find_full_scopes(results['scopes'], lines, self.scope.line_end)
-        self.scope_list.add(self.scope)
+        self.scope_list = self.find_full_scopes(self.scope.get_all_children(), lines, self.scope.line_end)
         
     def find_full_scopes(self, scopes, lines, max_line):
         scope_list = ScopeList()

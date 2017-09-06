@@ -1,15 +1,19 @@
 from collections import namedtuple
-import attr
 
-@attr.s
 class Scope():
-    name = attr.ib()
-    line_start = attr.ib()
-    indent = attr.ib()
-    parent = attr.ib(default=None)
-    line_end = attr.ib(default=-1)
-    context = attr.ib(default=attr.Factory(dict))
-    children = attr.ib(default=attr.Factory(list))
+    def __init__(self, name, line_start, indent, parent=None, line_end=-1, context=None):
+        self.name = name
+        self.line_start = line_start
+        self.indent = indent
+        self.parent = parent
+        self.line_end = line_end
+        if context:
+            self.context = context
+        else:
+            self.context = {}
+        if parent:
+            self.parent.add_child(self)
+        self.children = []
 
     def __getitem__(self, key):
         if key in self.context:
@@ -49,7 +53,7 @@ class Scope():
     def get_all_children(self):
         results = [self]
         for x in self.children:
-            results.append(x.get_all_children())
+            results.extend(x.get_all_children())
         return results
 
 class ScopeList():

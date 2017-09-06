@@ -17,6 +17,11 @@ class TestScopeMatches(unittest.TestCase):
     def testOutsideScopeDoesNotMatch(self):
         sc = Scope('name', line_start=0, indent=0, line_end=10)
         self.assertFalse(sc.matches(50,0))
+        
+    def testScopeTrees(self):
+        sc1 = Scope('sc1', line_start=0, indent=-1)
+        sc2 = Scope('sc2', line_start=4, indent=0, parent=sc1)
+        self.assertIn(sc2,sc1.get_all_children())
 
 class TestScopeList(unittest.TestCase):
     def checkScope(self, scope_list, position, match):
