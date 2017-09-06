@@ -10,7 +10,7 @@ class TestFunctionType(unittest.TestCase):
         f = FunctionType.fromASTNode(node.body[0])
         self.assertEqual(f.args,['a','b'])
         self.assertEqual(f.docstring,"Sample docstring")
-        self.assertEqual(f.return_values,TypeSet(UnknownType("return")))
+        self.assertEqual(f.return_values,TypeSet(None))
         
         
     def testSimpleReturnType(self):

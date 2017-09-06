@@ -18,7 +18,7 @@ def get_parameters(function):
 class FunctionType(InferredType):
 
     @classmethod
-    def fromASTNode(cls, node, scope=None):
+    def fromASTNode(cls, node, scope=None, owning_class=None):
         if scope is None:
             scope=Scope('__test__',0,-1)
         name = node.name
@@ -27,10 +27,22 @@ class FunctionType(InferredType):
         self = cls(name, arg_names, UnknownType('return'), docstring)
         self.scope = Scope(node.name, node.lineno, node.col_offset, parent = scope)
         args_node = node.args
-        for arg in args_node.args:
-            name = arg.arg
-            self.scope[name] = UnknownType(name)
-
+        if owning_class is None:
+            for arg in args_node.args:
+                name = arg.arg
+                self.scope[name] = UnknownType(name)
+        else:            
+            self.scope[owning_class.name] = owning_class
+            name = args_node.args[0].arg
+            if any(self.node_is_staticmethod(n) for n in node.decorator_list):
+                self.scope[name] = UnknownType(name)
+            elif any(self.node_is_classmethod(n) for n in node.decorator_list):
+                self.scope[name] = owning_class
+            else:
+                self.scope[name] = owning_class.instance_type
+            for arg in args_node.args[1:]:
+                name = arg.arg
+                self.scope[name] = UnknownType(name)
         if args_node.vararg:
             list_element_type = UnknownType(args_node.vararg.arg)
             inferred_list = InferredList(list_element_type)
@@ -40,9 +52,10 @@ class FunctionType(InferredType):
         self.scope[node.name] = self
         parser = FunctionParser(self.scope)
         results = parser.parseFunction(node.body)
-        scope.add_child(self.scope)
         if results['return']:
             self.return_values = results['return']
+        else:
+            self.return_values = get_built_in_for_literal(None)
         return self
 
     @classmethod
@@ -62,6 +75,12 @@ class FunctionType(InferredType):
         
     def __str__(self):
         return "%s(%s) -> (%s)" % (self.name, ', '.join(self.args), self.return_values)
+
+    def node_is_staticmethod(self, node):
+        return getattr(node,"id","") == "staticmethod"
+            
+    def node_is_classmethod(self, node):
+        return getattr(node,"id","") == "classmethod"
         
 class FunctionParser(StatementBlockTypeParser):
     def parseFunction(self, nodes):

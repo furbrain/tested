@@ -40,10 +40,6 @@ class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Ba
     def testMultipleTargetAssignment(self):
         self.checkStatement("a = b = 2", {'a':'<int>','b':'<int>'})
         
-    def testReturnValue(self):
-        self.checkStatement("return 'abc'",'<str>',field="return")
-        self.checkStatement("return 2",'<int>',field="return")
-        
     def testMultiLineAssignment(self):
         self.checkStatement("a = 1\nb = 2.0\nc = a+b",{'a':'<int>','b':'<float>','c':'<float>'})
         

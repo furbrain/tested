@@ -40,7 +40,7 @@ class Scope():
             if indent > self.indent:
                 return True
         return False
-        
+                
     def get_whole_context(self):
         new_ctx = self.context.copy()
         if self.parent:
