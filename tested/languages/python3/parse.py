@@ -8,15 +8,24 @@ def parse_text(text):
 def get_suggestions(context, line, line_number):
     indent = len(line) - len(line.lstrip(' '))
     scope = context.getScope(line_number, indent)
-    #    return [str(scope)]
-    identifier = get_last_whole_identifier(line)
-    obj,_,prefix = identifier.rpartition('.')
-    if obj=='' and prefix=='':
+    last_char = line[-1]
+    if last_char.isidentifier() or last_char=='.':
+        identifier = get_last_whole_identifier(line)
+        obj,_,prefix = identifier.rpartition('.')
+        if obj=='' and prefix=='':
+            return []
+        if obj:
+            try:
+                obj = expressions.get_expression_type(obj,scope)
+                scope = obj.get_all_attrs()
+                print(scope)
+            except SyntaxError:
+                pass
+        return [x for x in scope if x.startswith(prefix)]
+    else:
         return []
-    if obj:
-        scope = expressions.get_expression_type(obj,scope).get_all_attrs()
-    return [x for x in scope if x.startswith(prefix)]
-    
+        
+
 def get_last_whole_identifier(line):
     if line=='':
         return ''

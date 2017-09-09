@@ -28,6 +28,9 @@ class Scope():
             return True
         except KeyError:
             return False    
+
+    def __iter__(self):
+        return iter(self.context)        
         
     def __setitem__(self, key, value):
         self.context[key] = value
