@@ -1,6 +1,36 @@
 import ast
+import sys
+
+from .inferred_types import InferredType
 from .statements import parse_statements
 from .scopes import Scope, ScopeList
+
+#set document path to specific locale...
+class set_path():
+    def __init__(self, path):
+        self.path = path
+        
+    def __enter__(self):
+        self.old_path = sys.path
+        sys.path = self.path +[x for x in sys.path if 'gedit' not in x.lower()]
+        
+    def __exit__(self, exc_type, exc_value, traceback):
+        sys.path = self.old_path
+
+class ModuleType(InferredType):
+    @classmethod
+    def fromName(cls, name, path):
+        #find file...
+        self = cls()
+        self.name = name
+        #self.parseText(text)
+        return self
+        
+    def parseText(self, text):
+        parser = ModuleTypeParser()
+        parser.parseModule(text)
+        for name, typeset in parser.scope.items():
+            self.add_attr(name, typeset)
 
 class ModuleTypeParser(ast.NodeVisitor):
 
@@ -47,6 +77,6 @@ class LineNumberGetter(ast.NodeVisitor):
                 self.lines[node.lineno] = min(node.col_offset,self.lines[node.lineno])
             else:
                 self.lines[node.lineno] = node.col_offset
-        super().generic_visit(node) 
-           
-            
+        super().generic_visit(node)
+
+

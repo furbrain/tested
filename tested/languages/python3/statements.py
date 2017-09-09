@@ -45,6 +45,13 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         from .classes import ClassType
         self.scope[node.name] = ClassType.fromASTNode(node, self.scope)
         
+    def visit_Import(self, node):
+        from .modules import ModuleType
+        for alias in node.names:
+            name = alias.asname or alias.name
+            self.scope[name] = ModuleType.fromName(alias.name, self.scope)
+        
+        
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))
         
