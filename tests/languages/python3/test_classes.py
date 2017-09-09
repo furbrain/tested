@@ -13,8 +13,9 @@ class TestClasses(unittest.TestCase):
             parents = []
         if context is None:
             context = {}
-        scope = Scope('',0,0,context=context)
-        c = ClassType(name=name, parents=parents, scope=scope, docstring='')
+        c = ClassType(name=name, parents=parents, docstring='')
+        for k, v in context.items():
+            c.add_attr(k, v)
         return c
         
     def testCreateClass(self):

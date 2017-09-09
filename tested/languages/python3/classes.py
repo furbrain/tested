@@ -11,7 +11,7 @@ class ClassType(InferredType):
         name=node.name
         parents = [get_expression_type(x, scope) for x in node.bases]
         docstring = ast.get_docstring(node)
-        self = cls(name, parents, scope, docstring)
+        self = cls(name, parents, docstring)
         self.scope = Scope(node.name, line_start=node.lineno, indent=node.col_offset, parent=scope)
         parser = ClassBlockParser(self.scope, self)
         parser.parseStatements(node.body)
@@ -23,14 +23,12 @@ class ClassType(InferredType):
         super().add_attr(attr, typeset)
         self.instance_type.add_attr(attr, typeset)
         
-    def __init__(self, name,  parents, scope = None, docstring=""):
+    def __init__(self, name,  parents, docstring=""):
         super().__init__()
         self.name = name
         for parent in parents:
             for tp in parent:
                 self.attrs.update(tp.attrs)
-        if scope:
-            self.attrs.update(scope.context)
         self.instance_type = InstanceType(self)
         self.return_values= self.instance_type
         

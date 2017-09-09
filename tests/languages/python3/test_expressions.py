@@ -149,9 +149,9 @@ class TestExpressionTypeParser(unittest.TestCase):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
         context = {'f':f}
         self.checkExpr("f()", "Unknown", context=context)
-    
+    ### CLASS TESTS ###
     def testGetAttribute(self):
-        c = ClassType('C',[],{},'')
+        c = ClassType('C',[],'')
         c.add_attr('a',self.int)
         context={'C':c}
         self.checkExpr("C.a", "<int>", context=context)

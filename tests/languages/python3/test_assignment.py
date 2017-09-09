@@ -16,14 +16,14 @@ class TestAssignment(unittest.TestCase):
         self.assertEqual({'a':'<int>'}, context)
         
     def testClassMemberAssignment(self):
-        context = {'C':TypeSet(ClassType('C',[],{},''))}
+        context = {'C':TypeSet(ClassType('C',[],''))}
         assign_to_node('C.x',TypeSet(self.int),context)
         self.assertEqual(context['C'][0].get_attr('x'), '<int>')
         
     def testComplexClassMemberAssignment(self):
-        a = ClassType('A',[],{},'')
+        a = ClassType('A',[],'')
         a.add_attr('x', TypeSet(self.int))
-        b = ClassType('B',[],{},'')        
+        b = ClassType('B',[],'')        
         context = {'C':TypeSet(a,b)}
         assign_to_node('C.x',TypeSet(self.str),context)
         self.assertEqual(a.get_attr('x'),'<int>, <str>')
