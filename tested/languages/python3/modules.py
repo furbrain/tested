@@ -4,6 +4,7 @@ import sys
 from .inferred_types import InferredType
 from .statements import parse_statements
 from .scopes import Scope, ScopeList
+from . import module_finder
 
 #set document path to specific locale...
 class set_path():
@@ -19,17 +20,20 @@ class set_path():
 
 class ModuleType(InferredType):
     @classmethod
-    def fromName(cls, name, path):
+    def fromName(cls, name, scope):
         #find file...
         self = cls()
         self.name = name
-        #self.parseText(text)
+        filename = module_finder.find_module(self.name, 0, '', '')
+        if filename:
+            with open(filename) as f:
+                self.parseText(f.read())
         return self
         
     def parseText(self, text):
         parser = ModuleTypeParser()
         parser.parseModule(text)
-        for name, typeset in parser.scope.items():
+        for name, typeset in parser.scope.context.items():
             self.add_attr(name, typeset)
 
 class ModuleTypeParser(ast.NodeVisitor):

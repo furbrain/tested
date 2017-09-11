@@ -2,6 +2,7 @@ import unittest
 import importlib.util
 import tested.languages.python3.module_finder as mf
 
+
 class TestModuleFinder(unittest.TestCase):
     def setUp(self):
         self.files = [
@@ -22,7 +23,8 @@ class TestModuleFinder(unittest.TestCase):
             '/home/test/Project/project/subb/mod2.py',
             ]
         self.sys_modules = {
-            'sysmod': '/usr/lib/python/sysmod.py',
+            'sysmod': 'built-in',
+            'testmod': '/usr/lib/python/testmod.py',
             'test2.submod': '/usr/lib/python/test2/submod.py'
         }    
         self.old_exists = mf.os.path.exists
@@ -41,8 +43,12 @@ class TestModuleFinder(unittest.TestCase):
         return path in self.files
         
     def dummy_find_spec(self, path):
+        class DummySpec:
+            pass
         if path in self.sys_modules:
-            spec = importlib.util.spec_from_file_location(path, self.sys_modules[path])
+            spec = DummySpec()
+            spec.name = path
+            spec.origin = self.sys_modules[path]
             return spec
         else:
             return None
@@ -51,10 +57,11 @@ class TestModuleFinder(unittest.TestCase):
         mf.os.path.exists = self.old_exists
         mf.os.path.isdir = self.old_isdir
         mf.importlib.util.find_spec = self.old_find_spec
+        
     def check_finder(self, path, answer, level=0,
                      from_file = '/home/test/Project/project/main.py', 
                      initial_file = '/home/test/Project/project/main.py'):
-        module_path = mf.find_module(path, level, from_file, initial_file)                                  
+        module_path = mf.find_module(path, level, from_file, initial_file)
         self.assertEqual(module_path, answer)
     
     def testSimpleAbsoluteLookup(self):
@@ -70,13 +77,16 @@ class TestModuleFinder(unittest.TestCase):
         self.check_finder('suba.mod1','/home/test/Project/project/suba/mod1.py')
     
     def testSystemModuleLookup(self):
-        self.check_finder('sysmod', self.sys_modules['sysmod'])    
+        self.check_finder('testmod', self.sys_modules['testmod'])    
         
     def testSystemSubModuleLookup(self):
         self.check_finder('test2.submod', self.sys_modules['test2.submod'])
         
     def testSystemModuleRelativeLookupFails(self):
-        self.check_finder('sysmod', None, level=1)    
+        self.check_finder('testmod', None, level=1)
+       
+    def testBuiltInModuleLookup(self):
+        self.check_finder('sysmod', None)
     
         
 
