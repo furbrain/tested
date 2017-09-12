@@ -55,6 +55,12 @@ class Scope():
         for x in self.children:
             results.extend(x.get_all_children())
         return results
+        
+    def get_module(self):
+        try:
+            return self.module
+        except AttributeError:
+            return self.parent.get_module()
 
 class ScopeList():
     def __init__(self):

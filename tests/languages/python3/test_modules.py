@@ -1,6 +1,6 @@
 import unittest
-import attr
-from tested.languages.python3 import ModuleTypeParser, LineNumberGetter, Scope
+import os.path
+from tested.languages.python3 import ModuleType, ModuleTypeParser, LineNumberGetter, Scope
 
 SPECIMEN_CODE = """
 #!/usr/bin/env python
@@ -32,22 +32,23 @@ late_variable = 100
 b = BaseClass(12)
 """ 
 
-class TestModuleTypeParser(unittest.TestCase):
-    def checkModule(self, module, result):
-        parser = ModuleTypeParser()
-        parser.parseModule(module)
-        answer = parser.scope.context
-        message = "%s should return %s, instead returned %s" % (module, result, answer)
-        self.assertEqual(answer, result)
+fixture_dir = os.path.join(os.path.dirname(__file__),'fixtures','fake_project')
+main_file = os.path.join(fixture_dir,'main.py')
 
-
-    def setUpSpecimenModule(self):
-        parser = ModuleTypeParser()
-        return parser.parseModule(SPECIMEN_CODE)
+class FakeDocument():
+    def __init__(self, location):
+        self.location = location
         
-    def getScopeStarting(self, scopes, line_start):
-        possible_scopes = [x for x in scopes if x.line_start == line_start]
-        return possible_scopes[0].get_whole_context()
+
+class TestModuleType(unittest.TestCase):
+    def createModule(self, text, location=""):
+        return ModuleType.fromText(text, location, FakeDocument(location))
+
+    def checkModule(self, text, result, location=""):
+        module = self.createModule(text, location)
+        answer = module.get_outer_scope().context
+        for k, v in result.items():
+            self.assertEqual(v,answer[k])
 
     def testSimpleAssignment(self):
         self.checkModule("a = 1",{'a':'<int>'})
@@ -56,21 +57,34 @@ class TestModuleTypeParser(unittest.TestCase):
         self.checkModule("a=1\nb=a",{'a':'<int>','b':'<int>'})
         
     def testComplexAssignment(self):
-        self.checkModule("a=1\nb=2.5\nc=a*b",{'a':'<int>','b':'<float>','c':'<float>'})
+        self.checkModule("a=1\nb=2.5\nc=a*b", {'a': '<int>','b': '<float>','c': '<float>'})
         
+
+    def testRecursiveModuleImports(self):
+        self.checkModule("import recursive_a\nx = recursive_a.recursive_b.f()", {'x': '<int>'}, location=main_file)
+        
+class TestModuleTypeParser(unittest.TestCase):
+    def setUpSpecimenModule(self):
+        parser = ModuleTypeParser()
+        return parser.parseModule(SPECIMEN_CODE, None)
+        
+    def getScopeStarting(self, scopes, line_start):
+        possible_scopes = [x for x in scopes if x.line_start == line_start]
+        return possible_scopes[0].get_whole_context()
+
     def testModuleScope(self):
         scopes = self.setUpSpecimenModule()
         ctx = self.getScopeStarting(scopes, 0)
-        self.assertIn('antelope',ctx)
-        self.assertIn('late_variable',ctx)
-        self.assertIn('simple_function',ctx)
-        self.assertIn('BaseClass',ctx)
-        self.assertNotIn('local_var_f1',ctx)
-        self.assertNotIn('arg1',ctx)
-        self.assertNotIn('local_var_f1',ctx)
-        self.assertNotIn('subclass_method',ctx)
-        self.assertNotIn('SubClass',ctx)
-        self.assertNotIn('arg2',ctx)
+        self.assertIn('antelope', ctx)
+        self.assertIn('late_variable', ctx)
+        self.assertIn('simple_function', ctx)
+        self.assertIn('BaseClass', ctx)
+        self.assertNotIn('local_var_f1', ctx)
+        self.assertNotIn('arg1', ctx)
+        self.assertNotIn('local_var_f1', ctx)
+        self.assertNotIn('subclass_method', ctx)
+        self.assertNotIn('SubClass', ctx)
+        self.assertNotIn('arg2', ctx)
 
     def testFuncScope(self):
         scopes = self.setUpSpecimenModule()
@@ -104,7 +118,7 @@ class TestModuleTypeParser(unittest.TestCase):
         scopes = self.setUpSpecimenModule()
         ctx = self.getScopeStarting(scopes, 22)
         self.assertTrue('__init__' in ctx['self'].get_all_attrs())
-
+    
             
 class TestLineNumberGetter(unittest.TestCase):
     def checkLineNumbers(self, text, expected):

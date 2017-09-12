@@ -19,33 +19,54 @@ class set_path():
         sys.path = self.old_path
 
 class ModuleType(InferredType):
+    known_modules = {}
     @classmethod
     def fromName(cls, name, scope):
-        #find file...
+        parent_module = scope.get_module()
+        document = parent_module.document
+        filename = module_finder.find_module(name, 0, parent_module.filename, document.location)
+        if filename in cls.known_modules:
+            return cls.known_modules[filename]
         self = cls()
         self.name = name
-        filename = module_finder.find_module(self.name, 0, '', '')
-        if filename:
-            with open(filename) as f:
+        parent_module = scope.get_module()
+        self.document = parent_module.document
+        self.filename = filename
+        cls.known_modules[filename] = self
+        if self.filename:
+            with open(self.filename) as f:
                 self.parseText(f.read())
+        return self
+        
+    @classmethod
+    def fromText(cls, text, filename, document):
+        self = cls()
+        self.name = '__main__'
+        self.filename = filename
+        self.document = document
+        self.parseText(text)
         return self
         
     def parseText(self, text):
         parser = ModuleTypeParser()
-        parser.parseModule(text)
-        for name, typeset in parser.scope.context.items():
+        self.scope_list = parser.parseModule(text, self)
+        self.outer_scope = parser.scope
+        for name, typeset in self.outer_scope.context.items():
             self.add_attr(name, typeset)
+            
+    def get_outer_scope(self):
+        return self.outer_scope
 
 class ModuleTypeParser(ast.NodeVisitor):
 
-    def parseModule(self, text):
-        self.text = text
-        syntax_tree = ast.parse(self.text)
+    def parseModule(self, text, module):
+        self.scope = Scope('__main__', line_start = 0, indent = -1,line_end =len(text.splitlines()))
+        self.scope.module = module
+        syntax_tree = ast.parse(text)
         self.visit(syntax_tree)
         return self.scope_list
         
     def visit_Module(self,node):
-        self.scope = Scope('__main__', line_start = 0, indent = -1,line_end =len(self.text.splitlines()))
         results = parse_statements(node.body, self.scope)
         lines = LineNumberGetter().process_text(node)
         self.scope_list = self.find_full_scopes(self.scope.get_all_children(), lines, self.scope.line_end)
