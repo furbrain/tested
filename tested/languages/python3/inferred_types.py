@@ -184,7 +184,7 @@ class TypeSet():
         
     def add_attr(self, attr, typeset):
         assert(isInferredType(typeset))
-        for tp in self.types:
+        for tp in list(self.types):
             tp.add_attr(attr, typeset)
             
     def has_attr(self, attr):
@@ -195,7 +195,7 @@ class TypeSet():
             
     def add_item(self, item):
         assert(isInferredType(item))
-        for tp in self.types:
+        for tp in list(self.types):
             tp.add_item(item)
         
     def get_call_return(self, arg_types):
