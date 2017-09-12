@@ -108,6 +108,9 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("(1,'a')[0]", "<int>")
         self.checkExpr("(1,'a')[1]", "<str>")
         
+    def testTupleExtractionWithUnknownIndex(self):
+        self.checkExpr("(1,'a')[0+1]", "<int>, <str>")
+        
     def testTupleSlice(self):
         self.checkExpr("(1,'a',2.0)[1:2]", "[<float>, <int>, <str>]")
         self.checkExpr("(1,'a')[:]", "[<int>, <str>]")

@@ -1,7 +1,7 @@
 from .inferred_types import InferredType, InferredList, InferredTuple, InferredDict, TypeSet, UnknownType
 from .expressions import get_expression_type
 from .statements import parse_statements
-from .modules import ModuleTypeParser, LineNumberGetter
+from .modules import ModuleType, ModuleTypeParser, LineNumberGetter
 from .functions import FunctionType
 from .classes import ClassType, InstanceType
 from .assignment import assign_to_node
