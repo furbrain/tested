@@ -132,6 +132,12 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         self.assertEqual(ctx['A'].get_attr('sm'),'sm(a) -> (Unknown: a)')
         self.assertEqual(ctx['a'].get_attr('sm'),'sm(a) -> (Unknown: a)')
         
+    def testStaticMethodWithNoArgsCreation(self):
+        stmt = "class A(object):\n  @staticmethod\n  def sm():\n    return 1\na=A()"
+        ctx = self.getContext(stmt)
+        self.assertEqual(ctx['A'].get_attr('sm'),'sm() -> (<int>)')
+        self.assertEqual(ctx['a'].get_attr('sm'),'sm() -> (<int>)')
+        
     def testClassInheritance(self):
         stmt = "class A(object):\n  i=1\nclass B(A):\n  s='abc'\na=A()\nb=B()"
         ctx = self.getContext(stmt)

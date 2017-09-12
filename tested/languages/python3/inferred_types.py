@@ -12,6 +12,26 @@ def get_type_name(obj):
 
 def isInferredType(obj):
     return isinstance(obj,(InferredType, TypeSet))
+    
+def do_not_recurse(default):
+    def decorator(func):
+        def inner(*args):
+            hashed_args = [hash(x) for x in args]
+            if hasattr(func,'arg_list'):
+                if hashed_args in func.arg_list:
+                    return default
+            else:
+                func.arg_list = []
+            func.arg_list.append(hashed_args)
+            result = func(*args)
+            if hasattr(func,'arg_list'):
+                del func.arg_list
+            return result
+            
+        return inner
+    return decorator
+            
+        
 
 class InferredType():
     @classmethod
@@ -28,10 +48,12 @@ class InferredType():
         self.return_values = None
         self.name=""
         self.docstring=""
-        
+    
+    @do_not_recurse('...')
     def __str__(self):
         return self.name
         
+    @do_not_recurse('...')
     def __repr__(self):
         return str(self)
         
@@ -128,6 +150,7 @@ class InferredList(InferredType):
         for arg in args:
             self.add_item(arg)
         
+    @do_not_recurse('...')
     def __str__(self):
         return '[%s]' % self.items
         
@@ -136,7 +159,8 @@ class InferredTuple(InferredType):
         super().__init__()
         self.name="tuple"
         self.items = list(args)
-        
+    
+    @do_not_recurse('...')    
     def __str__(self):
         item_names = [str(x) for x in self.items]
         return"({})".format(', '.join(item_names))

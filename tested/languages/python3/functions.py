@@ -51,11 +51,12 @@ class FunctionType(InferredType):
         args_dict = make_arg_dict(node.args)
         if owning_class:
             scope[owning_class.name] = owning_class
-            first_arg = node.args.args[0].arg
-            if any(node_is_classmethod(n) for n in node.decorator_list):
-                args_dict[first_arg] = owning_class
-            elif not any(node_is_staticmethod(n) for n in node.decorator_list):
-                args_dict[first_arg] = owning_class.instance_type
+            if node.args.args: #exclude case where no args applied - likely staticmethod
+                first_arg = node.args.args[0].arg
+                if any(node_is_classmethod(n) for n in node.decorator_list):
+                    args_dict[first_arg] = owning_class
+                elif not any(node_is_staticmethod(n) for n in node.decorator_list):
+                    args_dict[first_arg] = owning_class.instance_type
         for name, arg_type in args_dict.items():
             scope[name] = arg_type
         
