@@ -1,6 +1,6 @@
 import unittest
 
-from tested.languages.python3.inferred_types import InferredType, InferredTuple, InferredDict, TypeSet, UnknownType 
+from tested.languages.python3.inferred_types import InferredType, InferredTuple, InferredList, InferredDict, TypeSet, UnknownType 
 from tested.languages.python3.functions import FunctionType
 
 class TestInferredType(unittest.TestCase):
@@ -113,6 +113,21 @@ class TestInferredTuple(unittest.TestCase):
         
     def testSlice(self):
         self.assertEqual(self.tuple.get_slice(), '[float, int, str]')
+        
+class TestInferredList(unittest.TestCase):
+    def setUp(self):
+        self.int = InferredType.fromType(int)
+        self.str = InferredType.fromType(str)
+        self.float = InferredType.fromType(float)
+
+    def testCreation(self):
+        lst = InferredList(self.int,self.float)
+        self.assertEqual(lst, '[float, int]')
+        
+    def testRecursiveList(self):
+        lst = InferredList(self.int)
+        lst.add_item(lst)
+        self.assertEqual(lst, '[[...], int]')
             
 class TestInferredDict(unittest.TestCase):
     def setUp(self):

@@ -150,7 +150,7 @@ class InferredList(InferredType):
         for arg in args:
             self.add_item(arg)
         
-    @do_not_recurse('...')
+    @do_not_recurse('[...]')
     def __str__(self):
         return '[%s]' % self.items
         
@@ -160,7 +160,7 @@ class InferredTuple(InferredType):
         self.name="tuple"
         self.items = list(args)
     
-    @do_not_recurse('...')    
+    @do_not_recurse('(...)')    
     def __str__(self):
         item_names = [str(x) for x in self.items]
         return"({})".format(', '.join(item_names))
