@@ -34,6 +34,7 @@ b = BaseClass(12)
 
 fixture_dir = os.path.join(os.path.dirname(__file__),'fixtures','fake_project')
 main_file = os.path.join(fixture_dir,'main.py')
+submod_file =os.path.join(fixture_dir, 'submod', 'submod1.py')
 
 class FakeDocument():
     def __init__(self, location):
@@ -59,9 +60,27 @@ class TestModuleType(unittest.TestCase):
     def testComplexAssignment(self):
         self.checkModule("a=1\nb=2.5\nc=a*b", {'a': '<int>','b': '<float>','c': '<float>'})
         
-
+    def testSimpleAbsoluteImport(self):
+        self.checkModule("import secondary\nx = secondary.x", {'x': '<int>'}, location=main_file)
+        
     def testRecursiveModuleImports(self):
         self.checkModule("import recursive_a\nx = recursive_a.recursive_b.f()", {'x': '<int>'}, location=main_file)
+    
+    def testRelativeFlatImport(self):
+        self.checkModule("from . import secondary\nx = secondary.x", {'x': '<int>'}, location=main_file)
+        
+    def testImportFromParent(self):
+        self.checkModule("from .. import secondary\nx = secondary.x", {'x': '<int>'}, location=submod_file)
+        
+    def testImportAttributeFrom__Init__(self):
+        self.checkModule("from . import init_var", {'init_var': '<str>'}, location=submod_file)
+        
+    def testImportModuleFrom__Init(self):
+        self.checkModule("from . import submod2", {'submod2': 'submod2'}, location=submod_file)
+        
+    def testImportAttributeFromModule(self):
+        self.checkModule("from .submod2 import submod2_var", {'submod2_var': '<float>'}, location=submod_file)
+        
         
 class TestModuleTypeParser(unittest.TestCase):
     def setUpSpecimenModule(self):
