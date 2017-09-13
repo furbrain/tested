@@ -21,12 +21,14 @@ class TestModuleFinder(unittest.TestCase):
             '/home/test/Project/project/subb/',
             '/home/test/Project/project/subb/__init__.py',
             '/home/test/Project/project/subb/mod2.py',
+            '/home/test/Project/project/subb/mod3.py',
             ]
         self.sys_modules = {
             'sysmod': 'built-in',
             'testmod': '/usr/lib/python/testmod.py',
             'test2.submod': '/usr/lib/python/test2/submod.py'
-        }    
+        }
+        self.submodfile = '/home/test/Project/project/subb/mod2.py'
         self.old_exists = mf.os.path.exists
         self.old_isdir = mf.os.path.isdir
         self.old_find_spec = mf.importlib.util.find_spec
@@ -87,6 +89,17 @@ class TestModuleFinder(unittest.TestCase):
        
     def testBuiltInModuleLookup(self):
         self.check_finder('sysmod', None)
-    
+        
+    def testSimpleRelativePackageLookup(self):
+        self.check_finder(None, '/home/test/Project/project/subb/__init__.py', level=1, from_file=self.submodfile)    
+        
+    def testSimpleRelativeModuleLookup(self):
+        self.check_finder('mod3', '/home/test/Project/project/subb/mod3.py', level=1, from_file=self.submodfile)    
+        
+    def testParentRelativePackageLookup(self):
+        self.check_finder(None, '/home/test/Project/project/__init__.py', level=2, from_file=self.submodfile)    
+        
+    def testParentRelativeModuleLookup(self):
+        self.check_finder('secondary', '/home/test/Project/project/secondary.py', level=2, from_file=self.submodfile)    
         
 
