@@ -1,7 +1,7 @@
 import ast
 import sys
 
-from .inferred_types import InferredType
+from .inferred_types import InferredType, UnknownType
 from .statements import parse_statements
 from .scopes import Scope, ScopeList
 from . import module_finder
@@ -21,10 +21,12 @@ class set_path():
 class ModuleType(InferredType):
     known_modules = {}
     @classmethod
-    def fromName(cls, name, scope):
+    def fromName(cls, name, scope, level=0):
         parent_module = scope.get_module()
         document = parent_module.document
-        filename = module_finder.find_module(name, 0, parent_module.filename, document.location)
+        print(name, level, parent_module.filename, document.location)
+        filename = module_finder.find_module(name, level, parent_module.filename, document.location)
+        print(filename)
         if filename in cls.known_modules:
             return cls.known_modules[filename]
         self = cls()
@@ -33,9 +35,12 @@ class ModuleType(InferredType):
         self.document = parent_module.document
         self.filename = filename
         cls.known_modules[filename] = self
-        if self.filename:
+        try:
             with open(self.filename) as f:
                 self.parseText(f.read())
+        except (IOError, TypeError):
+            self = UnknownType()
+            cls.known_modules[filename] = self
         return self
         
     @classmethod

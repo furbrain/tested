@@ -50,7 +50,16 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         for alias in node.names:
             name = alias.asname or alias.name
             self.scope[name] = ModuleType.fromName(alias.name, self.scope)
-        
+            
+    def visit_ImportFrom(self, node):
+        from .modules import ModuleType
+        module = ModuleType.fromName(node.module, self.scope, node.level)
+        for alias in node.names:
+            name = alias.asname or alias.name
+            if not module.has_attr(alias.name):
+                if hasattr(module,'outer_scope'):
+                    module.set_attr(alias.name, ModuleType.fromName(alias.name, module.outer_scope, level=1))
+            self.scope[name] = module.get_attr(alias.name)
         
     def isSequence(self, node):
         return (type(node).__name__ in ("Tuple","List"))

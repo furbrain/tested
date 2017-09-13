@@ -29,11 +29,18 @@ def get_possible_path(path, starting_file, levels=0):
     return possible_path
     
 def get_builtin_module(path):
-    spec = importlib.util.find_spec(path)
-    if spec:
-        if spec.origin == "built-in":
-            return None
-        else:
-            return spec.origin
+    try:
+        spec = importlib.util.find_spec(path)
+    except:
+        return None
+    if is_valid_spec(spec):
+        return spec.origin
     else:
         return None
+        
+def is_valid_spec(spec):
+    if spec:
+        if spec.origin:
+            if spec.origin.endswith('.py'):
+                return True
+    return False

@@ -26,7 +26,8 @@ class TestModuleFinder(unittest.TestCase):
         self.sys_modules = {
             'sysmod': 'built-in',
             'testmod': '/usr/lib/python/testmod.py',
-            'test2.submod': '/usr/lib/python/test2/submod.py'
+            'test2.submod': '/usr/lib/python/test2/submod.py',
+            'dll': '/usr/lib/python/dll.so'
         }
         self.submodfile = '/home/test/Project/project/subb/mod2.py'
         self.old_exists = mf.os.path.exists
@@ -53,7 +54,7 @@ class TestModuleFinder(unittest.TestCase):
             spec.origin = self.sys_modules[path]
             return spec
         else:
-            return None
+            raise ImportError("Could not import {}".format(path))
         
     def tearDown(self):
         mf.os.path.exists = self.old_exists
@@ -71,6 +72,9 @@ class TestModuleFinder(unittest.TestCase):
         
     def testFailedAbsoluteLookup(self):
         self.check_finder('tertiary',None)
+        
+    def testByteCodeLookupFails(self):
+        self.check_finder('dll',None)
         
     def testAbsolultePackageLookup(self):
         self.check_finder('suba', '/home/test/Project/project/suba/__init__.py')
@@ -102,4 +106,3 @@ class TestModuleFinder(unittest.TestCase):
     def testParentRelativeModuleLookup(self):
         self.check_finder('secondary', '/home/test/Project/project/secondary.py', level=2, from_file=self.submodfile)    
         
-
