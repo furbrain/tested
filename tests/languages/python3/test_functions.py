@@ -38,4 +38,10 @@ class TestFunctionType(unittest.TestCase):
     
         f = FunctionType('f', ['a'], TypeSet(UnknownType('a')), "")
         self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "int")
+        
+    def testRecursiveFunctionType(self):
+        f = FunctionType('f', [], None, "")
+        f.return_values = f
+        self.assertEqual(f, 'f() -> (...)')
+        
 

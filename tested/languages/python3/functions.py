@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from .inferred_types import TypeSet, InferredType, InferredList, InferredDict, UnknownType
+from .inferred_types import TypeSet, InferredType, InferredList, InferredDict, UnknownType, do_not_recurse
 from .builtins import get_built_in_for_literal
 from .expressions import get_expression_type
 from .statements import StatementBlockTypeParser
@@ -83,7 +83,8 @@ class FunctionType(InferredType):
         self.return_values = returns
         self.type = "FUNCTION"
         self.docstring = docstring
-        
+    
+    @do_not_recurse('...')    
     def __str__(self):
         return "%s(%s) -> (%s)" % (self.name, ', '.join(self.args), self.return_values)
         

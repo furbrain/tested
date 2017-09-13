@@ -114,6 +114,10 @@ class TestInferredTuple(unittest.TestCase):
     def testSlice(self):
         self.assertEqual(self.tuple.get_slice(), '[float, int, str]')
         
+    def testAddItemDoesNothing(self):
+        self.tuple.add_item(InferredType.fromType(complex))
+        self.assertEqual(self.tuple, '(int, str, float)') 
+        
 class TestInferredList(unittest.TestCase):
     def setUp(self):
         self.int = InferredType.fromType(int)

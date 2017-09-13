@@ -165,6 +165,9 @@ class InferredTuple(InferredType):
         item_names = [str(x) for x in self.items]
         return"({})".format(', '.join(item_names))
         
+    def add_item(self, item):
+        pass
+    
     def get_item(self, index):
         if isInferredType(index):
             return TypeSet(*self.items)
