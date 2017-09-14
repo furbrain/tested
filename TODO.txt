@@ -5,6 +5,9 @@ implement basic library in pseudocode...
 Basic types implemented DONE
 Need to implement relevant classes and builtin functions -- and file class also
 implement dict and list comprehensions
-self is not aware of other methods
 order completions alphabetically
+sort out fromimports:
+    two cases - we have a module and need to import just parts of it into our scope
+    we have a package and need to import a module
+    also deal with special case of '*'
 

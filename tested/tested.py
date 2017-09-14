@@ -106,8 +106,10 @@ class CompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         
     def do_populate(self, context):
         pos = context.get_iter()[1]
+        location = pos.get_buffer().get_location()
+        location = location.get_path()
         try:
-            self.doc_context = self.parser(self.get_all_text(pos))
+            self.doc_context = self.parser(self.get_all_text(pos), location)
         except SyntaxError:
             pass
         if self.doc_context:
