@@ -24,9 +24,7 @@ class ModuleType(InferredType):
     def fromName(cls, name, scope, level=0):
         parent_module = scope.get_module()
         document = parent_module.document
-        print(name, level, parent_module.filename, document.location)
         filename = module_finder.find_module(name, level, parent_module.filename, document.location)
-        print(filename)
         if filename in cls.known_modules:
             return cls.known_modules[filename]
         self = cls()

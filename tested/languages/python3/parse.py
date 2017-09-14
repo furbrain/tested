@@ -17,7 +17,6 @@ def get_suggestions(document, line, line_number):
             try:
                 obj = expressions.get_expression_type(obj,scope)
                 scope = obj.get_all_attrs()
-                print(scope)
             except SyntaxError:
                 pass
         return [x for x in scope if x.startswith(prefix)]
