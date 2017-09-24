@@ -76,8 +76,6 @@ class ScopeList():
         self.scopes.append(scope)
                 
     def getScope(self, line, indent):
-        print(self.scopes)
-        print(line, indent)
         possible_scopes = [x for x in self.scopes if x.matches(line, indent)]
         if possible_scopes:
             return sorted(possible_scopes, key=lambda x: x.indent)[-1]
