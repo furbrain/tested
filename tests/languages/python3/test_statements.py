@@ -150,4 +150,16 @@ class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):
         self.assertEqual(ctx['B'].get_attr('s'),'<str>')
         self.assertEqual(ctx['b'].get_attr('s'),'<str>')
 
+class TestStatementBlockTypeParser_Comprehensions(TestStatementBlockTypeParser__Base):
+    def testListComprehension(self):
+        self.checkStatement("a = [1,2,3,4]\nb = [x for x in a]",{'a':'[<int>]','b':'[<int>]'})
+        self.checkStatement("a = [1,2,3,4]\nb = [x for x in a if x <2]",{'a':'[<int>]','b':'[<int>]'})
+        
+    def testSetComprehension(self):
+        self.checkStatement("a = [1,2,3,4]\nb = {x for x in a}",{'a':'[<int>]','b':'[<int>]'})
 
+    def testDictComprehension(self):
+        self.checkStatement("a = [1,2,3,4]\nb = {x:x for x in a}",{'a':'[<int>]','b':'{<int>: <int>}'})
+        self.checkStatement("a = [1,2,3,4]\nb = {x:'a' for x in a}",{'a':'[<int>]','b':'{<int>: <str>}'})
+        
+        

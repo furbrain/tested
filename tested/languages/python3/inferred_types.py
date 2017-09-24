@@ -104,6 +104,9 @@ class InferredType():
         else:
             return UnknownType()
             
+    def get_iter(self):
+        return self.get_item(-1)
+            
     def add_item(self, item):
         assert(isInferredType(item))
         self.items = self.items.add_type(item)
@@ -178,6 +181,9 @@ class InferredTuple(InferredType):
             
     def get_slice(self):
         return InferredList(*self.items)
+        
+    def get_iter(self):
+        return TypeSet(*self.items)
             
 class InferredDict(InferredType):
     def __init__(self, keys, values):

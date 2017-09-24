@@ -3,8 +3,7 @@ import warnings
 
 from .inferred_types import TypeSet, InferredList, InferredTuple, InferredDict, InferredType, UnknownType, get_type_name
 from .builtins import get_built_in_for_literal
-
-
+from .scopes import Scope
 
 def get_expression_type(expression, scope):
     if isinstance(expression,str):
@@ -142,4 +141,23 @@ class ExpressionTypeParser(ast.NodeVisitor):
         
     def visit_Compare(self, node):
         return self.bool
-
+        
+    def visit_ListComp(self, node):
+        scope = self.getScopeForComprehension(node)
+        target = get_expression_type(node.elt, scope)
+        return InferredList(target)
+            
+    def visit_DictComp(self, node):
+        scope = self.getScopeForComprehension(node)
+        key_target = get_expression_type(node.key, scope)
+        value_target = get_expression_type(node.value, scope)
+        return InferredDict([key_target],[value_target])
+    
+    def getScopeForComprehension(self, node):
+        from .assignment import assign_to_node
+        scope = self.scope
+        for generator in node.generators:
+            scope = Scope('__listcomp__', node.lineno, node.col_offset, parent=scope)
+            iterator = get_expression_type(generator.iter, scope)
+            assign_to_node(generator.target, iterator.get_iter(), scope)
+        return scope    
