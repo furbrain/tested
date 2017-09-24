@@ -155,4 +155,7 @@ class TestLineNumberGetter(unittest.TestCase):
         
     def testNestedFuncs(self):
         self.checkLineNumbers("def f(a,b):\n  def g(b):\n    return a",[(1,0),(2,2),(3,4)])
+        
+    def testLineNumbersInDocstrings(self):
+        self.checkLineNumbers('def f():\n  """\ntest docstring\n"""\n  return f', [(1,0),(5,2)])
     

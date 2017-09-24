@@ -7,7 +7,10 @@ def parse_text(text, location):
 def get_suggestions(document, line, line_number):
     indent = len(line) - len(line.lstrip(' '))
     scope = document.scopes.getScope(line_number, indent)
-    last_char = line[-1]
+    if line:
+        last_char = line[-1]
+    else:
+        last_char = ''
     if last_char.isidentifier() or last_char=='.':
         identifier = get_last_whole_identifier(line)
         obj,_,prefix = identifier.rpartition('.')

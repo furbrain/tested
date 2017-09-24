@@ -101,10 +101,11 @@ class LineNumberGetter(ast.NodeVisitor):
         
     def generic_visit(self, node):
         if hasattr(node,'lineno'):
-            if node.lineno in self.lines:
-                self.lines[node.lineno] = min(node.col_offset,self.lines[node.lineno])
-            else:
-                self.lines[node.lineno] = node.col_offset
+            if node.col_offset>=0: #docstrings have col_offset==-1 in cpython: a bug!
+                if node.lineno in self.lines:
+                    self.lines[node.lineno] = min(node.col_offset,self.lines[node.lineno])
+                else:
+                    self.lines[node.lineno] = node.col_offset
         super().generic_visit(node)
 
 
