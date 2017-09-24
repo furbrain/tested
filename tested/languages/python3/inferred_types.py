@@ -157,6 +157,17 @@ class InferredList(InferredType):
     def __str__(self):
         return '[%s]' % self.items
         
+class InferredSet(InferredType):
+    def __init__(self, *args):
+        super().__init__()
+        self.name="list"
+        for arg in args:
+            self.add_item(arg)
+        
+    @do_not_recurse('[...]')
+    def __str__(self):
+        return '{%s}' % self.items
+        
 class InferredTuple(InferredType):
     def __init__(self, *args):
         super().__init__()

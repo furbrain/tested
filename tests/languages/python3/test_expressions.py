@@ -122,6 +122,13 @@ class TestExpressionTypeParser(unittest.TestCase):
     def testDictIndex(self):
         self.checkExpr("{1: 'abc', 2.0: [1,2]}[1]", "<str>, [<int>]")
         
+    ### SETS ####
+    def testSet(self):
+        self.checkExpr("{1, 2, 3}",'{<int>}')
+        
+    def testMixedSet(self):
+        self.checkExpr("{1, 'abc'}", '{<int>, <str>}')
+        
     ### Comparison ###    
     def testCompare(self):
         self.checkExpr("1 < 2", "<bool>")

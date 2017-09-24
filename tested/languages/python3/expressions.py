@@ -1,7 +1,7 @@
 import ast
 import warnings
 
-from .inferred_types import TypeSet, InferredList, InferredTuple, InferredDict, InferredType, UnknownType, get_type_name
+from .inferred_types import TypeSet, InferredList, InferredTuple, InferredSet, InferredDict, InferredType, UnknownType, get_type_name
 from .builtins import get_built_in_for_literal
 from .scopes import Scope
 
@@ -53,11 +53,15 @@ class ExpressionTypeParser(ast.NodeVisitor):
         items = [self.getType(elt) for elt in node.elts]
         return InferredTuple(*items)
         
+    def visit_Set(self, node):
+        items = [self.getType(elt) for elt in node.elts]
+        return InferredSet(*items)
+
     def visit_Dict(self, node):
         keys = [self.getType(key) for key in node.keys]
         items = [self.getType(value) for value in node.values]
         return InferredDict(keys, items)
-            
+
     def visit_Call(self, node):
         func_types = self.getType(node.func)
         args = [self.getType(arg_node) for arg_node in node.args]
@@ -146,6 +150,11 @@ class ExpressionTypeParser(ast.NodeVisitor):
         scope = self.getScopeForComprehension(node)
         target = get_expression_type(node.elt, scope)
         return InferredList(target)
+            
+    def visit_SetComp(self, node):
+        scope = self.getScopeForComprehension(node)
+        target = get_expression_type(node.elt, scope)
+        return InferredSet(target)
             
     def visit_DictComp(self, node):
         scope = self.getScopeForComprehension(node)
