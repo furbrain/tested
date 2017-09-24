@@ -117,11 +117,11 @@ class CompletionProvider(GObject.Object, GtkSource.CompletionProvider):
             line_start = pos.get_buffer().get_iter_at_line(line_no)
             line = line_start.get_text(pos)
             suggestions = self.suggester(self.doc_context, line, line_no)
-            sugs = [self.createProposal(x) for x in suggestions]
+            sugs = [self.createProposal(x, info) for x, info in suggestions]
             context.add_proposals(self, sugs, True)
         
-    def createProposal(self, text):
-        prop = GtkSource.CompletionItem(label=text, text=text)
+    def createProposal(self, text, info):
+        prop = GtkSource.CompletionItem(label=text, text=text, info=info)
         return prop
     
     def get_activation(self):

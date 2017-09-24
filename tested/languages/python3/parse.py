@@ -22,7 +22,7 @@ def get_suggestions(document, line, line_number):
                 scope = obj.get_all_attrs()
             except SyntaxError:
                 pass
-        return [x for x in scope if x.startswith(prefix)]
+        return [(x, get_info(x, scope)) for x in scope if x.startswith(prefix)]
     else:
         return []
         
@@ -57,6 +57,13 @@ def get_last_whole_identifier(line):
 def get_line_part(line, node):
     line = line[node.col_offset:]
     return get_last_whole_identifier(line)
-    
+
+def get_info(var, scope):
+    if var in scope:
+        item = scope[var]
+        if hasattr(item,'docstring'):
+            return "{}\n\n{}".format(str(item),item.docstring)
+    return ''
+
 #do ifexp
 
