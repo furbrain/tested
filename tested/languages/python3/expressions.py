@@ -6,6 +6,8 @@ from .builtins import get_built_in_for_literal
 from .scopes import Scope
 
 def get_expression_type(expression, scope):
+    if scope is None:
+        warnings.warn("No scope passed to get_expression_type with expression: {}".format(expression))
     if isinstance(expression,str):
         expression = ast.parse(expression)
     parser = ExpressionTypeParser(scope)
@@ -43,10 +45,8 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return get_built_in_for_literal(node.value)
            
     def visit_List(self, node):
-        result = InferredList()
-        for elt in node.elts:
-            result.add_item(self.getType(elt))
-        return result
+        items = [self.getType(elt) for elt in node.elts]
+        return InferredList(*items)
 
         
     def visit_Tuple(self, node):

@@ -1,7 +1,7 @@
 import unittest
 import ast 
 
-from tested.languages.python3 import get_expression_type, InferredList, TypeSet, FunctionType, UnknownType, ClassType, get_global_scope
+from tested.languages.python3 import get_expression_type, InferredList, TypeSet, FunctionType, UnknownType, ClassType, get_global_scope, Scope
 
 class TestExpressionTypeParser(unittest.TestCase):
     def setUp(self):
@@ -10,6 +10,8 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.float = get_global_scope()['<float>'] 
 
     def checkExpr(self, expr, result, context=None):
+        if context is None:
+            context = Scope('__test__',0,-1)
         answer = str(get_expression_type(expr, context))
         message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, context)
         self.assertEqual(answer, result, msg = message)
@@ -165,4 +167,18 @@ class TestExpressionTypeParser(unittest.TestCase):
         c.add_attr('a',self.int)
         context={'C':c}
         self.checkExpr("C.a", "<int>", context=context)
+        
+       
+    ### COMPREHENSIONS ###
+    def testListComprehension(self):
+        self.checkExpr("[x for x in [1,2,3]]", '[<int>]')
+        self.checkExpr("[x for x in [1,2,3] if x <2]", '[<int>]')
+        
+    def testSetComprehension(self):
+        self.checkExpr("{x for x in [1,2,3]}", '{<int>}')
+
+    def testDictComprehension(self):
+        self.checkExpr("{x:x for x in [1,2,3]}", '{<int>: <int>}')
+        self.checkExpr("{x:'a' for x in [1,2,3]}", '{<int>: <str>}')
+    
         
