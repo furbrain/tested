@@ -23,11 +23,28 @@ class StatementBlockTypeParser(ast.NodeVisitor):
                     
     def visit_Assign(self, node):
         for target in node.targets:
-            assign_to_node(target,node.value, self.scope)
+            assign_to_node(target, node.value, self.scope)
             
     def visit_AugAssign(self, node):
         op_node = ast.BinOp(node.target,node.op,node.value)
-        assign_to_node(node.target,op_node, self.scope)
+        assign_to_node(node.target, op_node, self.scope)
+        
+    def visit_For(self, node):
+        iterator = get_expression_type(node.iter, self.scope).get_iter()
+        assign_to_node(node.target, iterator, self.scope)
+        self.generic_visit(node)
+        
+    def visit_AsyncFor(self, node):
+        self.visit_For(node)
+        
+    def visit_With(self, node):
+        for item in node.items:
+            if item.optional_vars:
+                assign_to_node(item.optional_vars, item.context_expr, self.scope)
+        self.generic_visit(node)        
+         
+    def visit_AsyncWith(self, node):
+        self.visit_With(node)
         
     def visit_FunctionDef(self, node):
         from .functions import FunctionType

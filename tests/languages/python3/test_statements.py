@@ -45,6 +45,14 @@ class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Ba
         
     def testAugmentedAssignment(self):
         self.checkStatement("a += 3.0", {'a':'<float>, <int>'}, context = {'a':TypeSet(1)})
+
+    def testForStatement(self):
+        self.checkStatement("a = [1,2,3,4]\nfor x in a:\n  y=x+2.1", 
+                            {'a':'[<int>]', 'x':'<int>', 'y':'<float>'})
+        
+    def testWithStatement(self):
+        self.checkStatement("class Context:\n  pass\nwith Context() as x:\n  pass", 
+                            {'Context':'Context', 'x':'<Context>'})
         
 class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base):
     def testBasicFunctionWithImplicitNone(self):
