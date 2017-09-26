@@ -160,7 +160,7 @@ class InferredList(InferredType):
 class InferredSet(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="list"
+        self.name="set"
         for arg in args:
             self.add_item(arg)
         
@@ -208,6 +208,9 @@ class InferredDict(InferredType):
     def get_key(self):
         return self.keys
         
+    def get_iter(self):
+        return self.get_key()
+        
 class TypeSet():
     def __init__(self, *args):
         self.types = set()
@@ -242,6 +245,9 @@ class TypeSet():
         for tp in list(self.types):
             tp.add_item(item)
         
+    def get_iter(self):
+        return TypeSet(*[tp.get_iter() for tp in self.types])
+            
     def get_call_return(self, arg_types):
         assert(all(isInferredType(x) for x in arg_types))
         return TypeSet(*[tp.get_call_return(arg_types) for tp in self.types])

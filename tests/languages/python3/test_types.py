@@ -132,6 +132,10 @@ class TestInferredList(unittest.TestCase):
         lst = InferredList(self.int)
         lst.add_item(lst)
         self.assertEqual(lst, '[[...], int]')
+        
+    def testGetIter(self):
+        lst = InferredList(self.int)
+        self.assertEqual(lst.get_item(0),lst.get_iter())
             
 class TestInferredDict(unittest.TestCase):
     def setUp(self):
@@ -148,6 +152,9 @@ class TestInferredDict(unittest.TestCase):
 
     def testKeys(self):
         self.assertEqual(self.dict.get_key(), 'float, int')
+
+    def testGetIter(self):
+        self.assertEqual(self.dict.get_iter(),'float, int')
         
 
 class TestTypeSet(unittest.TestCase):
@@ -229,3 +236,8 @@ class TestTypeSet(unittest.TestCase):
             'b':self.str, 
             'c':TypeSet(self.int, self.str)})
 
+    def testGetIter(self):
+        ts = TypeSet(InferredList(self.int),self.int)
+        self.assertEqual(ts.get_iter(),'Unknown, int')
+        ts = TypeSet(InferredList(self.int),InferredList(self.str))
+        self.assertEqual(ts.get_iter(),'int, str')        
