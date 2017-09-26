@@ -23,20 +23,12 @@ class StatementBlockTypeParser(ast.NodeVisitor):
                     
     def visit_Assign(self, node):
         for target in node.targets:
-            self.assignToTarget(target,node.value)
+            assign_to_node(target,node.value, self.scope)
             
     def visit_AugAssign(self, node):
         op_node = ast.BinOp(node.target,node.op,node.value)
-        self.assignToTarget(node.target,op_node)
+        assign_to_node(node.target,op_node, self.scope)
         
-    def assignToTarget(self, target, value_node):
-        if self.isSequence(target) and self.isSequence(value_node):
-            for i, subtarget in enumerate(target.elts):
-                self.assignToTarget(subtarget, value_node.elts[i])
-        else:
-            assigned_types = get_expression_type(value_node, self.scope)
-            assign_to_node(target, assigned_types, self.scope)
-
     def visit_FunctionDef(self, node):
         from .functions import FunctionType
         self.scope[node.name] =  FunctionType.fromASTNode(node, self.scope)
@@ -61,7 +53,5 @@ class StatementBlockTypeParser(ast.NodeVisitor):
                     module.set_attr(alias.name, ModuleType.fromName(alias.name, module.outer_scope, level=1))
             self.scope[name] = module.get_attr(alias.name)
         
-    def isSequence(self, node):
-        return (type(node).__name__ in ("Tuple","List"))
         
     

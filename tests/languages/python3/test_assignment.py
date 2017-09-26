@@ -1,6 +1,6 @@
 import unittest
 
-from tested.languages.python3 import assign_to_node, TypeSet, ClassType, InferredList, InferredDict, get_global_scope
+from tested.languages.python3 import assign_to_node, TypeSet, ClassType, InferredList, InferredTuple, InferredDict, get_global_scope
 
 
 
@@ -57,4 +57,15 @@ class TestAssignment(unittest.TestCase):
         assign_to_node('l()',self.str,context)
         self.assertEqual(context,{'l':'<int>'})
     
+    def testMultipleAssignmentFromList(self):
+        context = {}
+        mylist = InferredList(self.int, self.str)
+        assign_to_node('a, b', mylist, context)
+        self.assertEqual(context, {'a':'<int>, <str>', 'b':'<int>, <str>'})
+
+    def testMultipleAssignmentFromTuple(self):
+        context = {}
+        mytuple = InferredTuple(self.int, self.str)
+        assign_to_node('a, b', mytuple, context)
+        self.assertEqual(context, {'a':'<int>', 'b':'<str>'})
 

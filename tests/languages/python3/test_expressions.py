@@ -174,6 +174,10 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[x for x in [1,2,3]]", '[<int>]')
         self.checkExpr("[x for x in [1,2,3] if x <2]", '[<int>]')
         
+    def testListComprehensionWithTuples(self):
+        self.checkExpr("[x for x, y in [(1,'a'),(2,'b'),(3,'c')]]", '[<int>]')
+        self.checkExpr("[y for x, y in [(1,'a'),(2,'b'),(3,'c')]]", '[<str>]')
+        
     def testSetComprehension(self):
         self.checkExpr("{x for x in [1,2,3]}", '{<int>}')
 
