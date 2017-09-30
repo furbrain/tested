@@ -161,6 +161,11 @@ class ExpressionTypeParser(ast.NodeVisitor):
         key_target = get_expression_type(node.key, scope)
         value_target = get_expression_type(node.value, scope)
         return InferredDict([key_target],[value_target])
+        
+    def visit_GeneratorExp(self, node):
+        scope = self.getScopeForComprehension(node)
+        target = get_expression_type(node.elt, scope)
+        return InferredIterator(target)
     
     def getScopeForComprehension(self, node):
         from .assignment import assign_to_node

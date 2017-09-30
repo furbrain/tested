@@ -184,5 +184,7 @@ class TestExpressionTypeParser(unittest.TestCase):
     def testDictComprehension(self):
         self.checkExpr("{x:x for x in [1,2,3]}", '{<int>: <int>}')
         self.checkExpr("{x:'a' for x in [1,2,3]}", '{<int>: <str>}')
-    
         
+    def testGeneratorExpr(self):
+        self.checkExpr("(x for x in [1,2,3])", '(-> <int>)')
+
