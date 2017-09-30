@@ -57,7 +57,7 @@ def get_last_whole_identifier(line):
 def get_line_part(line, node):
     line = line[node.col_offset:]
     return get_last_whole_identifier(line)
-
+    
 def get_info(var, scope):
     if var in scope:
         item = scope[var]
@@ -65,5 +65,4 @@ def get_info(var, scope):
             return "{}\n\n{}".format(str(item),item.docstring)
     return ''
 
-#do ifexp
 

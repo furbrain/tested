@@ -1,7 +1,7 @@
 import ast
 import warnings
 
-from .inferred_types import TypeSet, InferredList, InferredTuple, InferredSet, InferredDict, InferredType, UnknownType, get_type_name
+from .inferred_types import TypeSet, InferredList, InferredTuple, InferredSet, InferredDict, InferredType, InferredIterator, UnknownType, get_type_name
 from .builtins import get_built_in_for_literal
 from .scopes import Scope
 
@@ -76,6 +76,9 @@ class ExpressionTypeParser(ast.NodeVisitor):
         
     def visit_Module(self, node):
         return self.getType(node.body[0])
+        
+    def visit_IfExp(self, node):
+        return TypeSet(self.getType(node.body), self.getType(node.orelse))
             
     def visit_BinOp(self, node):
         op = type(node.op).__name__

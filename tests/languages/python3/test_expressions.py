@@ -136,6 +136,10 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("1 < 2", "<bool>")
         self.checkExpr("2 > 3", "<bool>")
         self.checkExpr('"abc" <= "abc"', "<bool>")
+        
+    def testIfExp(self):
+        self.checkExpr("1 if True else 2", "<int>")
+        self.checkExpr("1 if False else 'abc'", "<int>, <str>")
 
     ### FUNCTION CALLS ###
     def testSimpleFunctionCall(self):

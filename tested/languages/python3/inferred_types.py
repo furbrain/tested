@@ -210,6 +210,14 @@ class InferredDict(InferredType):
         
     def get_iter(self):
         return self.get_key()
+
+class InferredIterator(InferredType):
+    def __init__(self, return_type):
+        super().__init__()
+        self.add_item(return_type)
+        
+    def __str__(self):
+        return "(-> {!s})".format(self.items)
         
 class TypeSet():
     def __init__(self, *args):
