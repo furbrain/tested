@@ -9,5 +9,9 @@ sort out fromimports:
     two cases - we have a module and need to import just parts of it into our scope DONE
     we have a package and need to import a module DONE
     also deal with special case of '*'
-Implement Sets
-Add methods to lists and dicts...
+Implement Sets DONE
+Add methods to lists and dicts and sets oh my
+
+Add to expressions: lambdas, bytes, starred function args...
+
+
