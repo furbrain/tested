@@ -6,6 +6,9 @@ from .inferred_types import TypeSet, InferredList, InferredType
 def isSequence(node):
     return (type(node).__name__ in ("Tuple","List"))
 
+def isStarred(node):
+    return type(node).__name__ == "Starred"
+
 def isNode(node):
     return isinstance(node, ast.AST)
     
@@ -18,11 +21,19 @@ def assign_to_node(target, value, scope):
     if isSequence(target):
         if isNode(value) and isSequence(value):
             for i, subtarget in enumerate(target.elts):
-                assign_to_node(subtarget, value.elts[i], scope)
+                if isStarred(subtarget):
+                    elements = [get_expression_type(x) for x in value.elts[i:]]
+                    assign_to_node(subtarget, InferredList(*elements), scope)
+                else:
+                    assign_to_node(subtarget, value.elts[i], scope)
             return
         elif isInferredType(value):
             for i, subtarget in enumerate(target.elts):
-                assign_to_node(subtarget, value.get_item(i), scope)
+                if isStarred(subtarget):
+                    elements = value.get_slice_from(i)
+                    assign_to_node(subtarget, elements, scope)
+                else:
+                    assign_to_node(subtarget, value.get_item(i), scope)
             return
     if isNode(value):
         value = get_expression_type(value, scope)

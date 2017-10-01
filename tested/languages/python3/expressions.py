@@ -13,6 +13,9 @@ def get_expression_type(expression, scope):
     parser = ExpressionTypeParser(scope)
     return parser.getType(expression)
 
+def isStarred(node):
+    return type(node).__name__ == "Starred"
+
 class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, scope):
         self.scope = scope
@@ -45,18 +48,27 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return get_built_in_for_literal(node.value)
            
     def visit_List(self, node):
-        items = [self.getType(elt) for elt in node.elts]
+        items = self.get_sequence_items(node)
         return InferredList(*items)
-
         
     def visit_Tuple(self, node):
-        items = [self.getType(elt) for elt in node.elts]
+        items = self.get_sequence_items(node)
         return InferredTuple(*items)
         
     def visit_Set(self, node):
-        items = [self.getType(elt) for elt in node.elts]
+        items = self.get_sequence_items(node)
         return InferredSet(*items)
 
+    def get_sequence_items(self, node):
+        items = []
+        for elt in node.elts:
+            if isStarred(elt):
+                elt_type = self.getType(elt.value)
+                items.extend(elt_type.items)
+            else:
+                items.append(self.getType(elt))
+        return items
+        
     def visit_Dict(self, node):
         keys = [self.getType(key) for key in node.keys]
         items = [self.getType(value) for value in node.values]

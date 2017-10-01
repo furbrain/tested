@@ -68,4 +68,16 @@ class TestAssignment(unittest.TestCase):
         mytuple = InferredTuple(self.int, self.str)
         assign_to_node('a, b', mytuple, context)
         self.assertEqual(context, {'a':'<int>', 'b':'<str>'})
+        
+    def testAssignmentToStarredFromTuple(self):
+        context = {}
+        mytuple = InferredTuple(self.int, self.str, self.float)    
+        assign_to_node('(a, *b)', mytuple, context)
+        self.assertEqual(context, {'a':'<int>', 'b':'[<float>, <str>]'})
+
+    def testAssignmentToStarredFromList(self):
+        context = {}
+        mytuple = InferredList(self.int, self.str, self.float)    
+        assign_to_node('(a, *b)', mytuple, context)
+        self.assertEqual(context, {'a':'<float>, <int>, <str>', 'b':'[<float>, <int>, <str>]'})
 

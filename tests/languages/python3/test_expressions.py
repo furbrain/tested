@@ -117,6 +117,11 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("(1,'a',2.0)[1:2]", "[<float>, <int>, <str>]")
         self.checkExpr("(1,'a')[:]", "[<int>, <str>]")
         
+    def testTupleConstructionFromStarred(self):
+        tp = InferredTuple(self.int, self.float)
+        ctx = {'tp':tp}
+        self.checkExpr("('abc', *tp)", "(<str>, <int>, <float>)", context=ctx)    
+        
     ### DICTS ###
     def testDict(self):
         self.checkExpr("{1: 'abc', 2.0: [1,2]}", "{<float>, <int>: <str>, [<int>]}")
