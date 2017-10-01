@@ -43,6 +43,14 @@ class FunctionType(InferredType):
         else:
             self.return_values = get_built_in_for_literal(None)
         return self
+        
+    @classmethod
+    def fromLambdaNode(cls, node, scope):
+        arg_names = [arg.arg for arg in node.args.args]
+        docstring = "Anonymous lambda function"
+        self = cls('__lambda__', arg_names, get_expression_type(node.body, scope), docstring)
+        return self
+        
 
     def createScopeFromNode(self, node, parent_scope, owning_class):
         if parent_scope is None:

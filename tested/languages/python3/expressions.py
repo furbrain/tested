@@ -38,6 +38,9 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_Str(self, node):
         return get_built_in_for_literal(node.s)
         
+    def visit_Bytes(self, node):
+        return get_built_in_for_literal(node.s)
+        
     def visit_Name(self, node):
         if node.id in self.scope:
             return self.scope[node.id]
@@ -78,6 +81,10 @@ class ExpressionTypeParser(ast.NodeVisitor):
         func_types = self.getType(node.func)
         args = [self.getType(arg_node) for arg_node in node.args]
         return func_types.get_call_return(args)
+        
+    def visit_Lambda(self, node):
+        from .functions import FunctionType
+        return FunctionType.fromLambdaNode(node, self.scope)    
         
     def visit_Attribute(self, node):
         base_var = self.getType(node.value)

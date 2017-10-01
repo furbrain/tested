@@ -1,7 +1,7 @@
 import unittest
 import ast 
 
-from tested.languages.python3 import get_expression_type, InferredList, TypeSet, FunctionType, UnknownType, ClassType, get_global_scope, Scope
+from tested.languages.python3 import get_expression_type, InferredList, InferredTuple, TypeSet, FunctionType, UnknownType, ClassType, get_global_scope, Scope
 
 class TestExpressionTypeParser(unittest.TestCase):
     def setUp(self):
@@ -25,6 +25,9 @@ class TestExpressionTypeParser(unittest.TestCase):
 
     def testPlainString(self):
         self.checkExpr("'abc'","<str>")
+        
+    def testBytes(self):
+        self.checkExpr("b'abc'","<bytes>")          
         
     def testBoolean(self):
         self.checkExpr("True","<bool>")
@@ -170,6 +173,9 @@ class TestExpressionTypeParser(unittest.TestCase):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
         context = {'f':f}
         self.checkExpr("f()", "Unknown", context=context)
+        
+    def testLambdaExpression(self):
+        self.checkExpr('lambda x: 3', '__lambda__(x) -> (<int>)')
     ### CLASS TESTS ###
     def testGetAttribute(self):
         c = ClassType('C',[],'')
