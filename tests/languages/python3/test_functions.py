@@ -19,7 +19,7 @@ class TestFunctionType(unittest.TestCase):
         
     def testMultpleReturnType(self):
         f = FunctionType('f', [], TypeSet(int, float), "")
-        self.assertEqual(f.get_call_return([]),"float, int")
+        self.assertEqual(f.get_call_return([]),"float | int")
         
     def testContingentReturnType(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a')), "")
@@ -30,7 +30,7 @@ class TestFunctionType(unittest.TestCase):
         
     def testContingentMultipleReturnType(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
-        self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "float, int")
+        self.assertEqual(f.get_call_return([TypeSet(int), TypeSet(float)]), "float | int")
 
     def testBadlyMatchedArgsReturnType(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a')), "")

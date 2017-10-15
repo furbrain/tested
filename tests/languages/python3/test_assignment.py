@@ -26,31 +26,31 @@ class TestAssignment(unittest.TestCase):
         b = ClassType('B',[],'')        
         context = {'C':TypeSet(a,b)}
         assign_to_node('C.x',TypeSet(self.str),context)
-        self.assertEqual(a.get_attr('x'),'<int>, <str>')
+        self.assertEqual(a.get_attr('x'),'<int> | <str>')
         self.assertEqual(b.get_attr('x'),'<str>')
         
     def testListIndexAssigment(self):
         """Test assignment to a list index works"""
         context = {'l': TypeSet(InferredList(self.int))}
         assign_to_node('l[0]', self.str, context)
-        self.assertEqual(context,{'l':'[<int>, <str>]'})
+        self.assertEqual(context,{'l':'[<int> | <str>]'})
         
     def testListSliceAssignment(self):
         context = {'l': TypeSet(InferredList(self.int))}
         l2 = TypeSet(InferredList(self.str))
         assign_to_node('l[1:2]',l2,context)
-        self.assertEqual(context,{'l':'[<int>, <str>]'})
+        self.assertEqual(context,{'l':'[<int> | <str>]'})
         
     def testListSliceTotalAssignment(self):        
         context = {'l': TypeSet(InferredList(self.int))}
         l2 = TypeSet(InferredList(self.str))
         assign_to_node('l[:]',l2,context)
-        self.assertEqual(context,{'l':'[<int>, <str>]'})
+        self.assertEqual(context,{'l':'[<int> | <str>]'})
 
     def testDictIndexAssignment(self):
         context = {'d': InferredDict([self.str],[self.int])}
         assign_to_node("d['abc']", self.float, context)
-        self.assertEqual(context,{'d':'{<str>: <float>, <int>}'})
+        self.assertEqual(context,{'d':'{<str>: <float> | <int>}'})
         
     def testCallResultAssignmentDoesNothing(self):
         context = {'l': self.int}
@@ -61,7 +61,7 @@ class TestAssignment(unittest.TestCase):
         context = {}
         mylist = InferredList(self.int, self.str)
         assign_to_node('a, b', mylist, context)
-        self.assertEqual(context, {'a':'<int>, <str>', 'b':'<int>, <str>'})
+        self.assertEqual(context, {'a':'<int> | <str>', 'b':'<int> | <str>'})
 
     def testMultipleAssignmentFromTuple(self):
         context = {}
@@ -73,11 +73,11 @@ class TestAssignment(unittest.TestCase):
         context = {}
         mytuple = InferredTuple(self.int, self.str, self.float)    
         assign_to_node('(a, *b)', mytuple, context)
-        self.assertEqual(context, {'a':'<int>', 'b':'[<float>, <str>]'})
+        self.assertEqual(context, {'a':'<int>', 'b':'[<float> | <str>]'})
 
     def testAssignmentToStarredFromList(self):
         context = {}
         mytuple = InferredList(self.int, self.str, self.float)    
         assign_to_node('(a, *b)', mytuple, context)
-        self.assertEqual(context, {'a':'<float>, <int>, <str>', 'b':'[<float>, <int>, <str>]'})
+        self.assertEqual(context, {'a':'<float> | <int> | <str>', 'b':'[<float> | <int> | <str>]'})
 

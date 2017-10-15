@@ -44,7 +44,7 @@ class TestStatementBlockTypeParser__Assignments(TestStatementBlockTypeParser__Ba
         self.checkStatement("a = 1\nb = 2.0\nc = a+b",{'a':'<int>','b':'<float>','c':'<float>'})
         
     def testAugmentedAssignment(self):
-        self.checkStatement("a += 3.0", {'a':'<float>, <int>'}, context = {'a':TypeSet(1)})
+        self.checkStatement("a += 3.0", {'a':'<float> | <int>'}, context = {'a':TypeSet(1)})
 
     def testForStatement(self):
         self.checkStatement("a = [1,2,3,4]\nfor x in a:\n  y=x+2.1", 
@@ -63,7 +63,7 @@ class TestStatementBlockTypeParser__Functions(TestStatementBlockTypeParser__Base
 
     def testFunctionReturnsSemiImplicitNone(self):
         self.checkStatement("def f(): return", {'f':'f() -> (None)'})
-        self.checkStatement("def f():\n  if x:\n    return\n  else:\n    return 1", {'f':'f() -> (<int>, None)'})
+        self.checkStatement("def f():\n  if x:\n    return\n  else:\n    return 1", {'f':'f() -> (<int> | None)'})
 
     def testFunctionReturnsInt(self):
         self.checkStatement("def f(): return 1", {'f':'f() -> (<int>)'})
@@ -88,7 +88,7 @@ def f(a, b):
     else:
          return b
 """
-        self.checkStatement(func, {'f':'f(a, b) -> (Unknown: a, Unknown: b)'})
+        self.checkStatement(func, {'f':'f(a, b) -> (Unknown: a | Unknown: b)'})
                 
                 
 class TestStatementBlockTypeParser__Classes(TestStatementBlockTypeParser__Base):

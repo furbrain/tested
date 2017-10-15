@@ -89,7 +89,7 @@ class TestInferredType(unittest.TestCase):
         self.test_type.add_attr('b',it_str)
         self.test_type.add_attr('c',it_num)
         self.test_type.add_attr('c',it_str)
-        self.assertEqual(self.test_type.get_all_attrs(),{'a':'<int>', 'b':'<str>', 'c':'<int>, <str>'})
+        self.assertEqual(self.test_type.get_all_attrs(),{'a':'<int>', 'b':'<str>', 'c':'<int> | <str>'})
        
        
 class TestInferredTuple(unittest.TestCase):
@@ -112,7 +112,7 @@ class TestInferredTuple(unittest.TestCase):
         self.assertEqual(self.tuple.get_item(3), UnknownType())    
         
     def testSlice(self):
-        self.assertEqual(self.tuple.get_slice(), '[float, int, str]')
+        self.assertEqual(self.tuple.get_slice(), '[float | int | str]')
         
     def testAddItemDoesNothing(self):
         self.tuple.add_item(InferredType.fromType(complex))
@@ -126,12 +126,12 @@ class TestInferredList(unittest.TestCase):
 
     def testCreation(self):
         lst = InferredList(self.int,self.float)
-        self.assertEqual(lst, '[float, int]')
+        self.assertEqual(lst, '[float | int]')
         
     def testRecursiveList(self):
         lst = InferredList(self.int)
         lst.add_item(lst)
-        self.assertEqual(lst, '[[...], int]')
+        self.assertEqual(lst, '[[...] | int]')
         
     def testGetIter(self):
         lst = InferredList(self.int)
@@ -145,16 +145,16 @@ class TestInferredDict(unittest.TestCase):
         self.dict = InferredDict(keys = [self.int, self.float], values = [self.str, self.float])
 
     def testInit(self):
-        self.assertEqual(self.dict, '{float, int: float, str}')
+        self.assertEqual(self.dict, '{float | int: float | str}')
         
     def testValues(self):
-        self.assertEqual(self.dict.get_item(0), 'float, str')
+        self.assertEqual(self.dict.get_item(0), 'float | str')
 
     def testKeys(self):
-        self.assertEqual(self.dict.get_key(), 'float, int')
+        self.assertEqual(self.dict.get_key(), 'float | int')
 
     def testGetIter(self):
-        self.assertEqual(self.dict.get_iter(),'float, int')
+        self.assertEqual(self.dict.get_iter(),'float | int')
         
 
 class TestTypeSet(unittest.TestCase):
@@ -183,21 +183,21 @@ class TestTypeSet(unittest.TestCase):
         
     def testWithMultipleVals(self):
         st = TypeSet(1,"a")
-        self.assertEqual(str(st),"<int>, <str>")
+        self.assertEqual(str(st),"<int> | <str>")
         
     def testWithMixedVals(self):
         st = TypeSet(int, "a")
-        self.assertEqual(str(st),"<str>, int")
+        self.assertEqual(str(st),"<str> | int")
         
     def testEquality(self):
         self.assertEqual(TypeSet(int), TypeSet(int))
         self.assertEqual(TypeSet(int, float), TypeSet(int, float))
-        self.assertEqual(TypeSet(int, float),"float, int")
+        self.assertEqual(TypeSet(int, float),"float | int")
         
     def testInequality(self):
         self.assertNotEqual(TypeSet(int), TypeSet(float))
         self.assertNotEqual(TypeSet(int, float), TypeSet(int))
-        self.assertNotEqual(TypeSet(int, float), "int,float")
+        self.assertNotEqual(TypeSet(int, float), "int | float")
         self.assertNotEqual(TypeSet(int),[])
 
     def testGetAttr(self): 
@@ -238,6 +238,6 @@ class TestTypeSet(unittest.TestCase):
 
     def testGetIter(self):
         ts = TypeSet(InferredList(self.int),self.int)
-        self.assertEqual(ts.get_iter(),'Unknown, int')
+        self.assertEqual(ts.get_iter(),'Unknown | int')
         ts = TypeSet(InferredList(self.int),InferredList(self.str))
-        self.assertEqual(ts.get_iter(),'int, str')        
+        self.assertEqual(ts.get_iter(),'int | str')        

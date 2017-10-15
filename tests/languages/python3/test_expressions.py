@@ -56,9 +56,9 @@ class TestExpressionTypeParser(unittest.TestCase):
     def testMixedBinaryConversions(self):
         dct = {'a':InferredList(self.int), 'b':InferredList(self.int, self.str)}
         self.checkExpr("a[0]+b[0]","<int>", context=dct)
-        self.checkExpr("b[0]+b[0]","<int>, <str>", context=dct)
+        self.checkExpr("b[0]+b[0]","<int> | <str>", context=dct)
         self.checkExpr("a[0]*b[0]","<int>", context=dct)
-        self.checkExpr("b[0]*a[0]","<int>, <str>", context=dct)
+        self.checkExpr("b[0]*a[0]","<int> | <str>", context=dct)
         
     def testUnaryOps(self):
         boolean_tests = [("not True", "<bool>"), ("not False", "<bool>")]
@@ -93,11 +93,11 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[1,2,3,4]","[<int>]")
         
     def testListWithMixedTypes(self):
-        self.checkExpr("[1,2,'a',3,4]","[<int>, <str>]")
+        self.checkExpr("[1,2,'a',3,4]","[<int> | <str>]")
         
     def testListExtraction(self):
         self.checkExpr("[1,2,3,4][0]", "<int>")
-        self.checkExpr("[1,2,3,'a',4][0]", "<int>, <str>")
+        self.checkExpr("[1,2,3,'a',4][0]", "<int> | <str>")
         
     def testListSlice(self):
         self.checkExpr("[1,2,3,4][:]", "[<int>]")
@@ -114,11 +114,11 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("(1,'a')[1]", "<str>")
         
     def testTupleExtractionWithUnknownIndex(self):
-        self.checkExpr("(1,'a')[0+1]", "<int>, <str>")
+        self.checkExpr("(1,'a')[0+1]", "<int> | <str>")
         
     def testTupleSlice(self):
-        self.checkExpr("(1,'a',2.0)[1:2]", "[<float>, <int>, <str>]")
-        self.checkExpr("(1,'a')[:]", "[<int>, <str>]")
+        self.checkExpr("(1,'a',2.0)[1:2]", "[<float> | <int> | <str>]")
+        self.checkExpr("(1,'a')[:]", "[<int> | <str>]")
         
     def testTupleConstructionFromStarred(self):
         tp = InferredTuple(self.int, self.float)
@@ -127,17 +127,17 @@ class TestExpressionTypeParser(unittest.TestCase):
         
     ### DICTS ###
     def testDict(self):
-        self.checkExpr("{1: 'abc', 2.0: [1,2]}", "{<float>, <int>: <str>, [<int>]}")
+        self.checkExpr("{1: 'abc', 2.0: [1,2]}", "{<float> | <int>: <str> | [<int>]}")
         
     def testDictIndex(self):
-        self.checkExpr("{1: 'abc', 2.0: [1,2]}[1]", "<str>, [<int>]")
+        self.checkExpr("{1: 'abc', 2.0: [1,2]}[1]", "<str> | [<int>]")
         
     ### SETS ####
     def testSet(self):
         self.checkExpr("{1, 2, 3}",'{<int>}')
         
     def testMixedSet(self):
-        self.checkExpr("{1, 'abc'}", '{<int>, <str>}')
+        self.checkExpr("{1, 'abc'}", '{<int> | <str>}')
         
     ### Comparison ###    
     def testCompare(self):
@@ -147,7 +147,7 @@ class TestExpressionTypeParser(unittest.TestCase):
         
     def testIfExp(self):
         self.checkExpr("1 if True else 2", "<int>")
-        self.checkExpr("1 if False else 'abc'", "<int>, <str>")
+        self.checkExpr("1 if False else 'abc'", "<int> | <str>")
 
     ### FUNCTION CALLS ###
     def testSimpleFunctionCall(self):
@@ -167,7 +167,7 @@ class TestExpressionTypeParser(unittest.TestCase):
     def testComplexContingentFunctionCall(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
         context = {'f':f}
-        self.checkExpr("f(1, 'str')", "<int>, <str>", context=context)
+        self.checkExpr("f(1, 'str')", "<int> | <str>", context=context)
         
     def testUnknownResponse(self):
         f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('a'),UnknownType('b')), "")
