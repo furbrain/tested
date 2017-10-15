@@ -62,7 +62,5 @@ def get_info(var, scope):
     if var in scope:
         item = scope[var]
         if hasattr(item,'docstring'):
-            return "{}\n\n{}".format(str(item),item.docstring)
+            return "<b>{}</b>\n\n{}".format(html.escape(str(item)),html.escape(item.docstring))
     return ''
-
-
