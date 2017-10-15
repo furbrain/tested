@@ -1,4 +1,5 @@
 import ast
+import html
 from . import document, expressions
 
 def parse_text(text, location):
@@ -22,7 +23,10 @@ def get_suggestions(document, line, line_number):
                 scope = obj.get_all_attrs()
             except SyntaxError:
                 pass
-        return [(x, get_info(x, scope)) for x in scope if x.startswith(prefix)]
+        if prefix:
+            return sorted((x, get_info(x, scope)) for x in scope if x.startswith(prefix))
+        else:
+            return sorted((x, get_info(x, scope)) for x in scope if not x.startswith('_'))
     else:
         return []
         
