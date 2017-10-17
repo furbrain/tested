@@ -51,25 +51,25 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return get_built_in_for_literal(node.value)
            
     def visit_List(self, node):
-        items = self.get_sequence_items(node)
+        items = self.get_sequence_items(node.elts)
         return InferredList(*items)
         
     def visit_Tuple(self, node):
-        items = self.get_sequence_items(node)
+        items = self.get_sequence_items(node.elts)
         return InferredTuple(*items)
         
     def visit_Set(self, node):
-        items = self.get_sequence_items(node)
+        items = self.get_sequence_items(node.elts)
         return InferredSet(*items)
 
-    def get_sequence_items(self, node):
+    def get_sequence_items(self, node_list):
         items = []
-        for elt in node.elts:
-            if isStarred(elt):
-                elt_type = self.getType(elt.value)
-                items.extend(elt_type.items)
+        for node in node_list:
+            if isStarred(node):
+                node_type = self.getType(node.value)
+                items.extend(node_type.get_star_expansion())
             else:
-                items.append(self.getType(elt))
+                items.append(self.getType(node))
         return items
         
     def visit_Dict(self, node):
@@ -79,7 +79,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
 
     def visit_Call(self, node):
         func_types = self.getType(node.func)
-        args = [self.getType(arg_node) for arg_node in node.args]
+        args = self.get_sequence_items(node.args)
         return func_types.get_call_return(args)
         
     def visit_Lambda(self, node):

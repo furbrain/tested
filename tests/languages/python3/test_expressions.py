@@ -176,6 +176,27 @@ class TestExpressionTypeParser(unittest.TestCase):
         
     def testLambdaExpression(self):
         self.checkExpr('lambda x: 3', '__lambda__(x) -> (<int>)')
+        
+    def getStarredContext(self):    
+        f = FunctionType('f', ['a', 'b'], TypeSet(UnknownType('b')), "")
+        tpl = InferredTuple(self.int, self.float)
+        lst = InferredList(self.int, self.str)
+        ts = TypeSet(tpl,lst)
+        context = {'f':f, 'lst':lst, 'tpl':tpl, 'ts':ts}
+        return context
+        
+    def testStarredArgumentFunctionCallWithList(self):
+        context = self.getStarredContext()
+        self.checkExpr("f(*lst)", "<int> | <str>", context=context)
+        
+    def testStarredArgumentFunctionCallWithTuple(self):
+        context = self.getStarredContext()
+        self.checkExpr("f(*tpl)", "<float>", context=context)
+        
+    def testStarredArgumentFunctionCallWithTypeSet(self):
+        context = self.getStarredContext()
+        self.checkExpr("f(*ts)", "<float> | <int> | <str>", context=context)
+        
     ### CLASS TESTS ###
     def testGetAttribute(self):
         c = ClassType('C',[],'')

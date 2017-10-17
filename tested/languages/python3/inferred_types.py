@@ -139,6 +139,9 @@ class InferredType():
     def get_all_attrs(self):
         return self.attrs.copy()
         
+    def get_star_expansion(self):
+        return [self.items]*4
+        
 class UnknownType(InferredType):
     def __init__(self, name=None):
         super().__init__()
@@ -201,6 +204,10 @@ class InferredTuple(InferredType):
 
     def get_slice_from(self, index):
         return InferredList(*self.items[index:])
+
+    def get_star_expansion(self):
+        return self.items
+
             
 class InferredDict(InferredType):
     def __init__(self, keys, values):
@@ -276,6 +283,12 @@ class TypeSet():
                 else:
                     results[key] = value
         return results
+
+    def get_star_expansion(self):
+        items = [tp.get_star_expansion() for tp in self.types]
+        items = [TypeSet(*args) for args in zip(*items)]
+        return items
+
 
     def  __str__(self):
         return ' | '.join(sorted(str(x) for x in self.types))
