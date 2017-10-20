@@ -36,11 +36,14 @@ BASIC_TYPES = {5: INT_FUNCS,
 _scope = None
 
 def get_built_in_for_literal(value):
-    scp = get_global_scope()
     type_name = get_type_name(value)
-    if type_name not in scp:
-        raise AttributeError('Unknown builtin type {}'.format(type_name))
-    return scp[type_name]
+    return get_built_in_type(type_name)
+    
+def get_built_in_type(text):
+    scp = get_global_scope()
+    if text not in scp:
+        raise AttributeError('Unknown builtin type {}'.format(text))
+    return scp[text]
 
 def get_global_scope():
     global _scope    
