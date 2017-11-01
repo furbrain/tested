@@ -71,12 +71,8 @@ if __name__=="__main__":
                     f.write('{name}({args}) -> {retval}\n'.format(name=name, args=args, retval=retval))
                 elif inspect.isdatadescriptor(obj) or inspect.ismethoddescriptor(obj):
                     f.write('{name} = Unknown\n'.format(name=name))
-                elif isinstance(obj,str):
-                    f.write('{name} = str\n'.format(name=name))
-                    f.write('\n')
-                    continue
-                elif isinstance(obj,type):
-                    f.write('{name} = type\n'.format(name=name))
+                elif isinstance(obj, BUILTIN_TYPES):
+                    f.write('{name} = {tp}\n'.format(name=name, tp = obj.__class__.__name__))
                     f.write('\n')
                     continue
                 if obj.__doc__:

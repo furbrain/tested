@@ -2,25 +2,9 @@ __abstractmethods__ = Unknown
 
 __base__ = type
 
-  tuple() -> empty tuple
-  tuple(iterable) -> tuple initialized from iterable's items
-  
-  If the argument is a tuple, the return value is the same object.
+__bases__ = tuple
 
-  int(x=0) -> integer
-  int(x, base=10) -> integer
-  
-  Convert a number or string to an integer, or return 0 if no arguments
-  are given.  If x is a number, return x.__int__().  For floating point
-  numbers, this truncates towards zero.
-  
-  If x is not a number or if base is given, then x must be a string,
-  bytes, or bytearray instance representing an integer literal in the
-  given base.  The literal can be preceded by '+' or '-' and be surrounded
-  by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.
-  Base 0 means to interpret the base from the string as an integer literal.
-  >>> int('0b100', base=0)
-  4
+__basicsize__ = int
 
 __call__(self) -> Unknown
   Call self as a function.
@@ -31,20 +15,7 @@ __delattr__(self, name) -> None
   Implement delattr(self, name).
 
 
-  int(x=0) -> integer
-  int(x, base=10) -> integer
-  
-  Convert a number or string to an integer, or return 0 if no arguments
-  are given.  If x is a number, return x.__int__().  For floating point
-  numbers, this truncates towards zero.
-  
-  If x is not a number or if base is given, then x must be a string,
-  bytes, or bytearray instance representing an integer literal in the
-  given base.  The literal can be preceded by '+' or '-' and be surrounded
-  by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.
-  Base 0 means to interpret the base from the string as an integer literal.
-  >>> int('0b100', base=0)
-  4
+__dictoffset__ = int
 
 __dir__() -> [str]
   __dir__() -> list
@@ -55,20 +26,7 @@ __doc__ = str
 __eq__(self, value) -> bool
   Return self==value.
 
-  int(x=0) -> integer
-  int(x, base=10) -> integer
-  
-  Convert a number or string to an integer, or return 0 if no arguments
-  are given.  If x is a number, return x.__int__().  For floating point
-  numbers, this truncates towards zero.
-  
-  If x is not a number or if base is given, then x must be a string,
-  bytes, or bytearray instance representing an integer literal in the
-  given base.  The literal can be preceded by '+' or '-' and be surrounded
-  by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.
-  Base 0 means to interpret the base from the string as an integer literal.
-  >>> int('0b100', base=0)
-  4
+__flags__ = int
 
 __format__() -> str
   default object formatter
@@ -92,20 +50,7 @@ __instancecheck__() -> bool
   __instancecheck__() -> bool
   check if an object is an instance
 
-  int(x=0) -> integer
-  int(x, base=10) -> integer
-  
-  Convert a number or string to an integer, or return 0 if no arguments
-  are given.  If x is a number, return x.__int__().  For floating point
-  numbers, this truncates towards zero.
-  
-  If x is not a number or if base is given, then x must be a string,
-  bytes, or bytearray instance representing an integer literal in the
-  given base.  The literal can be preceded by '+' or '-' and be surrounded
-  by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.
-  Base 0 means to interpret the base from the string as an integer literal.
-  >>> int('0b100', base=0)
-  4
+__itemsize__ = int
 
 __le__(self, value) -> bool
   Return self<=value.
@@ -115,10 +60,7 @@ __lt__(self, value) -> bool
 
 __module__ = str
 
-  tuple() -> empty tuple
-  tuple(iterable) -> tuple initialized from iterable's items
-  
-  If the argument is a tuple, the return value is the same object.
+__mro__ = tuple
 
 __name__ = str
 
@@ -168,23 +110,11 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
+__text_signature__ = None
 
-  int(x=0) -> integer
-  int(x, base=10) -> integer
-  
-  Convert a number or string to an integer, or return 0 if no arguments
-  are given.  If x is a number, return x.__int__().  For floating point
-  numbers, this truncates towards zero.
-  
-  If x is not a number or if base is given, then x must be a string,
-  bytes, or bytearray instance representing an integer literal in the
-  given base.  The literal can be preceded by '+' or '-' and be surrounded
-  by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.
-  Base 0 means to interpret the base from the string as an integer literal.
-  >>> int('0b100', base=0)
-  4
+__weakrefoffset__ = int
 
-mro() -> list
+mro() -> [type]
   mro() -> list
   return a type's method resolution order
 
