@@ -1,7 +1,8 @@
 import unittest
 from tested.languages.python3.signatures import read_function, read_type
-from tested.languages.python3.builtins import get_built_in_type
-from tested.languages.python3.inferred_types import UnknownType, TypeSet, InferredList, InferredTuple, InferredSet, InferredDict
+from tested.languages.python3.builtins import get_built_in_type, get_built_in_for_literal
+from tested.languages.python3.inferred_types import UnknownType, TypeSet, InferredList, InferredTuple, InferredSet, InferredDict, InferredType
+from tested.languages.python3.functions import FunctionType
 
 class TestReadType(unittest.TestCase):
     def setUp(self):
@@ -55,6 +56,8 @@ class TestReadType(unittest.TestCase):
         with self.assertRaises(AttributeError):
             read_type('([int)]')
             
-       
+class TestReadFunction(unittest.TestCase):
+    def testBasicFunction(self):
+        self.assertEqual(read_function('f()->None'), FunctionType ('f',[],get_built_in_for_literal(None),''))  
          
         

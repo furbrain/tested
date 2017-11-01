@@ -63,7 +63,7 @@ def read_type(text):
     
 def read_function(text):
     pattern = r"""(?x)
-                  (?:\w\.)(?P<fname>\w+) \s*    # function name
+                  ^(?P<fname>\w+) \s*    # function name
                   \( (?P<args>.*) \)   # arguments
                   \s* -> \s*           # arrow
                   (?P<retval>.*)    # return value"""
@@ -71,5 +71,9 @@ def read_function(text):
     if results:
         return functions.FunctionType(name=results.group('fname'),
                                       args=[x.strip() for x in results.group('args').split(',')],
-                                      returns=read_type(results.group('retval')))
+                                      returns=read_type(results.group('retval')),
+                                      docstring='')
     return None
+    
+def read_spec(text):
+    pass
