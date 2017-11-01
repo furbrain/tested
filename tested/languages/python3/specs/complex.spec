@@ -7,6 +7,8 @@ __add__(self, value) -> complex
 __bool__(self) -> bool
   self != 0
 
+__class__ = type
+
 __delattr__(self, name) -> None
   Implement delattr(self, name).
 
@@ -16,6 +18,8 @@ __dir__() -> [str]
 
 __divmod__(self, value) -> Unknown
   Return divmod(self, value).
+
+__doc__ = str
 
 __eq__(self, value) -> bool
   Return self==value.

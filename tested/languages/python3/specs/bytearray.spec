@@ -6,6 +6,8 @@ __alloc__() -> int
   
   Return the number of bytes actually allocated.
 
+__class__ = type
+
 __contains__(self, key) -> bool
   Return key in self.
 
@@ -18,6 +20,8 @@ __delitem__(self, key) -> None
 __dir__() -> [str]
   __dir__() -> list
   default dir() implementation
+
+__doc__ = str
 
 __eq__(self, value) -> bool
   Return self==value.

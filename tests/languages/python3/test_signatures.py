@@ -3,7 +3,7 @@ from tested.languages.python3.signatures import read_function, read_type
 from tested.languages.python3.builtins import get_built_in_type
 from tested.languages.python3.inferred_types import UnknownType, TypeSet, InferredList, InferredTuple, InferredSet, InferredDict
 
-class TestReadFunctions(unittest.TestCase):
+class TestReadType(unittest.TestCase):
     def setUp(self):
         self.int = get_built_in_type('<int>')
         self.str = get_built_in_type('<str>')

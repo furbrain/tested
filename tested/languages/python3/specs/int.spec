@@ -13,6 +13,8 @@ __bool__(self) -> bool
 __ceil__() -> Unknown
   Ceiling of an Integral returns itself.
 
+__class__ = type
+
 __delattr__(self, name) -> None
   Implement delattr(self, name).
 
@@ -22,6 +24,8 @@ __dir__() -> [str]
 
 __divmod__(self, value) -> Unknown
   Return divmod(self, value).
+
+__doc__ = str
 
 __eq__(self, value) -> bool
   Return self==value.
@@ -192,6 +196,9 @@ bit_length() -> Unknown
 conjugate() -> Unknown
   Returns self, the complex conjugate of any int.
 
+denominator = Unknown
+  the denominator of a rational number in lowest terms
+
 from_bytes() -> Unknown
   int.from_bytes(bytes, byteorder, *, signed=False) -> int
   
@@ -207,6 +214,15 @@ from_bytes() -> Unknown
   
   The signed keyword-only argument indicates whether two's complement is
   used to represent the integer.
+
+imag = Unknown
+  the imaginary part of a complex number
+
+numerator = Unknown
+  the numerator of a rational number in lowest terms
+
+real = Unknown
+  the real part of a complex number
 
 to_bytes() -> Unknown
   int.to_bytes(length, byteorder, *, signed=False) -> bytes

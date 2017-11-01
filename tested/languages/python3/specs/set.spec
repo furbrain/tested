@@ -1,6 +1,8 @@
 __and__(self, value) -> set
   Return self&value.
 
+__class__ = type
+
 __contains__() -> bool
   x.__contains__(y) <==> y in x.
 
@@ -10,6 +12,8 @@ __delattr__(self, name) -> None
 __dir__() -> [str]
   __dir__() -> list
   default dir() implementation
+
+__doc__ = str
 
 __eq__(self, value) -> bool
   Return self==value.
@@ -25,6 +29,7 @@ __getattribute__(self, name) -> Unknown
 
 __gt__(self, value) -> bool
   Return self>value.
+
 
 __iand__(self, value) -> set
   Return self&=value.

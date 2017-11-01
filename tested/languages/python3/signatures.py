@@ -1,3 +1,4 @@
+import re
 from . import inferred_types
 from . import functions
 from . import classes
@@ -61,4 +62,14 @@ def read_type(text):
     return builtins.get_built_in_type(type_name)
     
 def read_function(text):
-    pass
+    pattern = r"""(?x)
+                  (?:\w\.)(?P<fname>\w+) \s*    # function name
+                  \( (?P<args>.*) \)   # arguments
+                  \s* -> \s*           # arrow
+                  (?P<retval>.*)    # return value"""
+    results = re.search(pattern, text)
+    if results:
+        return functions.FunctionType(name=results.group('fname'),
+                                      args=[x.strip() for x in results.group('args').split(',')],
+                                      returns=read_type(results.group('retval')))
+    return None

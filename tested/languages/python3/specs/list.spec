@@ -1,6 +1,8 @@
 __add__(self, value) -> list
   Return self+value.
 
+__class__ = type
+
 __contains__(self, key) -> bool
   Return key in self.
 
@@ -13,6 +15,8 @@ __delitem__(self, key) -> None
 __dir__() -> [str]
   __dir__() -> list
   default dir() implementation
+
+__doc__ = str
 
 __eq__(self, value) -> bool
   Return self==value.
@@ -31,6 +35,7 @@ __getitem__() -> Unknown
 
 __gt__(self, value) -> bool
   Return self>value.
+
 
 __iadd__(self, value) -> list
   Implement self+=value.

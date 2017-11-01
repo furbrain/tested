@@ -1,3 +1,5 @@
+__class__ = type
+
 __contains__(self, key) -> bool
   Return key in self.
 
@@ -7,6 +9,8 @@ __delattr__(self, name) -> None
 __dir__() -> [str]
   __dir__() -> list
   default dir() implementation
+
+__doc__ = str
 
 __eq__(self, value) -> bool
   Return self==value.
@@ -85,4 +89,10 @@ count() -> Unknown
 index() -> Unknown
   rangeobject.index(value, [start, [stop]]) -> integer -- return index of value.
   Raise ValueError if the value is not present.
+
+start = Unknown
+
+step = Unknown
+
+stop = Unknown
 
