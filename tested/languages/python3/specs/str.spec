@@ -29,7 +29,7 @@ __ge__(self, value) -> bool
 __getattribute__(self, name) -> Unknown
   Return getattr(self, name).
 
-__getitem__(self, key) -> Unknown
+__getitem__(self, key) -> str
   Return self[key].
 
 __getnewargs__() -> Unknown
@@ -43,7 +43,7 @@ __hash__(self) -> int
 __init__(self) -> None
   Initialize self.  See help(type(self)) for accurate signature.
 
-__iter__(self) -> Unknown
+__iter__(self) -> [str]
   Implement iter(self).
 
 __le__(self, value) -> bool
@@ -319,7 +319,7 @@ rpartition(sep) -> (head, sep, tail)
   the part before it, the separator itself, and the part after it.  If the
   separator is not found, return two empty strings and S.
 
-rsplit(sep, maxsplit=-1) -> list of strings
+rsplit(sep, maxsplit=-1) -> [str]
   S.rsplit(sep=None, maxsplit=-1) -> list of strings
   
   Return a list of the words in S, using sep as the
@@ -334,7 +334,7 @@ rstrip(chars) -> str
   Return a copy of the string S with trailing whitespace removed.
   If chars is given and not None, remove characters in chars instead.
 
-split(sep, maxsplit=-1) -> list of strings
+split(sep, maxsplit=-1) -> [str]
   S.split(sep=None, maxsplit=-1) -> list of strings
   
   Return a list of the words in S, using sep as the
@@ -343,7 +343,7 @@ split(sep, maxsplit=-1) -> list of strings
   whitespace string is a separator and empty strings are
   removed from the result.
 
-splitlines(keepends) -> list of strings
+splitlines(keepends) -> [str]
   S.splitlines([keepends]) -> list of strings
   
   Return a list of the lines in S, breaking at line boundaries.

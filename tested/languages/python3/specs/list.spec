@@ -76,7 +76,7 @@ __reduce_ex__() -> Unknown
 __repr__(self) -> str
   Return repr(self).
 
-__reversed__() -> Unknown
+__reversed__() -> list
   L.__reversed__() -- return a reverse iterator over the list
 
 __rmul__(self, value) -> list
@@ -111,30 +111,30 @@ clear() -> None -- remove all items from L
 copy() -> list -- a shallow copy of L
   L.copy() -> list -- a shallow copy of L
 
-count(value) -> integer -- return number of occurrences of value
+count(value) -> int -- return number of occurrences of value
   L.count(value) -> integer -- return number of occurrences of value
 
 extend(iterable) -> None -- extend list by appending elements from the iterable
   L.extend(iterable) -> None -- extend list by appending elements from the iterable
 
-index(value, start, stop) -> integer -- return first index of value.
+index(value, start, stop) -> int -- return first index of value.
   L.index(value, [start, [stop]]) -> integer -- return first index of value.
   Raises ValueError if the value is not present.
 
-insert() -> Unknown
+insert() -> None
   L.insert(index, object) -- insert object before index
 
-pop(index) -> item -- remove and return item at index (default last).
+pop(index) -> Unknown
   L.pop([index]) -> item -- remove and return item at index (default last).
   Raises IndexError if list is empty or index is out of range.
 
-remove(value) -> None -- remove first occurrence of value.
+remove(value) -> None
   L.remove(value) -> None -- remove first occurrence of value.
   Raises ValueError if the value is not present.
 
-reverse() -> Unknown
+reverse() -> None
   L.reverse() -- reverse *IN PLACE*
 
-sort(key, reverse) -> None -- stable sort *IN PLACE*
+sort(key, reverse) -> None
   L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*
 

@@ -98,37 +98,37 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-__xor__(self, value) -> Unknown
+__xor__(self, value) -> frozenset
   Return self^value.
 
-copy() -> Unknown
+copy() -> frozenset
   Return a shallow copy of a set.
 
-difference() -> Unknown
+difference(other) -> frozenset
   Return the difference of two or more sets as a new set.
   
   (i.e. all elements that are in this set but not the others.)
 
-intersection() -> Unknown
+intersection(other) -> frozenset
   Return the intersection of two sets as a new set.
   
   (i.e. all elements that are in both sets.)
 
-isdisjoint() -> Unknown
+isdisjoint(other) -> bool
   Return True if two sets have a null intersection.
 
-issubset() -> Unknown
+issubset(other) -> bool
   Report whether another set contains this set.
 
-issuperset() -> Unknown
+issuperset(other) -> bool
   Report whether this set contains another set.
 
-symmetric_difference() -> Unknown
+symmetric_difference(other) -> frozenset
   Return the symmetric difference of two sets as a new set.
   
   (i.e. all elements that are in exactly one of the sets.)
 
-union() -> Unknown
+union() -> frozenset
   Return the union of sets as a new set.
   
   (i.e. all elements that are in either set.)

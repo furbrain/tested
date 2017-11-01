@@ -149,7 +149,7 @@ __rshift__(self, value) -> bool
 __rsub__(self, value) -> bool
   Return value-self.
 
-__rtruediv__(self, value) -> Unknown
+__rtruediv__(self, value) -> float
   Return value/self.
 
 __rxor__(self, value) -> bool
@@ -196,7 +196,7 @@ bit_length() -> int
 conjugate() -> int
   Returns self, the complex conjugate of any int.
 
-denominator = Unknown
+denominator = int
   the denominator of a rational number in lowest terms
 
 from_bytes() -> int
@@ -215,13 +215,13 @@ from_bytes() -> int
   The signed keyword-only argument indicates whether two's complement is
   used to represent the integer.
 
-imag = Unknown
+imag = int
   the imaginary part of a complex number
 
-numerator = Unknown
+numerator = int
   the numerator of a rational number in lowest terms
 
-real = Unknown
+real = int
   the real part of a complex number
 
 to_bytes() -> bytes

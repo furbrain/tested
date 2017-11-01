@@ -10,7 +10,7 @@ __and__(self, value) -> int
 __bool__(self) -> bool
   self != 0
 
-__ceil__() -> Unknown
+__ceil__() -> int
   Ceiling of an Integral returns itself.
 
 __class__ = type
@@ -22,7 +22,7 @@ __dir__() -> [str]
   __dir__() -> list
   default dir() implementation
 
-__divmod__(self, value) -> Unknown
+__divmod__(self, value) -> (int, int)
   Return divmod(self, value).
 
 __doc__ = str
@@ -33,7 +33,7 @@ __eq__(self, value) -> bool
 __float__(self) -> float
   float(self)
 
-__floor__() -> Unknown
+__floor__() -> int
   Flooring an Integral returns itself.
 
 __floordiv__(self, value) -> int
@@ -106,7 +106,7 @@ __radd__(self, value) -> int
 __rand__(self, value) -> int
   Return value&self.
 
-__rdivmod__(self, value) -> Unknown
+__rdivmod__(self, value) -> (int, int)
   Return divmod(value, self).
 
 __reduce__() -> Unknown
@@ -133,7 +133,7 @@ __rmul__(self, value) -> int
 __ror__(self, value) -> int
   Return value|self.
 
-__round__() -> Unknown
+__round__() -> int
   Rounding an Integral returns itself.
   Rounding with an ndigits argument also returns an integer.
 
@@ -149,7 +149,7 @@ __rshift__(self, value) -> int
 __rsub__(self, value) -> int
   Return value-self.
 
-__rtruediv__(self, value) -> Unknown
+__rtruediv__(self, value) -> float
   Return value/self.
 
 __rxor__(self, value) -> int
@@ -175,16 +175,16 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-__truediv__(self, value) -> Unknown
+__truediv__(self, value) -> float
   Return self/value.
 
 __trunc__() -> Unknown
   Truncating an Integral returns itself.
 
-__xor__(self, value) -> Unknown
+__xor__(self, value) -> int
   Return self^value.
 
-bit_length() -> Unknown
+bit_length() -> int
   int.bit_length() -> int
   
   Number of bits necessary to represent self in binary.
@@ -193,13 +193,13 @@ bit_length() -> Unknown
   >>> (37).bit_length()
   6
 
-conjugate() -> Unknown
+conjugate() -> int
   Returns self, the complex conjugate of any int.
 
-denominator = Unknown
+denominator = int
   the denominator of a rational number in lowest terms
 
-from_bytes() -> Unknown
+from_bytes() -> int
   int.from_bytes(bytes, byteorder, *, signed=False) -> int
   
   Return the integer represented by the given array of bytes.
@@ -215,16 +215,16 @@ from_bytes() -> Unknown
   The signed keyword-only argument indicates whether two's complement is
   used to represent the integer.
 
-imag = Unknown
+imag = int
   the imaginary part of a complex number
 
-numerator = Unknown
+numerator = int
   the numerator of a rational number in lowest terms
 
-real = Unknown
+real = int
   the real part of a complex number
 
-to_bytes() -> Unknown
+to_bytes() -> bytes
   int.to_bytes(length, byteorder, *, signed=False) -> bytes
   
   Return an array of bytes representing an integer.

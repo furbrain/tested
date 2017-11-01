@@ -95,7 +95,7 @@ __pow__(self, value, mod) -> float
 __radd__(self, value) -> float
   Return value+self.
 
-__rdivmod__(self, value) -> Unknown
+__rdivmod__(self, value) -> float
   Return divmod(value, self).
 
 __reduce__() -> Unknown
@@ -116,7 +116,7 @@ __rmod__(self, value) -> float
 __rmul__(self, value) -> float
   Return value*self.
 
-__round__() -> Unknown
+__round__() -> int
   Return the Integral closest to x, rounding half toward even.
   When an argument is passed, work like built-in round(x, ndigits).
 
@@ -126,13 +126,13 @@ __rpow__(self, value, mod) -> float
 __rsub__(self, value) -> float
   Return value-self.
 
-__rtruediv__(self, value) -> Unknown
+__rtruediv__(self, value) -> float
   Return value/self.
 
 __setattr__(self, name, value) -> None
   Implement setattr(self, name, value).
 
-__setformat__() -> Unknown
+__setformat__() -> None
   float.__setformat__(typestr, fmt) -> None
   
   You probably don't want to use this function.  It exists mainly to be
@@ -163,13 +163,13 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-__truediv__(self, value) -> Unknown
+__truediv__(self, value) -> float  
   Return self/value.
 
-__trunc__() -> Unknown
+__trunc__() -> int
   Return the Integral closest to x between 0 and x.
 
-as_integer_ratio() -> Unknown
+as_integer_ratio() -> (int, int)
   float.as_integer_ratio() -> (int, int)
   
   Return a pair of integers, whose ratio is exactly equal to the original
@@ -183,10 +183,10 @@ as_integer_ratio() -> Unknown
   >>> (-.25).as_integer_ratio()
   (-1, 4)
 
-conjugate() -> Unknown
+conjugate() -> float
   Return self, the complex conjugate of any float.
 
-fromhex() -> Unknown
+fromhex() -> float
   float.fromhex(string) -> float
   
   Create a floating-point number from a hexadecimal string.
@@ -195,7 +195,7 @@ fromhex() -> Unknown
   >>> float.fromhex('-0x1p-1074')
   -5e-324
 
-hex() -> Unknown
+hex() -> str
   float.hex() -> string
   
   Return a hexadecimal representation of a floating-point number.
@@ -204,12 +204,12 @@ hex() -> Unknown
   >>> 3.14159.hex()
   '0x1.921f9f01b866ep+1'
 
-imag = Unknown
+imag = float
   the imaginary part of a complex number
 
-is_integer() -> Unknown
+is_integer() -> bool
   Return True if the float is an integer.
 
-real = Unknown
+real = float
   the real part of a complex number
 

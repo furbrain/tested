@@ -24,7 +24,7 @@ __ge__(self, value) -> bool
 __getattribute__(self, name) -> Unknown
   Return getattr(self, name).
 
-__getitem__(self, key) -> Unknown
+__getitem__(self, key) -> int
   Return self[key].
 
 __gt__(self, value) -> bool
@@ -36,7 +36,7 @@ __hash__(self) -> int
 __init__(self) -> None
   Initialize self.  See help(type(self)) for accurate signature.
 
-__iter__(self) -> Unknown
+__iter__(self) -> [int]
   Implement iter(self).
 
 __le__(self, value) -> bool
@@ -62,7 +62,7 @@ __reduce_ex__() -> Unknown
 __repr__(self) -> str
   Return repr(self).
 
-__reversed__() -> Unknown
+__reversed__() -> [int]
   Return a reverse iterator.
 
 __setattr__(self, name, value) -> None
@@ -83,16 +83,16 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-count() -> Unknown
+count() -> int
   rangeobject.count(value) -> integer -- return number of occurrences of value
 
-index() -> Unknown
+index() -> int
   rangeobject.index(value, [start, [stop]]) -> integer -- return index of value.
   Raise ValueError if the value is not present.
 
-start = Unknown
+start = int
 
-step = Unknown
+step = int
 
-stop = Unknown
+stop = int
 

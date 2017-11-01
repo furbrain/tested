@@ -41,7 +41,7 @@ __hash__(self) -> int
 __init__(self) -> None
   Initialize self.  See help(type(self)) for accurate signature.
 
-__iter__(self) -> Unknown
+__iter__(self) -> [Unknown]
   Implement iter(self).
 
 __le__(self, value) -> bool
@@ -92,10 +92,10 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-count(value) -> integer -- return number of occurrences of value
+count(value) -> int
   T.count(value) -> integer -- return number of occurrences of value
 
-index(value, start, stop) -> integer -- return first index of value.
+index(value, start, stop) -> int
   T.index(value, [start, [stop]]) -> integer -- return first index of value.
   Raises ValueError if the value is not present.
 
