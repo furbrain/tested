@@ -155,7 +155,7 @@ class UnknownType(InferredType):
 class InferredList(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="list"
+        self.name="<list>"
         for arg in args:
             self.add_item(arg)
         
@@ -166,7 +166,7 @@ class InferredList(InferredType):
 class InferredSet(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="set"
+        self.name="<set>"
         for arg in args:
             self.add_item(arg)
         
@@ -174,10 +174,15 @@ class InferredSet(InferredType):
     def __str__(self):
         return '{%s}' % self.items
         
+class InferredFrozenSet(InferredSet):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name="<frozenset>"
+        
 class InferredTuple(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="tuple"
+        self.name="<tuple>"
         self.items = list(args)
     
     @do_not_recurse('(...)')    
@@ -210,8 +215,13 @@ class InferredTuple(InferredType):
 
             
 class InferredDict(InferredType):
-    def __init__(self, keys, values):
+    def __init__(self, keys = None, values = None):
         super().__init__()
+        self.name = "<dict>"
+        if keys is None:
+            keys = []
+        if values is None:
+            values = []
         self.keys = TypeSet(*keys)
         self.items = TypeSet(*values)
 
