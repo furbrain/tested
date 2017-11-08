@@ -38,7 +38,7 @@ def get_retval(name, type_name):
         return type_name
     return None
     
-BUILTIN_TYPES = (int, bool, float, complex, str, bytes, bytearray, list, tuple, range, set, frozenset, NONE_TYPE, type)
+BUILTIN_TYPES = (int, bool, float, complex, str, bytes, bytearray, list, tuple, range, set, frozenset, dict, NONE_TYPE, type)
 FUNC_PATTERN = r"""(?x)
               (?:\w\.)?(?P<name>\w+) \s*    # function name
               \( (?P<args>.*) \)   # arguments

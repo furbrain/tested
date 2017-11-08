@@ -99,7 +99,7 @@ __subclasscheck__() -> bool
   __subclasscheck__() -> bool
   check if a class is a subclass
 
-__subclasses__() -> list of immediate subclasses
+__subclasses__() -> [type]
   __subclasses__() -> list of immediate subclasses
 
 __subclasshook__() -> bool
