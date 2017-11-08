@@ -1,8 +1,14 @@
 import re
 from . import inferred_types
-from . import functions
-from . import classes
-from . import builtins
+
+FUNC_PATTERN = r"""(?xm)
+                   ^(?P<fname>\w+) [ ]*             # function name
+                   \( (?P<args>.*) \)               # arguments
+                   [ ]* -> [ ]*                     # arrow
+                   (?P<retval>.*)\n                 # return value
+                   (?P<docstring> (?:[ ]{2}.*?\n)*) # following docstring"""
+
+ATTRIBUTE_PATTERN =r"(?m)^(?P<attrname>\w+) = (?P<value>.*)$"
 
 def split_on(text, split):
     """return a string split on "split" characters provided they are not within brackets"""
@@ -29,51 +35,64 @@ def split_on(text, split):
 def is_bracketed(text,brackets):
     return text[0]==brackets[0] and text[-1]==brackets[-1]
 
-def read_type(text):
+def read_type(text, scope):
     text = text.strip()
     #first split on pipes...
     pipes = split_on(text, '|')
     if len(pipes)>1:
-        subtypes = [read_type(x) for x in pipes]
+        subtypes = [read_type(x, scope) for x in pipes]
         return inferred_types.TypeSet(*subtypes)
     text = pipes[0].strip()
 
     #return tuples
     if is_bracketed(text,'()'):
         text = text[1:-1]
-        subtypes = [read_type(x) for x in split_on(text, ',')]
+        subtypes = [read_type(x, scope) for x in split_on(text, ',')]
         return inferred_types.InferredTuple(*subtypes)
 
     #return lists
     if is_bracketed(text,'[]'):
         text = text[1:-1]
-        return inferred_types.InferredList(read_type(text))
+        return inferred_types.InferredList(read_type(text, scope))
 
     #return sets/dicts
     if is_bracketed(text,'{}'):
         text = text[1:-1]
         parts = split_on(text,':')
         if len(parts)>1:
-            return inferred_types.InferredDict([read_type(parts[0])], [read_type(parts[1])])
+            return inferred_types.InferredDict([read_type(parts[0], scope)], [read_type(parts[1], scope)])
         else:
-            return inferred_types.InferredSet(read_type(text))
+            return inferred_types.InferredSet(read_type(text, scope))
     
     type_name = '<{}>'.format(text.strip())
-    return builtins.get_built_in_type(type_name)
+    if type_name in scope:
+        return scope[type_name]
+    elif type_name=="<Unknown>":
+        return inferred_types.UnknownType()
+    else:
+        raise AttributeError('Unknown builtin type {}'.format(type_name))
+
     
-def read_function(text):
-    pattern = r"""(?x)
-                  ^(?P<fname>\w+) \s*    # function name
-                  \( (?P<args>.*) \)   # arguments
-                  \s* -> \s*           # arrow
-                  (?P<retval>.*)    # return value"""
-    results = re.search(pattern, text)
-    if results:
-        return functions.FunctionType(name=results.group('fname'),
-                                      args=[x.strip() for x in results.group('args').split(',')],
-                                      returns=read_type(results.group('retval')),
-                                      docstring='')
+def read_function(matching_regex, scope):
+    from . import functions
+    if matching_regex.group('docstring'):
+        raw_docstring = matching_regex.group('docstring')
+        raw_docstring_list = [x.strip() for x in raw_docstring.splitlines()]
+        docstring = '\n'.join(raw_docstring_list)
+    else:
+        docstring = ''
+    return functions.FunctionType(name=matching_regex.group('fname'),
+                                  args=[x.strip() for x in matching_regex.group('args').split(',')],
+                                  returns=read_type(matching_regex.group('retval'), scope),
+                                  docstring=docstring)
     return None
+
+
     
-def read_spec(text):
-    pass
+def read_spec(text, scope):
+    funcs = [read_function(x, scope) for x in re.finditer(FUNC_PATTERN, text)]
+    funcs = {x.name:x for x in funcs}
+    attributes = {x[0]:read_type(x[1], scope) for x in re.findall(ATTRIBUTE_PATTERN, text)}
+    attributes.update(funcs)
+    return attributes
+    
