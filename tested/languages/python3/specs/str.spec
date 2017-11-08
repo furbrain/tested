@@ -278,7 +278,7 @@ maketrans(x, y, z) -> Unknown
   character at the same position in y. If there is a third argument, it
   must be a string, whose characters will be mapped to None in the result.
 
-partition(sep) -> (head, sep, tail)
+partition(sep) -> (str, str, str)
   S.partition(sep) -> (head, sep, tail)
   
   Search for the separator sep in S, and return the part before it,
@@ -312,7 +312,7 @@ rjust(width, fillchar) -> str
   Return S right-justified in a string of length width. Padding is
   done using the specified fill character (default is a space).
 
-rpartition(sep) -> (head, sep, tail)
+rpartition(sep) -> (str, str, str)
   S.rpartition(sep) -> (head, sep, tail)
   
   Search for the separator sep in S, starting at the end of S, and return

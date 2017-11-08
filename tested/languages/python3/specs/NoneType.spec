@@ -10,6 +10,7 @@ __dir__() -> [str]
   __dir__() -> list
   default dir() implementation
 
+__doc__ = None
 
 __eq__(self, value) -> bool
   Return self==value.
@@ -41,7 +42,7 @@ __lt__(self, value) -> bool
 __ne__(self, value) -> bool
   Return self!=value.
 
-__new__(type) -> NoneType
+__new__(type) -> None
   Create and return a new object.  See help(type) for accurate signature.
 
 __reduce__() -> Unknown

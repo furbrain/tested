@@ -102,22 +102,22 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-append(object) -> None -- append object to end
+append(object) -> None
   L.append(object) -> None -- append object to end
 
-clear() -> None -- remove all items from L
+clear() -> None
   L.clear() -> None -- remove all items from L
 
-copy() -> list -- a shallow copy of L
+copy() -> list
   L.copy() -> list -- a shallow copy of L
 
-count(value) -> int -- return number of occurrences of value
+count(value) -> int
   L.count(value) -> integer -- return number of occurrences of value
 
-extend(iterable) -> None -- extend list by appending elements from the iterable
+extend(iterable) -> None
   L.extend(iterable) -> None -- extend list by appending elements from the iterable
 
-index(value, start, stop) -> int -- return first index of value.
+index(value, start, stop) -> int
   L.index(value, [start, [stop]]) -> integer -- return first index of value.
   Raises ValueError if the value is not present.
 
@@ -125,7 +125,7 @@ insert() -> None
   L.insert(index, object) -- insert object before index
 
 pop(index) -> Unknown
-  L.pop([index]) -> item -- remove and return item at index (default last).
+  L.pop([index]) -> item
   Raises IndexError if list is empty or index is out of range.
 
 remove(value) -> None

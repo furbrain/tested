@@ -1,4 +1,4 @@
-__abs__(self) -> complex
+__abs__(self) -> float
   abs(self)
 
 __add__(self, value) -> complex

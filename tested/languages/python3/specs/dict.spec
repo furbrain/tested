@@ -33,7 +33,7 @@ __getitem__() -> Unknown
 __gt__(self, value) -> bool
   Return self>value.
 
-__hash__ = NoneType
+__hash__ = None
 
 __init__(self) -> None
   Initialize self.  See help(type(self)) for accurate signature.
@@ -85,7 +85,7 @@ __subclasshook__() -> bool
   NotImplemented, the normal algorithm is used.  Otherwise, it
   overrides the normal algorithm (and the outcome is cached).
 
-clear() -> None.  Remove all items from D.
+clear() -> None
   D.clear() -> None.  Remove all items from D.
 
 copy() -> dict
