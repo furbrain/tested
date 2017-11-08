@@ -1,8 +1,10 @@
 import os.path
 
-from .inferred_types import InferredType, get_type_name
+from .inferred_types import InferredType, InferredList, InferredTuple, InferredSet, InferredFrozenSet, InferredDict, get_type_name
 from .utils.get_signatures import BUILTIN_TYPES
 from .signatures import read_spec
+
+
 
 _scope = None
 
@@ -26,7 +28,10 @@ def create_scope():
     from .classes import ClassType
     scope={}
     for tp in BUILTIN_TYPES:
-        class_type = ClassType(tp.__name__,[])
+        if tp.__name__ in SpecialTypeClass.TYPES:
+            class_type = SpecialTypeClass(tp.__name__)
+        else:
+            class_type = ClassType(tp.__name__,[])
         scope[class_type.name] = class_type
         instance_type = class_type.instance_type
         if tp.__name__ == "NoneType":
@@ -40,3 +45,29 @@ def create_scope():
                 scope[tp.__name__].add_attr(name, attr)            
     return scope        
     
+    
+class SpecialTypeClass(InferredType):
+    TYPES = {
+        'list': InferredList,
+        'tuple': InferredTuple,
+        'dict': InferredDict,
+        'set': InferredSet,
+        'frozenset': InferredFrozenSet
+    }
+    
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+        self.subtype = self.TYPES[name]
+        self.instance_type = self.subtype()
+        
+    def add_attr(self, attr, typeset):
+        super().add_attr(attr, typeset)
+        self.instance_type.add_attr(attr, typeset)
+
+    def get_call_return(self, arg_types):
+        return self.get_new_instance()
+
+    def get_new_instance(self, *args):
+        copy = self.subtype(*args)
+        copy.attrs = self.attrs.copy()
