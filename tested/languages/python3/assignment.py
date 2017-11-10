@@ -24,6 +24,7 @@ def assign_to_node(target, value, scope):
                 if isStarred(subtarget):
                     elements = [get_expression_type(x) for x in value.elts[i:]]
                     assign_to_node(subtarget, InferredList(*elements), scope)
+                    assign_to_node(subtarget, builtins.create_list(*elements), scope)
                 else:
                     assign_to_node(subtarget, value.elts[i], scope)
             return

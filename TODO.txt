@@ -10,8 +10,22 @@ sort out fromimports:
     we have a package and need to import a module DONE
     also deal with special case of '*'
 Implement Sets DONE
-Add methods to lists and dicts and sets oh my
+Add methods to lists and dicts and sets oh my DONE
+Make literal lists unique DONE
 
 Add to expressions: lambdas, bytes, starred function args...
 
+
+Refactoring...
+house style:
+functions in snake_case
+methods in camelCase
+classes in TitleCase
+variables in snake_case
+
+layout
+builtin imports first
+do from . import module
+avoid from .module import function
+make PEP8 compliant
 

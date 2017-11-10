@@ -24,6 +24,22 @@ def get_global_scope():
         _scope = create_scope()
     return _scope
     
+def create_list(*items):
+    list_type = get_built_in_type('list')
+    return list_type.get_new_instance(*items)
+
+def create_set(*items):
+    set_type = get_built_in_type('set')
+    return set_type.get_new_instance(*items)
+
+def create_tuple(*items):
+    tuple_type = get_built_in_type('tuple')
+    return tuple_type.get_new_instance(*items)
+
+def create_dict(keys, values):
+    dict_type = get_built_in_type('dict')
+    return dict_type.get_new_instance(keys, values)
+    
 def create_scope():
     from .classes import ClassType
     scope={}
@@ -71,3 +87,4 @@ class SpecialTypeClass(InferredType):
     def get_new_instance(self, *args):
         copy = self.subtype(*args)
         copy.attrs = self.attrs.copy()
+        return copy

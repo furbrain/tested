@@ -2,7 +2,7 @@ import ast
 import warnings
 
 from .inferred_types import TypeSet, InferredList, InferredTuple, InferredSet, InferredDict, InferredType, InferredIterator, UnknownType, get_type_name
-from .builtins import get_built_in_for_literal
+from .builtins import get_built_in_for_literal, create_list, create_dict, create_set, create_tuple
 from .scopes import Scope
 
 def get_expression_type(expression, scope):
@@ -52,15 +52,15 @@ class ExpressionTypeParser(ast.NodeVisitor):
            
     def visit_List(self, node):
         items = self.get_sequence_items(node.elts)
-        return InferredList(*items)
+        return create_list(*items)
         
     def visit_Tuple(self, node):
         items = self.get_sequence_items(node.elts)
-        return InferredTuple(*items)
+        return create_tuple(*items)
         
     def visit_Set(self, node):
         items = self.get_sequence_items(node.elts)
-        return InferredSet(*items)
+        return create_set(*items)
 
     def get_sequence_items(self, node_list):
         items = []
@@ -75,7 +75,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_Dict(self, node):
         keys = [self.getType(key) for key in node.keys]
         items = [self.getType(value) for value in node.values]
-        return InferredDict(keys, items)
+        return create_dict(keys, items)
 
     def visit_Call(self, node):
         func_types = self.getType(node.func)
@@ -171,18 +171,18 @@ class ExpressionTypeParser(ast.NodeVisitor):
     def visit_ListComp(self, node):
         scope = self.getScopeForComprehension(node)
         target = get_expression_type(node.elt, scope)
-        return InferredList(target)
+        return create_list(target)
             
     def visit_SetComp(self, node):
         scope = self.getScopeForComprehension(node)
         target = get_expression_type(node.elt, scope)
-        return InferredSet(target)
+        return create_set(target)
             
     def visit_DictComp(self, node):
         scope = self.getScopeForComprehension(node)
         key_target = get_expression_type(node.key, scope)
         value_target = get_expression_type(node.value, scope)
-        return InferredDict([key_target],[value_target])
+        return create_dict([key_target],[value_target])
         
     def visit_GeneratorExp(self, node):
         scope = self.getScopeForComprehension(node)
