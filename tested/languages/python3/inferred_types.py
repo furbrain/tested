@@ -1,41 +1,17 @@
-import inspect
-import re
+from . import utils
 
 def get_type_name(obj):
-    if inspect.isclass(obj):
+    if isinstance(obj, type):
         return obj.__name__
     else:
-        if obj is None: # Special case for NoneType which is weird
+        if obj is None:  # Special case for NoneType which is weird
             return 'None'
         else:
             return '<{}>'.format(type(obj).__name__)
 
-def isInferredType(obj):
-    return isinstance(obj,(InferredType, TypeSet))
-
-def do_not_recurse(default):
-    def decorator(func):
-        def inner(*args):
-            hashed_args = [hash(x) for x in args]
-            if hasattr(func,'arg_list'):
-                if hashed_args in func.arg_list:
-                    return default
-            else:
-                func.arg_list = []
-            func.arg_list.append(hashed_args)
-            result = func(*args)
-            if hasattr(func,'arg_list'):
-                del func.arg_list
-            return result
-
-        return inner
-    return decorator
-
-
-
 class InferredType():
     @classmethod
-    def fromType(cls, object_type):
+    def from_type(cls, object_type):
         self = cls()
         self.type = object_type
         self.name = get_type_name(object_type)
@@ -46,31 +22,31 @@ class InferredType():
         self.items = TypeSet()
         self.args = []
         self.return_values = None
-        self.name=""
-        self.docstring=""
+        self.name = ""
+        self.docstring = ""
 
-    @do_not_recurse('...')
+    @utils.do_not_recurse('...')
     def __str__(self):
         return self.name
 
-    @do_not_recurse('...')
+    @utils.do_not_recurse('...')
     def __repr__(self):
         return str(self)
 
     def __eq__(self, other):
-        if isinstance(other,InferredType):
-            return str(self)==str(other)
-        elif isinstance(other, TypeSet) and len(other)==1:
+        if isinstance(other, InferredType):
+            return str(self) == str(other)
+        elif isinstance(other, TypeSet) and len(other) == 1:
             return self in other
         elif isinstance(other, str):
-            return str(self)==other
-        elif inspect.isclass(other):
+            return str(self) == other
+        elif isinstance(other, type):
             return self.type == other
         else:
             return NotImplemented
 
-    def __ne__(self,other):
-        return not self==other
+    def __ne__(self, other):
+        return not self == other
 
     def __hash__(self):
         return hash(self.name)
@@ -79,7 +55,7 @@ class InferredType():
         return iter((self,))
 
     def has_attr(self, attr):
-        assert(isinstance(attr,str))
+        assert(isinstance(attr, str))
         return attr in self.attrs
 
     def get_attr(self, attr):
@@ -88,11 +64,11 @@ class InferredType():
         return self.attrs[attr]
 
     def set_attr(self, attr, typeset):
-        assert(isInferredType(typeset))
+        assert(utils.is_inferred_type(typeset))
         self.attrs[attr] = typeset
 
     def add_attr(self, attr, typeset):
-        assert(isInferredType(typeset))
+        assert(utils.is_inferred_type(typeset))
         if attr in self.attrs:
             self.attrs[attr] = self.attrs[attr].add_type(typeset)
         else:
@@ -111,28 +87,28 @@ class InferredType():
         return InferredList(*self.items)
 
     def add_item(self, item):
-        assert(isInferredType(item))
+        assert(utils.is_inferred_type(item))
         self.items = self.items.add_type(item)
 
     def get_call_return(self, arg_types):
-        assert(all(isInferredType(x) for x in arg_types))
+        assert(all(utils.is_inferred_type(x) for x in arg_types))
         if "__call__" in self.attrs:
             return self.attrs['__call__'].get_call_return(arg_types)
         if self.return_values:
             return_typeset = TypeSet()
-            type_mapping = {k:v for k,v in zip(self.args, arg_types)}
+            type_mapping = {k: v for k, v in zip(self.args, arg_types)}
             for possible_type in self.return_values:
-                if isinstance(possible_type,UnknownType):
+                if isinstance(possible_type, UnknownType):
                     replacement_type = type_mapping.get(possible_type.type, UnknownType())
-                    return_typeset =return_typeset.add_type(replacement_type)
+                    return_typeset = return_typeset.add_type(replacement_type)
                 else:
                     return_typeset = return_typeset.add_type(possible_type)
             return return_typeset
         return UnknownType()
 
     def add_type(self, other):
-        assert(isInferredType(other))
-        if self==other:
+        assert(utils.is_inferred_type(other))
+        if self == other:
             return self
         return TypeSet(self, other)
 
@@ -140,7 +116,7 @@ class InferredType():
         return self.attrs.copy()
 
     def get_star_expansion(self):
-        return [self.items]*4
+        return [self.items] * 4
 
 class UnknownType(InferredType):
     def __init__(self, name=None):
@@ -155,37 +131,37 @@ class UnknownType(InferredType):
 class InferredList(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="<list>"
+        self.name = "<list>"
         for arg in args:
             self.add_item(arg)
 
-    @do_not_recurse('[...]')
+    @utils.do_not_recurse('[...]')
     def __str__(self):
         return '[%s]' % self.items
 
 class InferredSet(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="<set>"
+        self.name = "<set>"
         for arg in args:
             self.add_item(arg)
 
-    @do_not_recurse('[...]')
+    @utils.do_not_recurse('[...]')
     def __str__(self):
         return '{%s}' % self.items
 
 class InferredFrozenSet(InferredSet):
     def __init__(self, *args):
         super().__init__(*args)
-        self.name="<frozenset>"
+        self.name = "<frozenset>"
 
 class InferredTuple(InferredType):
     def __init__(self, *args):
         super().__init__()
-        self.name="<tuple>"
+        self.name = "<tuple>"
         self.items = list(args)
 
-    @do_not_recurse('(...)')
+    @utils.do_not_recurse('(...)')
     def __str__(self):
         item_names = [str(x) for x in self.items]
         return"({})".format(', '.join(item_names))
@@ -194,7 +170,7 @@ class InferredTuple(InferredType):
         pass
 
     def get_item(self, index):
-        if isInferredType(index):
+        if utils.is_inferred_type(index):
             return TypeSet(*self.items)
         try:
             return self.items[index]
@@ -215,7 +191,7 @@ class InferredTuple(InferredType):
 
 
 class InferredDict(InferredType):
-    def __init__(self, keys = None, values = None):
+    def __init__(self, keys=None, values=None):
         super().__init__()
         self.name = "<dict>"
         if keys is None:
@@ -249,19 +225,19 @@ class TypeSet():
             self.add_type(a)
 
     def add_type(self, other):
-        if isinstance(other,TypeSet):
+        if isinstance(other, TypeSet):
             self.types.update(other)
-        elif isinstance(other,(InferredType, InferredList)):
+        elif isinstance(other, (InferredType, InferredList)):
             self.types.add(other)
         else:
-            self.types.add(InferredType.fromType(other))
+            self.types.add(InferredType.from_type(other))
         return self
 
     def get_attr(self, attr):
         return TypeSet(*[tp.get_attr(attr) for tp in self.types])
 
     def add_attr(self, attr, typeset):
-        assert(isInferredType(typeset))
+        assert(utils.is_inferred_type(typeset))
         for tp in list(self.types):
             tp.add_attr(attr, typeset)
 
@@ -272,7 +248,7 @@ class TypeSet():
         return TypeSet(*[tp.get_item(index) for tp in self.types])
 
     def add_item(self, item):
-        assert(isInferredType(item))
+        assert(utils.is_inferred_type(item))
         for tp in list(self.types):
             tp.add_item(item)
 
@@ -280,7 +256,7 @@ class TypeSet():
         return TypeSet(*[tp.get_iter() for tp in self.types])
 
     def get_call_return(self, arg_types):
-        assert(all(isInferredType(x) for x in arg_types))
+        assert(all(utils.is_inferred_type(x) for x in arg_types))
         return TypeSet(*[tp.get_call_return(arg_types) for tp in self.types])
 
     def get_all_attrs(self):
@@ -299,8 +275,7 @@ class TypeSet():
         items = [TypeSet(*args) for args in zip(*items)]
         return items
 
-
-    def  __str__(self):
+    def __str__(self):
         return ' | '.join(sorted(str(x) for x in self.types))
 
     def __repr__(self):
@@ -310,14 +285,14 @@ class TypeSet():
         return iter(self.types)
 
     def __eq__(self, other):
-        if isinstance(other,TypeSet):
-            return self.types==other.types
-        if isinstance(other,str):
-            return str(self)==other
+        if isinstance(other, TypeSet):
+            return self.types == other.types
+        if isinstance(other, str):
+            return str(self) == other
         return NotImplemented
 
     def __ne__(self, other):
-        return not self==other
+        return not self == other
 
     def __len__(self):
         return len(self.types)

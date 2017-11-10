@@ -1,6 +1,6 @@
 import ast
 
-from . import inferred_types, builtins, expressions, statements, scopes
+from . import inferred_types, builtins, expressions, statements, scopes, utils
 
 def node_is_staticmethod(node):
     return getattr(node, "id", "") == "staticmethod"
@@ -73,7 +73,7 @@ class FunctionType(inferred_types.InferredType):
         self.type = "FUNCTION"
         self.docstring = docstring
 
-    @inferred_types.do_not_recurse('...')
+    @utils.do_not_recurse('...')
     def __str__(self):
         return "%s(%s) -> (%s)" % (self.name, ', '.join(self.args), self.return_values)
 
