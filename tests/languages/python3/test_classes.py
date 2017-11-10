@@ -44,7 +44,7 @@ class TestClasses(unittest.TestCase):
     def testInstanceInheritsContext(self):
         c = self.makeClass('c',context = {'i':TypeSet(self.int)})
         instance = c.get_call_return([])
-        self.assertEqual(instance[0].get_attr('i'),"<int>")
+        self.assertEqual(instance.get_attr('i'),"<int>")
         
     def testInstancesSameObjects(self):
         c = self.makeClass('c')

@@ -3,20 +3,27 @@ import ast
 
 from tested.languages.python3 import get_expression_type, InferredList, InferredTuple, TypeSet, FunctionType, UnknownType, ClassType, get_global_scope, Scope
 
-class TestExpressionTypeParser(unittest.TestCase):
+class TestExpressionBase(unittest.TestCase):
     def setUp(self):
         self.int = get_global_scope()['<int>']
         self.str = get_global_scope()['<str>']
-        self.float = get_global_scope()['<float>'] 
-
-    def checkExpr(self, expr, result, context=None):
+        self.float = get_global_scope()['<float>']
+        
+    def getType(self, expr, context=None):
         if context is None:
             context = Scope('__test__',0,-1)
-        answer = str(get_expression_type(expr, context))
+        return get_expression_type(expr, context)
+        
+    def checkExpr(self, expr, result, context=None):
+        answer = str(self.getType(expr, context))
         message = "%s should return %s, instead returned %s, context is %s" % (expr, result, answer, context)
         self.assertEqual(answer, result, msg = message)
+
+    def checkHasAttr(self, expr, attr):
+        tp = self.getType(expr)
+        self.assertTrue(tp.has_attr(attr))
                 
-    ### SIMPLE CASES ###   
+class TestSimpleExpressions(TestExpressionBase):
     def testSingleNumber(self):
         self.checkExpr("1","<int>")
         
@@ -36,8 +43,17 @@ class TestExpressionTypeParser(unittest.TestCase):
     def testNone(self):
         self.checkExpr("None",'None')
     
+    def testExpressionWithVariables(self):
+        context = {'a':self.float, 'b':self.int}
+        self.checkExpr("a","<float>",context=context)
+        self.checkExpr("b","<int>",context=context)
     
-    ### OPERATIONS ###    
+    def testExpressionWithUnknownVariable(self):
+        context = {'a':self.float, 'b':self.int}
+        self.checkExpr("c","Unknown", context=context)
+        
+    
+class TestOperations(TestExpressionBase):
     def testNumericBinaryOpConversions(self):
         numbers = [('1','<int>'), ('2.3','<float>')]
         for a,b in numbers:
@@ -77,18 +93,17 @@ class TestExpressionTypeParser(unittest.TestCase):
                  ("False or False", '<bool>')]
         for expr,res in tests:
             self.checkExpr(expr, res)
-    
-    ### WITH CONTEXT###        
-    def testExpressionWithVariables(self):
-        context = {'a':self.float, 'b':self.int}
-        self.checkExpr("a","<float>",context=context)
-        self.checkExpr("b","<int>",context=context)
-    
-    def testExpressionWithUnknownVariable(self):
-        context = {'a':self.float, 'b':self.int}
-        self.checkExpr("c","Unknown", context=context)
+
+    def testCompare(self):
+        self.checkExpr("1 < 2", "<bool>")
+        self.checkExpr("2 > 3", "<bool>")
+        self.checkExpr('"abc" <= "abc"', "<bool>")
         
-    ### LISTS ###    
+    def testIfExp(self):
+        self.checkExpr("1 if True else 2", "<int>")
+        self.checkExpr("1 if False else 'abc'", "<int> | <str>")
+    
+class TestLists(TestExpressionBase):
     def testListWithSingleType(self):
         self.checkExpr("[1,2,3,4]","[<int>]")
         
@@ -103,8 +118,11 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[1,2,3,4][:]", "[<int>]")
         self.checkExpr("[1,2,3,4][1:]", "[<int>]")
         self.checkExpr("[1,2,3,4][:-1]", "[<int>]")
+        
+    def testListHasAttributes(self):
+        self.checkHasAttr("[1,2,3,4]","append")
     
-    ### TUPLES ###
+class TestTuples(TestExpressionBase):
     def testTuple(self):
         self.checkExpr("(1,2,3,4)","(<int>, <int>, <int>, <int>)")
         self.checkExpr("(1,'a')", "(<int>, <str>)")
@@ -124,32 +142,34 @@ class TestExpressionTypeParser(unittest.TestCase):
         tp = InferredTuple(self.int, self.float)
         ctx = {'tp':tp}
         self.checkExpr("('abc', *tp)", "(<str>, <int>, <float>)", context=ctx)    
+
+    def testTupleHasAttributes(self):
+        self.checkHasAttr("(1,2)","index")
+
         
-    ### DICTS ###
+class TestDicts(TestExpressionBase):
     def testDict(self):
         self.checkExpr("{1: 'abc', 2.0: [1,2]}", "{<float> | <int>: <str> | [<int>]}")
         
     def testDictIndex(self):
         self.checkExpr("{1: 'abc', 2.0: [1,2]}[1]", "<str> | [<int>]")
+
+    def testDictHasAttributes(self):
+        self.checkHasAttr("{1: 'abc', 2.0: [1,2]}","items")
+
         
-    ### SETS ####
+class TestSets(TestExpressionBase):
     def testSet(self):
         self.checkExpr("{1, 2, 3}",'{<int>}')
         
     def testMixedSet(self):
         self.checkExpr("{1, 'abc'}", '{<int> | <str>}')
         
-    ### Comparison ###    
-    def testCompare(self):
-        self.checkExpr("1 < 2", "<bool>")
-        self.checkExpr("2 > 3", "<bool>")
-        self.checkExpr('"abc" <= "abc"', "<bool>")
+    def testSetHasAttributes(self):
+        self.checkHasAttr("{1, 2, 3}",'union')
         
-    def testIfExp(self):
-        self.checkExpr("1 if True else 2", "<int>")
-        self.checkExpr("1 if False else 'abc'", "<int> | <str>")
 
-    ### FUNCTION CALLS ###
+class TestFunctions(TestExpressionBase):
     def testSimpleFunctionCall(self):
         f = FunctionType('f', [], self.int, "")
         context = {'f':f}
@@ -197,7 +217,7 @@ class TestExpressionTypeParser(unittest.TestCase):
         context = self.getStarredContext()
         self.checkExpr("f(*ts)", "<float> | <int> | <str>", context=context)
         
-    ### CLASS TESTS ###
+class TestClasses(TestExpressionBase):
     def testGetAttribute(self):
         c = ClassType('C',[],'')
         c.add_attr('a',self.int)
@@ -205,7 +225,7 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("C.a", "<int>", context=context)
         
        
-    ### COMPREHENSIONS ###
+class TestComprehensions(TestExpressionBase):
     def testListComprehension(self):
         self.checkExpr("[x for x in [1,2,3]]", '[<int>]')
         self.checkExpr("[x for x in [1,2,3] if x <2]", '[<int>]')
@@ -214,13 +234,22 @@ class TestExpressionTypeParser(unittest.TestCase):
         self.checkExpr("[x for x, y in [(1,'a'),(2,'b'),(3,'c')]]", '[<int>]')
         self.checkExpr("[y for x, y in [(1,'a'),(2,'b'),(3,'c')]]", '[<str>]')
         
+    def testListComprehensionHasAttributes(self):
+        self.checkHasAttr("[x for x in [1,2,3]]","append")
+
     def testSetComprehension(self):
         self.checkExpr("{x for x in [1,2,3]}", '{<int>}')
+
+    def testSetComprehensionHasAttributes(self):
+        self.checkHasAttr("{x for x in [1,2,3]}","union")
 
     def testDictComprehension(self):
         self.checkExpr("{x:x for x in [1,2,3]}", '{<int>: <int>}')
         self.checkExpr("{x:'a' for x in [1,2,3]}", '{<int>: <str>}')
         
+    def testDictComprehensionHasAttributes(self):
+        self.checkHasAttr("{x:x for x in [1,2,3]}","items")
+
     def testGeneratorExpr(self):
         self.checkExpr("(x for x in [1,2,3])", '(-> <int>)')
 
