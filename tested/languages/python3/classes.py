@@ -45,4 +45,4 @@ class ClassBlockParser(statements.StatementBlockTypeParser):
 
     def visit_FunctionDef(self, node):
         from .functions import FunctionType
-        self.scope[node.name] = FunctionType.fromASTNode(node, self.scope.parent, owning_class=self.class_type)
+        self.scope[node.name] = FunctionType.from_ast_node(node, self.scope.parent, owning_class=self.class_type)

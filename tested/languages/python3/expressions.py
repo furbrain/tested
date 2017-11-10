@@ -79,7 +79,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         
     def visit_Lambda(self, node):
         from .functions import FunctionType
-        return FunctionType.fromLambdaNode(node, self.scope)    
+        return FunctionType.from_lambda_node(node, self.scope)    
         
     def visit_Attribute(self, node):
         base_var = self.get_type(node.value)
