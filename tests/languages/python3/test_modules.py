@@ -43,7 +43,7 @@ class FakeDocument():
 
 class TestModuleType(unittest.TestCase):
     def createModule(self, text, location=""):
-        return ModuleType.fromText(text, location, FakeDocument(location))
+        return ModuleType.from_text(text, location, FakeDocument(location))
 
     def checkModule(self, text, result, location=""):
         module = self.createModule(text, location)
@@ -85,7 +85,7 @@ class TestModuleType(unittest.TestCase):
 class TestModuleTypeParser(unittest.TestCase):
     def setUpSpecimenModule(self):
         parser = ModuleTypeParser()
-        return parser.parseModule(SPECIMEN_CODE, None)
+        return parser.parse_module(SPECIMEN_CODE, None)
         
     def getScopeStarting(self, scopes, line_start):
         possible_scopes = [x for x in scopes if x.line_start == line_start]

@@ -58,16 +58,16 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         from .modules import ModuleType
         for alias in node.names:
             name = alias.asname or alias.name
-            self.scope[name] = ModuleType.fromName(alias.name, self.scope)
+            self.scope[name] = ModuleType.from_name(alias.name, self.scope)
 
     def visit_ImportFrom(self, node):
         from .modules import ModuleType
-        module = ModuleType.fromName(node.module, self.scope, node.level)
+        module = ModuleType.from_name(node.module, self.scope, node.level)
         for alias in node.names:
             name = alias.asname or alias.name
             if not module.has_attr(alias.name):
                 if hasattr(module,'outer_scope'):
-                    module.set_attr(alias.name, ModuleType.fromName(alias.name, module.outer_scope, level=1))
+                    module.set_attr(alias.name, ModuleType.from_name(alias.name, module.outer_scope, level=1))
             self.scope[name] = module.get_attr(alias.name)
 
 
