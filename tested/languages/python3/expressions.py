@@ -13,9 +13,6 @@ def get_expression_type(expression, scope):
     parser = ExpressionTypeParser(scope)
     return parser.getType(expression)
 
-def isStarred(node):
-    return type(node).__name__ == "Starred"
-
 class ExpressionTypeParser(ast.NodeVisitor):
     def __init__(self, scope):
         self.scope = scope

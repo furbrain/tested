@@ -1,40 +1,28 @@
 import ast
 
-from . import expressions, inferred_types, builtins
-
-def is_sequence(node):
-    return (type(node).__name__ in ("Tuple", "List"))
-
-def is_starred(node):
-    return type(node).__name__ == "Starred"
-
-def is_node(node):
-    return isinstance(node, ast.AST)
-    
-def is_inferred_type(node):
-    return isinstance(node, (inferred_types.InferredType, inferred_types.TypeSet))
+from . import expressions, inferred_types, builtins, utils
     
 def assign_to_node(target, value, scope):
     if isinstance(target, str):
         target = ast.parse(target, mode="eval").body
-    if is_sequence(target):
-        if is_node(value) and is_sequence(value):
+    if utils.is_ast_sequence(target):
+        if utils.is_ast_node(value) and utils.is_ast_sequence(value):
             for i, subtarget in enumerate(target.elts):
-                if is_starred(subtarget):
+                if utils.is_ast_starred(subtarget):
                     elements = [expressions.get_expression_type(x) for x in value.elts[i:]]
                     assign_to_node(subtarget, builtins.create_list(*elements), scope)
                 else:
                     assign_to_node(subtarget, value.elts[i], scope)
             return
-        elif is_inferred_type(value):
+        elif utils.is_inferred_type(value):
             for i, subtarget in enumerate(target.elts):
-                if is_starred(subtarget):
+                if utils.is_ast_starred(subtarget):
                     elements = value.get_slice_from(i)
                     assign_to_node(subtarget, elements, scope)
                 else:
                     assign_to_node(subtarget, value.get_item(i), scope)
             return
-    if is_node(value):
+    if utils.is_ast_node(value):
         value = expressions.get_expression_type(value, scope)
     parser = Assigner(scope, value)
     parser.visit(target)
