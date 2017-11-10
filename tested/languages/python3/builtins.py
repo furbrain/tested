@@ -9,7 +9,7 @@ _scope = None
 def get_built_in_for_literal(value):
     type_name = inferred_types.get_type_name(value)
     return get_built_in_type(type_name)
-    
+
 def get_built_in_type(text):
     scp = get_global_scope()
     if text not in scp:
@@ -17,11 +17,11 @@ def get_built_in_type(text):
     return scp[text]
 
 def get_global_scope():
-    global _scope    
+    global _scope
     if _scope is None:
         _scope = create_scope()
     return _scope
-    
+
 def create_list(*items):
     list_type = get_built_in_type('list')
     return list_type.get_new_instance(*items)
@@ -37,7 +37,7 @@ def create_tuple(*items):
 def create_dict(keys, values):
     dict_type = get_built_in_type('dict')
     return dict_type.get_new_instance(keys, values)
-    
+
 def create_scope():
     from .classes import ClassType
     scope={}
@@ -56,10 +56,10 @@ def create_scope():
         sig_filename = os.path.join(os.path.dirname(__file__), 'specs', tp.__name__+'.spec')
         with open(sig_filename, 'r') as sig_file:
             for name, attr in signatures.read_spec(sig_file.read(), scope).items():
-                scope[tp.__name__].add_attr(name, attr)            
-    return scope        
-    
-    
+                scope[tp.__name__].add_attr(name, attr)
+    return scope
+
+
 class SpecialTypeClass(inferred_types.InferredType):
     TYPES = {
         'list': inferred_types.InferredList,
@@ -68,13 +68,13 @@ class SpecialTypeClass(inferred_types.InferredType):
         'set': inferred_types.InferredSet,
         'frozenset': inferred_types.InferredFrozenSet
     }
-    
+
     def __init__(self, name):
         super().__init__()
         self.name = name
         self.subtype = self.TYPES[name]
         self.instance_type = self.subtype()
-        
+
     def add_attr(self, attr, typeset):
         super().add_attr(attr, typeset)
         self.instance_type.add_attr(attr, typeset)

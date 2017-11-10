@@ -8,7 +8,7 @@ class Document:
         self.module.parseText(text)
         self.scopes = self.module.scope_list
 
-    
-    
-    
-    
+
+
+
+

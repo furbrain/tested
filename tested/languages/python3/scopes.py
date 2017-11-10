@@ -21,23 +21,23 @@ class Scope():
         if self.parent:
             return self.parent[key]
         raise KeyError("Scope Key: {} not found".format(key))
-        
+
     def __contains__(self, key):
         try:
             self.__getitem__(key)
             return True
         except KeyError:
-            return False    
+            return False
 
     def __iter__(self):
-        return iter(self.context)        
-        
+        return iter(self.context)
+
     def __setitem__(self, key, value):
         self.context[key] = value
 
     def __str__(self):
         return "{}->{} {}-{}".format(self.name, self.indent, self.line_start, self.line_end)
-        
+
     def __repr__(self):
         return "Scope:{}".format(str(self))
 
@@ -46,22 +46,22 @@ class Scope():
             if indent > self.indent:
                 return True
         return False
-                
+
     def get_whole_context(self):
         new_ctx = self.context.copy()
         if self.parent:
             new_ctx.update(self.parent.get_whole_context())
         return new_ctx
-        
+
     def add_child(self, child):
         self.children.append(child)
-        
+
     def get_all_children(self):
         results = [self]
         for x in self.children:
             results.extend(x.get_all_children())
         return results
-        
+
     def get_module(self):
         try:
             return self.module
@@ -71,16 +71,16 @@ class Scope():
 class ScopeList():
     def __init__(self):
         self.scopes = []
-        
+
     def add(self, scope):
         self.scopes.append(scope)
-                
+
     def getScope(self, line, indent):
         possible_scopes = [x for x in self.scopes if x.matches(line, indent)]
         if possible_scopes:
             return sorted(possible_scopes, key=lambda x: x.indent)[-1]
         return None
-        
+
     def __iter__(self):
         return iter(self.scopes)
 

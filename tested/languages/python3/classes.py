@@ -2,7 +2,7 @@ import ast
 
 from . import inferred_types, expressions, statements, scopes
 
-class ClassType(inferred_types.InferredType):    
+class ClassType(inferred_types.InferredType):
     @classmethod
     def from_ast_node(cls, node, scope=None):
         name = node.name
@@ -15,11 +15,11 @@ class ClassType(inferred_types.InferredType):
         for k, v in self.scope.context.items():
             self.add_attr(k, v)
         return self
-        
+
     def add_attr(self, attr, typeset):
         super().add_attr(attr, typeset)
         self.instance_type.add_attr(attr, typeset)
-        
+
     def __init__(self, name,  parents, docstring=""):
         super().__init__()
         self.name = name
@@ -28,8 +28,8 @@ class ClassType(inferred_types.InferredType):
                 self.attrs.update(tp.attrs)
         self.instance_type = InstanceType(self)
         self.return_values = self.instance_type
-        
-        
+
+
 class InstanceType(inferred_types.InferredType):
     def __init__(self, parent):
         super().__init__()
@@ -37,7 +37,7 @@ class InstanceType(inferred_types.InferredType):
         self.name = "<{}>".format(parent)
         self.attrs.update(parent.attrs)
 
-# this parser modifies function signatures within a class definition        
+# this parser modifies function signatures within a class definition
 class ClassBlockParser(statements.StatementBlockTypeParser):
     def __init__(self, scope, class_type):
         super().__init__(scope)

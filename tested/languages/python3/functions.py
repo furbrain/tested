@@ -4,7 +4,7 @@ from . import inferred_types, builtins, expressions, statements, scopes
 
 def node_is_staticmethod(node):
     return getattr(node, "id", "") == "staticmethod"
-        
+
 def node_is_classmethod(node):
     return getattr(node, "id", "") == "classmethod"
 
@@ -30,7 +30,7 @@ class FunctionType(inferred_types.InferredType):
         else:
             self.return_values = builtins.get_built_in_for_literal(None)
         return self
-        
+
     @classmethod
     def from_lambda_node(cls, node, scope):
         arg_names = [arg.arg for arg in node.args.args]
@@ -53,13 +53,13 @@ class FunctionType(inferred_types.InferredType):
                     args_dict[first_arg] = owning_class.instance_type
         for name, arg_type in args_dict.items():
             scope[name] = arg_type
-        
+
         if node.args.vararg:
             list_element_type = inferred_types.UnknownType(node.args.vararg.arg)
             inferred_list = builtins.create_list(list_element_type)
             scope[node.args.vararg.arg] = inferred_list
         if node.args.kwarg:
-            inferred_dict = builtins.create_dict(keys=[builtins.get_built_in_for_literal('abc')], 
+            inferred_dict = builtins.create_dict(keys=[builtins.get_built_in_for_literal('abc')],
                                                  values=[inferred_types.UnknownType()])
             scope[node.args.kwarg.arg] = inferred_dict
         scope[node.name] = self
@@ -72,17 +72,17 @@ class FunctionType(inferred_types.InferredType):
         self.return_values = returns
         self.type = "FUNCTION"
         self.docstring = docstring
-    
-    @inferred_types.do_not_recurse('...')    
+
+    @inferred_types.do_not_recurse('...')
     def __str__(self):
         return "%s(%s) -> (%s)" % (self.name, ', '.join(self.args), self.return_values)
-        
+
 class FunctionParser(statements.StatementBlockTypeParser):
     def parse_function(self, nodes):
         # create function type
         # parse function
         return self.parseStatements(nodes)
-            
+
     def visit_Return(self, node):
         if node.value:
             self.returns = self.returns.add_type(expressions.get_expression_type(node.value, self.scope))

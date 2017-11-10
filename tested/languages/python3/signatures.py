@@ -13,7 +13,7 @@ ATTRIBUTE_PATTERN =r"(?m)^(?P<attrname>\w+) = (?P<value>.*)$"
 def split_on(text, split):
     """return a string split on "split" characters provided they are not within brackets"""
     bracket_queue = []
-    brackets = {'}':'{', 
+    brackets = {'}':'{',
                 ']':'[',
                 ')':'(',
                 '>':'<'}
@@ -63,7 +63,7 @@ def read_type(text, scope):
             return inferred_types.InferredDict([read_type(parts[0], scope)], [read_type(parts[1], scope)])
         else:
             return inferred_types.InferredSet(read_type(text, scope))
-    
+
     type_name = '<{}>'.format(text.strip())
     if type_name in scope:
         return scope[type_name]
@@ -72,7 +72,7 @@ def read_type(text, scope):
     else:
         raise AttributeError('Unknown builtin type {}'.format(type_name))
 
-    
+
 def read_function(matching_regex, scope):
     from . import functions
     if matching_regex.group('docstring'):
@@ -88,11 +88,11 @@ def read_function(matching_regex, scope):
     return None
 
 
-    
+
 def read_spec(text, scope):
     funcs = [read_function(x, scope) for x in re.finditer(FUNC_PATTERN, text)]
     funcs = {x.name:x for x in funcs}
     attributes = {x[0]:read_type(x[1], scope) for x in re.findall(ATTRIBUTE_PATTERN, text)}
     attributes.update(funcs)
     return attributes
-    
+

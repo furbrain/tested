@@ -4,7 +4,7 @@ from . import document, expressions
 
 def parse_text(text, location):
     return document.Document(text, location)
-    
+
 def get_suggestions(document, line, line_number):
     indent = len(line) - len(line.lstrip(' '))
     scope = document.scopes.getScope(line_number, indent)
@@ -29,7 +29,7 @@ def get_suggestions(document, line, line_number):
             return sorted((x, get_info(x, scope)) for x in scope if not x.startswith('_'))
     else:
         return []
-        
+
 
 def get_last_whole_identifier(line):
     if line=='':
@@ -52,16 +52,16 @@ def get_last_whole_identifier(line):
             elif expr_type=="UnaryOp":
                 return get_line_part(line, body.operand)
             elif expr_type=="Compare":
-                return get_line_part(line, body.comparators[-1]) 
+                return get_line_part(line, body.comparators[-1])
             elif expr_type=="Tuple":
                 return get_line_part(line, body.elts[-1])
             return line
     return ""
-    
+
 def get_line_part(line, node):
     line = line[node.col_offset:]
     return get_last_whole_identifier(line)
-    
+
 def get_info(var, scope):
     if var in scope:
         item = scope[var]

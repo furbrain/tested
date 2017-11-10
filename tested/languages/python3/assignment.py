@@ -1,7 +1,7 @@
 import ast
 
 from . import expressions, inferred_types, builtins, utils
-    
+
 def assign_to_node(target, value, scope):
     if isinstance(target, str):
         target = ast.parse(target, mode="eval").body
@@ -26,25 +26,25 @@ def assign_to_node(target, value, scope):
         value = expressions.get_expression_type(value, scope)
     parser = Assigner(scope, value)
     parser.visit(target)
-    
+
 
 class Assigner(ast.NodeVisitor):
     def __init__(self, scope, value):
         self.scope = scope
         self.value = value
-        
+
     def visit_Name(self, node):
         name = node.id
         if name in self.scope:
             self.scope[name] = self.scope[name].add_type(self.value)
         else:
             self.scope[name] = self.value
-        
+
     def visit_Attribute(self, node):
         types = expressions.get_expression_type(node.value, self.scope)
         attr = node.attr
         types.add_attr(attr, self.value)
-                
+
     def visit_Subscript(self, node):
         types = expressions.get_expression_type(node.value, self.scope)
         slice_type = type(node.slice).__name__
@@ -54,7 +54,7 @@ class Assigner(ast.NodeVisitor):
             for val in self.value:
                 if isinstance(val, (inferred_types.InferredList, inferred_types.InferredTuple)):
                     types.add_item(val.get_item(0))
-            
+
     def visit_Call(self, node):
         # do nothing as does  not affect scope or classes
         pass

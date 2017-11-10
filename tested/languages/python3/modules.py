@@ -10,11 +10,11 @@ from . import module_finder
 class set_path():
     def __init__(self, path):
         self.path = path
-        
+
     def __enter__(self):
         self.old_path = sys.path
         sys.path = self.path +[x for x in sys.path if 'gedit' not in x.lower()]
-        
+
     def __exit__(self, exc_type, exc_value, traceback):
         sys.path = self.old_path
 
@@ -40,7 +40,7 @@ class ModuleType(InferredType):
             self = UnknownType()
             cls.known_modules[filename] = self
         return self
-        
+
     @classmethod
     def fromText(cls, text, filename, document):
         self = cls()
@@ -49,14 +49,14 @@ class ModuleType(InferredType):
         self.document = document
         self.parseText(text)
         return self
-        
+
     def parseText(self, text):
         parser = ModuleTypeParser()
         self.scope_list = parser.parseModule(text, self)
         self.outer_scope = parser.scope
         for name, typeset in self.outer_scope.context.items():
             self.add_attr(name, typeset)
-            
+
     def get_outer_scope(self):
         return self.outer_scope
 
@@ -68,12 +68,12 @@ class ModuleTypeParser(ast.NodeVisitor):
         syntax_tree = ast.parse(text)
         self.visit(syntax_tree)
         return self.scope_list
-        
+
     def visit_Module(self,node):
         results = parse_statements(node.body, self.scope)
         lines = LineNumberGetter().process_text(node)
         self.scope_list = self.find_full_scopes(self.scope.get_all_children(), lines, self.scope.line_end)
-        
+
     def find_full_scopes(self, scopes, lines, max_line):
         scope_list = ScopeList()
         for scope in scopes:
@@ -86,19 +86,19 @@ class ModuleTypeParser(ast.NodeVisitor):
                 scope.line_end = max_line
             scope_list.add(scope)
         return scope_list
-        
+
 class LineNumberGetter(ast.NodeVisitor):
     @classmethod
     def get_lines(cls, text):
         parser = cls()
         node = ast.parse(text)
         return parser.process_text(node)
-    
+
     def process_text(self, node):
         self.lines = {}
         self.visit(node)
         return sorted(list(self.lines.items()))
-        
+
     def generic_visit(self, node):
         if hasattr(node,'lineno'):
             if node.col_offset>=0: #docstrings have col_offset==-1 in cpython: a bug!

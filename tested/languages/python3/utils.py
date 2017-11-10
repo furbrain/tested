@@ -10,7 +10,7 @@ def is_ast_starred(node):
 
 def is_ast_node(node):
     return isinstance(node, ast.AST)
-    
+
 def is_inferred_type(node):
     return isinstance(node, (inferred_types.InferredType, inferred_types.TypeSet))
 
