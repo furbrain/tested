@@ -7,19 +7,19 @@ def parse_text(text, location):
 
 def get_suggestions(document, line, line_number):
     indent = len(line) - len(line.lstrip(' '))
-    scope = document.scopes.getScope(line_number, indent)
+    scope = document.scopes.get_scope(line_number, indent)
     if line:
         last_char = line[-1]
     else:
         last_char = ''
-    if last_char.isidentifier() or last_char=='.':
+    if last_char.isidentifier() or last_char == '.':
         identifier = get_last_whole_identifier(line)
-        obj,_,prefix = identifier.rpartition('.')
-        if obj=='' and prefix=='':
+        obj, _, prefix = identifier.rpartition('.')
+        if obj == '' and prefix == '':
             return []
         if obj:
             try:
-                obj = expressions.get_expression_type(obj,scope)
+                obj = expressions.get_expression_type(obj, scope)
                 scope = obj.get_all_attrs()
             except SyntaxError:
                 pass
@@ -32,11 +32,11 @@ def get_suggestions(document, line, line_number):
 
 
 def get_last_whole_identifier(line):
-    if line=='':
+    if line == '':
         return ''
     if line.endswith('.'):
-       return get_last_whole_identifier(line[:-1])+'.'
-    if not (line[-1].isidentifier() or line[-1] in (']','}',')')):
+        return get_last_whole_identifier(line[:-1]) + '.'
+    if not (line[-1].isidentifier() or line[-1] in (']', '}', ')')):
         return ''
     for i in range(len(line)):
         try:
@@ -47,13 +47,13 @@ def get_last_whole_identifier(line):
             line = line[i:]
             body = result.body
             expr_type = type(body).__name__
-            if expr_type=="BinOp":
+            if expr_type == "BinOp":
                 return get_line_part(line, body.right)
-            elif expr_type=="UnaryOp":
+            elif expr_type == "UnaryOp":
                 return get_line_part(line, body.operand)
-            elif expr_type=="Compare":
+            elif expr_type == "Compare":
                 return get_line_part(line, body.comparators[-1])
-            elif expr_type=="Tuple":
+            elif expr_type == "Tuple":
                 return get_line_part(line, body.elts[-1])
             return line
     return ""
@@ -65,6 +65,6 @@ def get_line_part(line, node):
 def get_info(var, scope):
     if var in scope:
         item = scope[var]
-        if hasattr(item,'docstring'):
-            return "<b>{}</b>\n\n{}".format(html.escape(str(item)),html.escape(item.docstring or ''))
+        if hasattr(item, 'docstring'):
+            return "<b>{}</b>\n\n{}".format(html.escape(str(item)), html.escape(item.docstring or ''))
     return ''

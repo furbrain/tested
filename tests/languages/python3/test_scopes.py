@@ -28,7 +28,7 @@ class TestScopeList(unittest.TestCase):
         s = ScopeList()
         for scope in scope_list:
             s.add(Scope(*scope))
-        result = s.getScope(*position)
+        result = s.get_scope(*position)
         self.assertEqual(result.context,match)
 
     def testScopeListFindsSimpleMatch(self):
@@ -54,11 +54,11 @@ class TestScopeList(unittest.TestCase):
         s = ScopeList()
         dcta = {'a':int}
         s.add(Scope('name',line_start=0, indent=4, line_end=10, context=dcta))
-        self.assertIsNone(s.getScope(5,0))
+        self.assertIsNone(s.get_scope(5,0))
 
     def testScopeListFailsOutsideArea(self):
         s = ScopeList()
         dcta = {'a':int}
         s.add(Scope('name',line_start=0, indent=4, line_end=10, context=dcta))
-        self.assertIsNone(s.getScope(12,0))
+        self.assertIsNone(s.get_scope(12,0))
         

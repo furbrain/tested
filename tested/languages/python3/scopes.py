@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 class Scope():
     def __init__(self, name, line_start, indent, parent=None, line_end=-1, context=None):
         self.name = name
@@ -75,7 +73,7 @@ class ScopeList():
     def add(self, scope):
         self.scopes.append(scope)
 
-    def getScope(self, line, indent):
+    def get_scope(self, line, indent):
         possible_scopes = [x for x in self.scopes if x.matches(line, indent)]
         if possible_scopes:
             return sorted(possible_scopes, key=lambda x: x.indent)[-1]
@@ -83,4 +81,3 @@ class ScopeList():
 
     def __iter__(self):
         return iter(self.scopes)
-
