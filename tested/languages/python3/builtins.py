@@ -1,15 +1,13 @@
 import os.path
 
-from .inferred_types import InferredType, InferredList, InferredTuple, InferredSet, InferredFrozenSet, InferredDict, get_type_name
-from .utils.get_signatures import BUILTIN_TYPES
-from .signatures import read_spec
+from . import inferred_types, signatures
 
-
+BUILTIN_TYPES = (int, bool, float, complex, str, bytes, bytearray, list, tuple, range, set, frozenset, dict, type(None), type)
 
 _scope = None
 
 def get_built_in_for_literal(value):
-    type_name = get_type_name(value)
+    type_name = inferred_types.get_type_name(value)
     return get_built_in_type(type_name)
     
 def get_built_in_type(text):
@@ -47,28 +45,28 @@ def create_scope():
         if tp.__name__ in SpecialTypeClass.TYPES:
             class_type = SpecialTypeClass(tp.__name__)
         else:
-            class_type = ClassType(tp.__name__,[])
+            class_type = ClassType(tp.__name__, [])
         scope[class_type.name] = class_type
         instance_type = class_type.instance_type
         if tp.__name__ == "NoneType":
-            instance_type.name="None"
+            instance_type.name = "None"
         scope[instance_type.name] = instance_type
     scope['<None>'] = scope['None']
     for tp in BUILTIN_TYPES:
         sig_filename = os.path.join(os.path.dirname(__file__), 'specs', tp.__name__+'.spec')
-        with open(sig_filename,'r') as sig_file:
-            for name, attr in read_spec(sig_file.read(), scope).items():
+        with open(sig_filename, 'r') as sig_file:
+            for name, attr in signatures.read_spec(sig_file.read(), scope).items():
                 scope[tp.__name__].add_attr(name, attr)            
     return scope        
     
     
-class SpecialTypeClass(InferredType):
+class SpecialTypeClass(inferred_types.InferredType):
     TYPES = {
-        'list': InferredList,
-        'tuple': InferredTuple,
-        'dict': InferredDict,
-        'set': InferredSet,
-        'frozenset': InferredFrozenSet
+        'list': inferred_types.InferredList,
+        'tuple': inferred_types.InferredTuple,
+        'dict': inferred_types.InferredDict,
+        'set': inferred_types.InferredSet,
+        'frozenset': inferred_types.InferredFrozenSet
     }
     
     def __init__(self, name):

@@ -2,6 +2,7 @@
 import inspect
 import re
 
+from languages.python3 import builtins
 
 BOOL_FUNCS = '''bool contains eq ge gt le lt ne subclasshook'''
 INT_FUNCS = '''cmp hash index int len rcmp sizeof'''
@@ -14,7 +15,6 @@ REFLEX_FUNCS = '''abs add and div floordiv iadd iand idiv ifloordiv ilshift imod
                   rxor sub'''
 NONE_FUNCS = '''del delattr delete delitem delslice init set setattr setitem setslice'''
 UNKNOWN_FUNCS = '''call get getattr getattribute getitem getslice'''
-NONE_TYPE = type(None)
 
 def make_dunderlist(text):
     return re.sub(r"\b","__",text).split()
@@ -38,7 +38,6 @@ def get_retval(name, type_name):
         return type_name
     return None
     
-BUILTIN_TYPES = (int, bool, float, complex, str, bytes, bytearray, list, tuple, range, set, frozenset, dict, NONE_TYPE, type)
 FUNC_PATTERN = r"""(?x)
               (?:\w\.)?(?P<name>\w+) \s*    # function name
               \( (?P<args>.*) \)   # arguments
@@ -47,8 +46,8 @@ FUNC_PATTERN = r"""(?x)
 
 
 if __name__=="__main__":
-    for tp in BUILTIN_TYPES:
-        fname = "../specs/{}.spec".format(tp.__name__)
+    for tp in builtins.BUILTIN_TYPES:
+        fname = "languages/python3/specs/{}.spec".format(tp.__name__)
         with open(fname, 'w') as f:
             for name, obj in inspect.getmembers(tp):
                 if inspect.isroutine(obj):
@@ -71,7 +70,7 @@ if __name__=="__main__":
                     f.write('{name}({args}) -> {retval}\n'.format(name=name, args=args, retval=retval))
                 elif inspect.isdatadescriptor(obj) or inspect.ismethoddescriptor(obj):
                     f.write('{name} = Unknown\n'.format(name=name))
-                elif isinstance(obj, BUILTIN_TYPES):
+                elif isinstance(obj, builtins.BUILTIN_TYPES):
                     f.write('{name} = {tp}\n'.format(name=name, tp = obj.__class__.__name__))
                     f.write('\n')
                     continue

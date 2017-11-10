@@ -1,43 +1,41 @@
 import ast
 
-from .expressions import get_expression_type
-from .inferred_types import TypeSet, InferredList, InferredType
+from . import expressions, inferred_types, builtins
 
-def isSequence(node):
-    return (type(node).__name__ in ("Tuple","List"))
+def is_sequence(node):
+    return (type(node).__name__ in ("Tuple", "List"))
 
-def isStarred(node):
+def is_starred(node):
     return type(node).__name__ == "Starred"
 
-def isNode(node):
+def is_node(node):
     return isinstance(node, ast.AST)
     
-def isInferredType(node):
-    return isinstance(node, (InferredType, TypeSet))
+def is_inferred_type(node):
+    return isinstance(node, (inferred_types.InferredType, inferred_types.TypeSet))
     
 def assign_to_node(target, value, scope):
     if isinstance(target, str):
         target = ast.parse(target, mode="eval").body
-    if isSequence(target):
-        if isNode(value) and isSequence(value):
+    if is_sequence(target):
+        if is_node(value) and is_sequence(value):
             for i, subtarget in enumerate(target.elts):
-                if isStarred(subtarget):
-                    elements = [get_expression_type(x) for x in value.elts[i:]]
-                    assign_to_node(subtarget, InferredList(*elements), scope)
+                if is_starred(subtarget):
+                    elements = [expressions.get_expression_type(x) for x in value.elts[i:]]
                     assign_to_node(subtarget, builtins.create_list(*elements), scope)
                 else:
                     assign_to_node(subtarget, value.elts[i], scope)
             return
-        elif isInferredType(value):
+        elif is_inferred_type(value):
             for i, subtarget in enumerate(target.elts):
-                if isStarred(subtarget):
+                if is_starred(subtarget):
                     elements = value.get_slice_from(i)
                     assign_to_node(subtarget, elements, scope)
                 else:
                     assign_to_node(subtarget, value.get_item(i), scope)
             return
-    if isNode(value):
-        value = get_expression_type(value, scope)
+    if is_node(value):
+        value = expressions.get_expression_type(value, scope)
     parser = Assigner(scope, value)
     parser.visit(target)
     
@@ -55,20 +53,20 @@ class Assigner(ast.NodeVisitor):
             self.scope[name] = self.value
         
     def visit_Attribute(self, node):
-        types = get_expression_type(node.value, self.scope)
+        types = expressions.get_expression_type(node.value, self.scope)
         attr = node.attr
         types.add_attr(attr, self.value)
                 
     def visit_Subscript(self, node):
-        types = get_expression_type(node.value, self.scope)
+        types = expressions.get_expression_type(node.value, self.scope)
         slice_type = type(node.slice).__name__
-        if slice_type=="Index":
+        if slice_type == "Index":
             types.add_item(self.value)
         else:
             for val in self.value:
-                if isinstance(val, InferredList):
+                if isinstance(val, (inferred_types.InferredList, inferred_types.InferredTuple)):
                     types.add_item(val.get_item(0))
             
     def visit_Call(self, node):
-        #do nothing as does  not affect scope or classes
+        # do nothing as does  not affect scope or classes
         pass

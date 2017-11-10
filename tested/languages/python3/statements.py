@@ -52,7 +52,7 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         
     def visit_ClassDef(self, node):
         from .classes import ClassType
-        self.scope[node.name] = ClassType.fromASTNode(node, self.scope)
+        self.scope[node.name] = ClassType.from_ast_node(node, self.scope)
         
     def visit_Import(self, node):
         from .modules import ModuleType

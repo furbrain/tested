@@ -19,7 +19,7 @@ Add to expressions: lambdas, bytes, starred function args...
 Refactoring...
 house style:
 functions in snake_case
-methods in camelCase
+methods in snake_case
 classes in TitleCase
 variables in snake_case
 

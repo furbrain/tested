@@ -1,22 +1,19 @@
-from .inferred_types import InferredType, TypeSet
-from .expressions import get_expression_type
-from .statements import StatementBlockTypeParser
-from .scopes import Scope
 import ast
 
-class ClassType(InferredType):
-    
+from . import inferred_types, expressions, statements, scopes
+
+class ClassType(inferred_types.InferredType):    
     @classmethod
-    def fromASTNode(cls, node, scope = None):
-        name=node.name
-        parents = [get_expression_type(x, scope) for x in node.bases]
+    def from_ast_node(cls, node, scope=None):
+        name = node.name
+        parents = [expressions.get_expression_type(x, scope) for x in node.bases]
         docstring = ast.get_docstring(node)
         self = cls(name, parents, docstring)
-        self.scope = Scope(node.name, line_start=node.lineno, indent=node.col_offset, parent=scope)
+        self.scope = scopes.Scope(node.name, line_start=node.lineno, indent=node.col_offset, parent=scope)
         parser = ClassBlockParser(self.scope, self)
         parser.parseStatements(node.body)
-        for k,v in self.scope.context.items():
-            self.add_attr(k,v)
+        for k, v in self.scope.context.items():
+            self.add_attr(k, v)
         return self
         
     def add_attr(self, attr, typeset):
@@ -30,22 +27,22 @@ class ClassType(InferredType):
             for tp in parent:
                 self.attrs.update(tp.attrs)
         self.instance_type = InstanceType(self)
-        self.return_values= self.instance_type
+        self.return_values = self.instance_type
         
         
-class InstanceType(InferredType):
+class InstanceType(inferred_types.InferredType):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.name = "<{}>".format(parent)
         self.attrs.update(parent.attrs)
 
-#this parser modifies function signatures within a class definition        
-class ClassBlockParser(StatementBlockTypeParser):
+# this parser modifies function signatures within a class definition        
+class ClassBlockParser(statements.StatementBlockTypeParser):
     def __init__(self, scope, class_type):
         super().__init__(scope)
         self.class_type = class_type
 
     def visit_FunctionDef(self, node):
         from .functions import FunctionType
-        self.scope[node.name] =  FunctionType.fromASTNode(node, self.scope.parent, owning_class=self.class_type)
+        self.scope[node.name] = FunctionType.fromASTNode(node, self.scope.parent, owning_class=self.class_type)
