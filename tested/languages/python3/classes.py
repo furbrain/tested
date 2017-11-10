@@ -11,7 +11,7 @@ class ClassType(inferred_types.InferredType):
         self = cls(name, parents, docstring)
         self.scope = scopes.Scope(node.name, line_start=node.lineno, indent=node.col_offset, parent=scope)
         parser = ClassBlockParser(self.scope, self)
-        parser.parseStatements(node.body)
+        parser.parse_statements(node.body)
         for k, v in self.scope.context.items():
             self.add_attr(k, v)
         return self

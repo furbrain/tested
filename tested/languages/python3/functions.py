@@ -81,7 +81,7 @@ class FunctionParser(statements.StatementBlockTypeParser):
     def parse_function(self, nodes):
         # create function type
         # parse function
-        return self.parseStatements(nodes)
+        return self.parse_statements(nodes)
 
     def visit_Return(self, node):
         if node.value:
