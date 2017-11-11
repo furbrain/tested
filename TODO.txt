@@ -16,16 +16,7 @@ Make literal lists unique DONE
 Add to expressions: lambdas, bytes, starred function args...
 
 
-Refactoring...
-house style:
-functions in snake_case
-methods in snake_case
-classes in TitleCase
-variables in snake_case
+Refactoring... DONE
+Refactoring part 2 - try and simplify all the structures...
 
-layout
-builtin imports first
-do from . import module
-avoid from .module import function
-make PEP8 compliant
 
