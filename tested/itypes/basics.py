@@ -1,3 +1,4 @@
+import itertools
 from .. import utils
 
 def is_inferred_type(node):
@@ -170,14 +171,16 @@ class TypeSet():
 
     def get_star_expansion(self):
         items = [tp.get_star_expansion() for tp in self.types]
-        items = [TypeSet(*args) for args in zip(*items)]
+        transposed_items = list(itertools.zip_longest(*items))
+        stripped_items = [[y for y in x if y is not None] for x in transposed_items]
+        items = [TypeSet(*args) for args in stripped_items]
         return items
 
     def __str__(self):
         return ' | '.join(sorted(str(x) for x in self.types))
 
     def __repr__(self):
-        return "<TypeSet: (%s)>" % self
+        return "<TypeSet: %s>" % self
 
     def __iter__(self):
         return iter(self.types)
@@ -194,6 +197,3 @@ class TypeSet():
 
     def __len__(self):
         return len(self.types)
-
-    def __getitem__(self, index):
-        return sorted(list(self.types))[index]

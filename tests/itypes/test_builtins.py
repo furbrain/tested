@@ -3,15 +3,12 @@ import unittest.mock
 import tested.itypes.builtins as builtins
 import tested.itypes.basics as basics
 
-get_global_scope = builtins.get_global_scope
+#get_global_scope = builtins.get_global_scope
 
 class BasicTypeBase(unittest.TestCase):
     def setUp(self):
         self.instance_type = builtins.get_type_by_value(self.target_instance)
         self.class_type = builtins.get_type_by_value(self.target_class)
-        
-    def testExistence(self):
-        pass
 
     def testName(self):
         self.assertEqual(str(self.instance_type), basics.get_type_name(self.target_instance))
@@ -120,8 +117,45 @@ class TestGetGlobalScope(unittest.TestCase):
     def testCreateScopeCalledOnceOnly(self, mock_create):
         builtins._scope = None #reset scope
         mock_create.ret_val = {'l':'something'}
-        f = get_global_scope()
-        g = get_global_scope()
+        f = builtins.get_global_scope()
+        g = builtins.get_global_scope()
         builtins._scope = None #reset scope
         self.assertEqual(mock_create.call_count,1)
 
+class TestCreateFuncs(unittest.TestCase):
+    def setUp(self):
+        self.int = builtins.get_type_by_value(1)
+        self.str = builtins.get_type_by_value('abc')
+        self.float = builtins.get_type_by_value(2.2)
+        
+    def testCreateList(self):
+        self.assertEqual(builtins.create_list(self.int),'[<int>]')
+        
+    def testCreatedListsAreIndividual(self):
+        self.assertFalse(builtins.create_list(self.int) is builtins.create_list(self.int))
+        
+    def testCreateTuple(self):
+        self.assertEqual(builtins.create_tuple(self.int, self.str, self.float),'(<int>, <str>, <float>)')
+        
+    def testCreatedTuplesAreIndividual(self):
+        self.assertFalse(builtins.create_tuple(self.int) is builtins.create_tuple(self.int))
+        
+    def testCreateSet(self):
+        self.assertEqual(builtins.create_set(self.int, self.float),'{<float> | <int>}')
+        
+    def testCreatedSetsAreIndividual(self):
+        self.assertFalse(builtins.create_set(self.int) is builtins.create_set(self.int))
+        
+    def testCreateDict(self):
+        self.assertEqual(builtins.create_dict([self.int],[self.float]),'{<int>: <float>}')
+        
+    def testCreatedDictsAreIndividual(self):
+        self.assertFalse(builtins.create_dict([self.int],[self.float]) is builtins.create_dict([self.int],[self.float]))
+        
+class TestSpecialTypeClass(unittest.TestCase):
+    def testUniqueInstanceCreation(self):
+        special_class = builtins.get_type_by_name('list')
+        lst1 = special_class.get_call_return([])
+        lst2 = special_class.get_call_return([])
+        self.assertFalse(lst1 is lst2)
+        

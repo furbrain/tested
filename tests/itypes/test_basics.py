@@ -79,8 +79,28 @@ class TestInferredType(unittest.TestCase):
         self.test_type.add_attr('c',it_str)
         self.assertEqual(self.test_type.get_all_attrs(),{'a':'<int>', 'b':'<str>', 'c':'<int> | <str>'})
        
-       
+    def testRepr(self):
+        it_num = basics.InferredType.from_type(1)
+        self.assertEqual(repr(it_num),'<int>')
         
+    def testGetItem(self):
+        it_num = basics.InferredType.from_type(1)
+        self.assertEqual(it_num.get_item(0),'Unknown')
+
+    def testGetSliceFrom(self):
+        it_num = basics.InferredType.from_type(1)
+        self.assertEqual(it_num.get_slice_from(1),['Unknown'])
+
+    def testAddItem(self):
+        it_num = basics.InferredType.from_type(1)
+        it_str = basics.InferredType.from_type("a")
+        it_num.add_item(it_str)
+        self.assertEqual(it_num.get_item(0),'Unknown')
+
+    def testGetStarExpansion(self):
+        it_num = basics.InferredType.from_type(1)
+        self.assertEqual(it_num.get_star_expansion(),['Unknown'])
+
 
 class TestTypeSet(unittest.TestCase):
     def setUp(self):
@@ -96,6 +116,7 @@ class TestTypeSet(unittest.TestCase):
         self.multiple_lists = basics.TypeSet(self.l1, self.l2)
         self.int = basics.InferredType.from_type(int)
         self.str = basics.InferredType.from_type(str)
+        self.float = basics.InferredType.from_type(float)
 
     def testInitWithSingleVal(self):
         st = basics.TypeSet(1)
@@ -137,6 +158,11 @@ class TestTypeSet(unittest.TestCase):
         self.multiple_types.add_attr('tst', self.int)
         self.assertEqual(self.tc1.get_attr('tst'), self.int)
         self.assertEqual(self.tc2.get_attr('tst'), self.int)
+    
+    def testHasAttr(self):
+        self.tc1.add_attr('tst', self.int)
+        self.assertTrue(self.multiple_types.has_attr('tst'))
+        self.assertFalse(self.multiple_types.has_attr('tst2'))
         
     def testGetItem(self):
         self.l1.add_item(self.int)
@@ -169,3 +195,16 @@ class TestTypeSet(unittest.TestCase):
         self.assertEqual(ts.get_iter(),'Unknown | int')
         ts = basics.TypeSet(compound.InferredList(self.int), compound.InferredList(self.str))
         self.assertEqual(ts.get_iter(),'int | str')        
+        
+    def testGetStarExpansion(self):
+        ts = basics.TypeSet(compound.InferredTuple(self.int, self.str),
+                            compound.InferredList(self.float))
+        self.assertEqual(ts.get_star_expansion(),['float | int', 
+                                                  'float | str',
+                                                  'float',
+                                                  'float'])
+                                                  
+    def testRepr(self):
+        ts = basics.TypeSet(self.int, self.float)
+        self.assertEqual(repr(ts),'<TypeSet: float | int>')
+                          

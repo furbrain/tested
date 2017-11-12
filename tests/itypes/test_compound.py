@@ -24,9 +24,17 @@ class TestInferredTuple(unittest.TestCase):
     def testSlice(self):
         self.assertEqual(self.tuple.get_slice(), ['int', 'str', 'float'])
         
+    def testSliceFrom(self):
+        self.assertEqual(self.tuple.get_slice_from(1), ['str', 'float'])
+
     def testAddItemDoesNothing(self):
         self.tuple.add_item(basics.InferredType.from_type(complex))
         self.assertEqual(self.tuple, '(int, str, float)') 
+
+    def testGetIter(self):
+        self.assertEqual(self.tuple.get_iter(),'float | int | str')
+        tpl = compound.InferredTuple(self.int, self.str)
+
         
 class TestInferredList(unittest.TestCase):
     def setUp(self):

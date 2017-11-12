@@ -25,19 +25,19 @@ def get_global_scope():
     return _scope
 
 def create_list(*items):
-    list_type = get_built_in_type('list')
+    list_type = get_type_by_name('list')
     return list_type.get_new_instance(*items)
 
 def create_set(*items):
-    set_type = get_built_in_type('set')
+    set_type = get_type_by_name('set')
     return set_type.get_new_instance(*items)
 
 def create_tuple(*items):
-    tuple_type = get_built_in_type('tuple')
+    tuple_type = get_type_by_name('tuple')
     return tuple_type.get_new_instance(*items)
 
 def create_dict(keys, values):
-    dict_type = get_built_in_type('dict')
+    dict_type = get_type_by_name('dict')
     return dict_type.get_new_instance(keys, values)
 
 def create_scope():
