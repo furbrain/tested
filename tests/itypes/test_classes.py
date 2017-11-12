@@ -51,4 +51,4 @@ class TestClasses(unittest.TestCase):
         c = self.makeClass('c')
         i1 = c.get_call_return([])
         i2 = c.get_call_return([])
-        self.assertTrue(i1[0] is i2[0])
+        self.assertTrue(i1 is i2)

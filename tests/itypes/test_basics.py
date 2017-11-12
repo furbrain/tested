@@ -1,7 +1,7 @@
 import unittest
 import tested.itypes.basics as basics
 import tested.itypes.compound as compound
-#import tested.itypes.functions as functions
+import tested.itypes.functions as functions
 
 class TestInferredType(unittest.TestCase):
     def setUp(self):
@@ -55,7 +55,6 @@ class TestInferredType(unittest.TestCase):
     def testUnknownAttribute(self):
         self.assertEqual(self.test_type.get_attr('surprise'), basics.TypeSet(basics.UnknownType()))
             
-    @unittest.skip("miss out function calls for now")    
     def testCallVia__call__(self):
         func = functions.FunctionType('test',[],basics.TypeSet(int),'')
         self.test_type.set_attr('__call__',func)
@@ -149,7 +148,6 @@ class TestTypeSet(unittest.TestCase):
         self.assertEqual(self.l1.get_item(1),self.int)
         self.assertEqual(self.l2.get_item(1),self.int)
 
-    @unittest.skip("miss out function calls for now")    
     def testGetCallReturn(self): 
         func1 = functions.FunctionType('f1',[],self.int,'')
         func2 = functions.FunctionType('f2',[],self.str,'')

@@ -1,6 +1,7 @@
 import ast
 
-from . import basics, builtins, expressions, statements, scopes, utils
+from . import basics, builtins
+from .. import utils
 
 def node_is_staticmethod(node):
     return getattr(node, "id", "") == "staticmethod"
@@ -12,7 +13,7 @@ def make_arg_dict(node):
     dct = {}
     for arg in node.args:
         name = arg.arg
-        dct[name] = inferred_types.UnknownType(name)
+        dct[name] = basics.UnknownType(name)
     return dct
 
 class FunctionType(basics.InferredType):
@@ -21,7 +22,7 @@ class FunctionType(basics.InferredType):
     def from_ast_node(cls, node, parent_scope=None, owning_class=None):
         arg_names = [arg.arg for arg in node.args.args]
         docstring = ast.get_docstring(node)
-        self = cls(node.name, arg_names, inferred_types.UnknownType('return'), docstring)
+        self = cls(node.name, arg_names, basics.UnknownType('return'), docstring)
         scope = self.create_scope_from_node(node, parent_scope, owning_class)
         parser = FunctionParser(scope)
         results = parser.parse_function(node.body)
@@ -55,12 +56,12 @@ class FunctionType(basics.InferredType):
             scope[name] = arg_type
 
         if node.args.vararg:
-            list_element_type = inferred_types.UnknownType(node.args.vararg.arg)
+            list_element_type = basics.UnknownType(node.args.vararg.arg)
             inferred_list = builtins.create_list(list_element_type)
             scope[node.args.vararg.arg] = inferred_list
         if node.args.kwarg:
             inferred_dict = builtins.create_dict(keys=[builtins.get_built_in_for_literal('abc')],
-                                                 values=[inferred_types.UnknownType()])
+                                                 values=[basics.UnknownType()])
             scope[node.args.kwarg.arg] = inferred_dict
         scope[node.name] = self
         return scope
@@ -78,24 +79,14 @@ class FunctionType(basics.InferredType):
         return "%s(%s) -> (%s)" % (self.name, ', '.join(self.args), self.return_values)
 
     def get_call_return(self, arg_types):
-        return_typeset = TypeSet()
+        return_typeSet = basics.TypeSet()
         type_mapping = {k: v for k, v in zip(self.args, arg_types)}
         for possible_type in self.return_values:
-            if isinstance(possible_type, UnknownType):
-                replacement_type = type_mapping.get(possible_type.type, UnknownType())
-                return_typeset = return_typeset.add_type(replacement_type)
+            if isinstance(possible_type, basics.UnknownType):
+                replacement_type = type_mapping.get(possible_type.type, basics.UnknownType())
+                return_typeSet = return_typeSet.add_type(replacement_type)
             else:
-                return_typeset = return_typeset.add_type(possible_type)
-        return return_typeset
+                return_typeSet = return_typeSet.add_type(possible_type)
+        return return_typeSet
 
-class FunctionParser(statements.StatementBlockTypeParser):
-    def parse_function(self, nodes):
-        # create function type
-        # parse function
-        return self.parse_statements(nodes)
 
-    def visit_Return(self, node):
-        if node.value:
-            self.returns = self.returns.add_type(expressions.get_expression_type(node.value, self.scope))
-        else:
-            self.returns = self.returns.add_type(builtins.get_built_in_for_literal(None))

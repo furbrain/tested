@@ -1,8 +1,8 @@
 import ast
 
-from . import inferred_types, expressions, statements, scopes
+from . import basics
 
-class ClassType(inferred_types.InferredType):
+class ClassType(basics.InferredType):
     @classmethod
     def from_ast_node(cls, node, scope=None):
         name = node.name
@@ -28,21 +28,14 @@ class ClassType(inferred_types.InferredType):
                 self.attrs.update(tp.attrs)
         self.instance_type = InstanceType(self)
         self.return_values = self.instance_type
+        
+    def get_call_return(self, arg_list):
+        return self.instance_type
 
 
-class InstanceType(inferred_types.InferredType):
+class InstanceType(basics.InferredType):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.name = "<{}>".format(parent)
         self.attrs.update(parent.attrs)
-
-# this parser modifies function signatures within a class definition
-class ClassBlockParser(statements.StatementBlockTypeParser):
-    def __init__(self, scope, class_type):
-        super().__init__(scope)
-        self.class_type = class_type
-
-    def visit_FunctionDef(self, node):
-        from .functions import FunctionType
-        self.scope[node.name] = FunctionType.from_ast_node(node, self.scope.parent, owning_class=self.class_type)

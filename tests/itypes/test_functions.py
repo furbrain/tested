@@ -1,15 +1,13 @@
 import unittest
 import tested.itypes.functions as functions
 import tested.itypes.builtins as builtins
-import tested.itypes.basic as basic
+import tested.itypes.basics as basics
 
-from tested.languages.python3.functions import functions.FunctionType
-from tested.languages.python3.inferred_types import TypeSet, UnknownType
-
-class Testfunctions.FunctionType(unittest.TestCase):
+class TestFunctionType(unittest.TestCase):
     def setUp(self):
         self.int = builtins.get_type_by_name('<int>')
         self.str = builtins.get_type_by_name('<str>')
+        self.float = builtins.get_type_by_name('<float>')
 
     @unittest.skip("should be elsewhere - needs moving")
     def testCreateFromSimpleNode(self):
@@ -17,7 +15,7 @@ class Testfunctions.FunctionType(unittest.TestCase):
         f = functions.FunctionType.from_ast_node(node.body[0])
         self.assertEqual(f.args,['a','b'])
         self.assertEqual(f.docstring,"Sample docstring")
-        self.assertEqual(f.return_values,TypeSet(None))
+        self.assertEqual(f.return_values, basics.TypeSet())
         
         
     def testSimpleReturnType(self):
@@ -25,7 +23,7 @@ class Testfunctions.FunctionType(unittest.TestCase):
         self.assertEqual(f.get_call_return([]),"<int>")
         
     def testMultpleReturnType(self):
-        f = functions.FunctionType('f', [], TypeSet(self.int, self.float), "")
+        f = functions.FunctionType('f', [], basics.TypeSet(self.int, self.float), "")
         self.assertEqual(f.get_call_return([]),"<float> | <int>")
         
     def testContingentReturnType(self):
@@ -47,7 +45,7 @@ class Testfunctions.FunctionType(unittest.TestCase):
         f = functions.FunctionType('f', ['a'], basics.UnknownType('a'), "")
         self.assertEqual(f.get_call_return([self.int, self.float]), "<int>")
         
-    def testRecursivefunctions.FunctionType(self):
+    def testRecursiveFunction(self):
         f = functions.FunctionType('f', [], None, "")
         f.return_values = f
         self.assertEqual(f, 'f() -> (...)')
