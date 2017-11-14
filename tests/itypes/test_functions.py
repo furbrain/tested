@@ -7,16 +7,7 @@ class TestFunctionType(unittest.TestCase):
     def setUp(self):
         self.int = builtins.get_type_by_name('<int>')
         self.str = builtins.get_type_by_name('<str>')
-        self.float = builtins.get_type_by_name('<float>')
-
-    @unittest.skip("should be elsewhere - needs moving")
-    def testCreateFromSimpleNode(self):
-        node = ast.parse('def f(a, b):\n    """Sample docstring"""\n    pass')
-        f = functions.FunctionType.from_ast_node(node.body[0])
-        self.assertEqual(f.args,['a','b'])
-        self.assertEqual(f.docstring,"Sample docstring")
-        self.assertEqual(f.return_values, basics.TypeSet())
-        
+        self.float = builtins.get_type_by_name('<float>')        
         
     def testSimpleReturnType(self):
         f = functions.FunctionType('f', [], self.int, "")
