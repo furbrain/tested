@@ -9,6 +9,18 @@ def is_ast_starred(node):
 
 def is_ast_node(node):
     return isinstance(node, ast.AST)
+    
+def get_matching_node(node_or_str, node_type):
+    """Return the first found matching type of node
+    Useful for extracting Expr or Module or FunctionDef nodes for testing"""
+    if isinstance(node_or_str,str):
+        node = ast.parse(node_or_str)
+    else:
+        node = node_or_str
+    for subnode in ast.walk(node):
+        if type(subnode).__name__ == node_type:
+            return subnode
+    return None
 
 def do_not_recurse(default):
     """decorator to prevent inappropriate recursion"""
