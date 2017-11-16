@@ -4,23 +4,16 @@ class FunctionParser(statements.StatementBlockTypeParser):
         # parse function
         return self.parse_statements(nodes)
 
-    def visit_Return(self, node):
-        if node.value:
-            self.returns = self.returns.add_type(expressions.get_expression_type(node.value, self.scope))
-        else:
-            self.returns = self.returns.add_type(builtins.get_built_in_for_literal(None))
-            
 # this parser modifies function signatures within a class definition
 class ClassBlockParser(statements.StatementBlockTypeParser):
     def __init__(self, scope, class_type):
         super().__init__(scope)
-        self.class_type = class_type
 
     def visit_FunctionDef(self, node):
         from .functions import FunctionType
         self.scope[node.name] = FunctionType.from_ast_node(node, self.scope.parent, owning_class=self.class_type)
         
-        class ModuleTypeParser(ast.NodeVisitor):
+class ModuleTypeParser(ast.NodeVisitor):
 
     def parse_module(self, text, module):
         self.scope = scopes.Scope('__main__', line_start=0, indent=-1, line_end=len(text.splitlines()))

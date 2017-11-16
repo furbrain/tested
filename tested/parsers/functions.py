@@ -9,11 +9,12 @@ def get_function_skeleton_from_node(node):
 def create_member_scope_from_node(func, node, parent_scope, owning_class):
     first_arg = None
     if node.args.args:  # exclude case where no args applied - likely staticmethod
-        first_arg = node.args.args[0].arg
         if any(node_is_classmethod(n) for n in node.decorator_list):
             first_arg = owning_class
         elif not any(node_is_staticmethod(n) for n in node.decorator_list):
             first_arg = owning_class.instance_type
+        else:
+            first_arg = None
     scope =  create_basic_scope_from_node(func, node, parent_scope.parent, first_arg)
     scope[owning_class.name] = owning_class
     return scope

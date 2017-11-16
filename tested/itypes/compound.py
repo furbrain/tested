@@ -110,7 +110,7 @@ class InferredDict(BaseCompoundType):
     def get_iter(self):
         return self.get_key()
 
-class InferredIterator(basics.InferredType):
+class InferredIterator(BaseCompoundType):
     def __init__(self, return_type):
         super().__init__()
         self.add_item(return_type)

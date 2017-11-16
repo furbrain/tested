@@ -1,13 +1,13 @@
 import ast
 
 from .. import itypes
-from . import functions, expressions
+from . import functions, classes, expressions, assignment
 
 
-def parse_statements(statements, scope=None):
+def parse_statements(statements, scope=None, class_type=None):
     if isinstance(statements, str):
         statements = [ast.parse(statements)]
-    parser = StatementBlockTypeParser(scope)
+    parser = StatementBlockTypeParser(scope, class_type)
     return parser.parse_statements(statements)
 
 class StatementBlockTypeParser(ast.NodeVisitor):
@@ -60,8 +60,11 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         self.scope[node.name] = func        
 
     def visit_ClassDef(self, node):
-        from .classes import ClassType
-        self.scope[node.name] = ClassType.from_ast_node(node, self.scope)
+        class_ = classes.get_class_skeleton_from_node(node, self.scope)
+        self.scope[node.name] = class_
+        class_scope = classes.create_class_scope_from_node(node, self.scope)
+        parse_statements(node.body, class_scope, class_)
+        classes.apply_scope_to_class(class_, class_scope)
 
     def visit_Import(self, node):
         from .modules import ModuleType

@@ -78,8 +78,9 @@ class ExpressionTypeParser(ast.NodeVisitor):
         return func_types.get_call_return(args)
 
     def visit_Lambda(self, node):
-        from .functions import FunctionType
-        return FunctionType.from_lambda_node(node, self.scope)
+        arg_names = [arg.arg for arg in node.args.args]
+        docstring = "Anonymous lambda function"
+        return itypes.FunctionType('__lambda__', arg_names, self.get_type(node.body), docstring)
 
     def visit_Attribute(self, node):
         base_var = self.get_type(node.value)
@@ -157,7 +158,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
                 return value.get_item(self.get_type(index))
         else:
             if hasattr(value, 'get_slice'):
-                return value.get_slice()
+                return itypes.create_list(*value.get_slice_from(0))
             return value
 
     def visit_Compare(self, node):
