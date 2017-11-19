@@ -1,6 +1,6 @@
 import unittest
 import importlib.util
-import tested.languages.python3.module_finder as mf
+import tested.parsers.module_finder as mf
 
 
 class TestModuleFinder(unittest.TestCase):

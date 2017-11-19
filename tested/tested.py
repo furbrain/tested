@@ -5,8 +5,7 @@ import webbrowser
 import warnings
 from gi.repository import GObject, Gedit, Gtk, GtkSource
 
-from .languages import python3
-from .languages.python3 import parse_text, get_suggestions
+from .parsers import parse
 from .pyweb.module_finder import get_module_dict
 
 warnings.simplefilter('once',UserWarning)
@@ -25,7 +24,7 @@ class TestedPlugin(GObject.Object, Gedit.ViewActivatable):
     def do_activate(self):
         self.view.connect("populate-popup",self.add_to_popup)
         self.buffer = self.view.get_buffer()
-        self.completion = CompletionProvider(python3)
+        self.completion = CompletionProvider(parse)
         completions = self.view.get_completion()
         completions.add_provider(self.completion)
         
@@ -76,7 +75,7 @@ class TestedPlugin(GObject.Object, Gedit.ViewActivatable):
         
     def update_context(self):
         try:
-            self.context = parse_text(self.buffer.get_text())
+            self.context = parse.parse_text(self.buffer.get_text())
         except SyntaxError:
             pass
                     
