@@ -1,7 +1,7 @@
 import ast
 
 from . import expressions
-from .. import itypes
+from .. import itypes, scopes
 
 def get_class_skeleton_from_node(node, scope):
     name = node.name
@@ -10,7 +10,7 @@ def get_class_skeleton_from_node(node, scope):
     return itypes.ClassType(name, parents, docstring)
     
 def create_class_scope_from_node(node, parent_scope):
-    return itypes.Scope(node.name, line_start=node.lineno, indent=node.col_offset, parent=parent_scope)
+    return scopes.Scope(node.name, line_start=node.lineno, indent=node.col_offset, parent=parent_scope)
 
 def apply_scope_to_class(class_, scope):
     #class_.scope = scope

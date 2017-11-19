@@ -65,6 +65,21 @@ class Scope():
             return self.module
         except AttributeError:
             return self.parent.get_module()
+            
+    def create_scope_list(self, lines):
+        scope_list = scopes.ScopeList()
+        for scope in self.get_all_children():
+            indent = scope.indent
+            line_start = scope.line_start
+            possible_finish_lines = [line for line in lines if line[0]>line_start and line[1]<=indent]
+            if possible_finish_lines:
+                scope.line_end = min(possible_finish_lines)[0]
+            else:
+                scope.line_end = self.line_end
+            scope_list.add(scope)
+        return scope_list
+
+            
 
 class ScopeList():
     def __init__(self):

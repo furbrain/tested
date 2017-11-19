@@ -1,7 +1,7 @@
 import ast
 import warnings
 
-from .. import itypes, utils
+from .. import itypes, scopes, utils
 
 def get_expression_type(expression, scope):
     if scope is None:
@@ -189,7 +189,7 @@ class ExpressionTypeParser(ast.NodeVisitor):
         from .assignment import assign_to_node
         scope = self.scope
         for generator in node.generators:
-            scope = itypes.Scope('__listcomp__', node.lineno, node.col_offset, parent=scope)
+            scope = scopes.Scope('__listcomp__', node.lineno, node.col_offset, parent=scope)
             iterator = get_expression_type(generator.iter, scope)
             assign_to_node(generator.target, iterator.get_iter(), scope)
         return scope

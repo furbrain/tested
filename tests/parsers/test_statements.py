@@ -1,7 +1,8 @@
 import unittest
 import ast
 from tested.parsers.statements import parse_statements
-from tested.itypes import TypeSet, ClassType, Scope
+from tested.itypes import TypeSet, ClassType
+from tested.scopes import Scope
 
 class TestStatementBlockTypeParser__Base(unittest.TestCase):
     def checkStatement(self, stmt, result, field="context", context=None):

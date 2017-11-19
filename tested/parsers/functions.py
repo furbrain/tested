@@ -1,5 +1,5 @@
 import ast
-from .. import itypes
+from .. import itypes, scopes
 
 def get_function_skeleton_from_node(node):
     arg_names = [arg.arg for arg in node.args.args]
@@ -24,8 +24,8 @@ def create_function_scope_from_node(func, node, parent_scope):
 
 def create_basic_scope_from_node(func, node, parent_scope, first_arg=None):
     if parent_scope is None:
-        parent_scope = itypes.Scope('__test__', 0, -1)
-    scope = itypes.Scope(node.name, node.lineno, node.col_offset, parent=parent_scope)
+        parent_scope = scopes.Scope('__test__', 0, -1)
+    scope = scopes.Scope(node.name, node.lineno, node.col_offset, parent=parent_scope)
     args_dict = make_arg_dict(node.args)
     if first_arg is not None:
         args_dict[node.args.args[0].arg] = first_arg

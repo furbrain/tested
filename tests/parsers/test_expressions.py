@@ -2,7 +2,7 @@ import unittest
 import ast 
 
 from tested.parsers import expressions
-from tested import itypes
+from tested import itypes, scopes
 
 class TestExpressionBase(unittest.TestCase):
     def setUp(self):
@@ -12,7 +12,7 @@ class TestExpressionBase(unittest.TestCase):
         
     def getType(self, expr, context=None):
         if context is None:
-            context = itypes.Scope('__test__',0,-1)
+            context = scopes.Scope('__test__',0,-1)
         return expressions.get_expression_type(expr, context)
         
     def checkExpr(self, expr, result, context=None):

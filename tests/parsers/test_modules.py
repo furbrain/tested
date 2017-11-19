@@ -1,8 +1,9 @@
 import unittest
 import os.path
 
-import tested.itypes.modules as modules
-from tested.languages.python3 import ModuleType, ModuleTypeParser, LineNumberGetter, Scope
+from tested.itypes import modules
+from tested import scopes
+#from tested.languages.python3 import modules.ModuleType, modules.ModuleTypeParser, LineNumberGetter, Scope
 
 SPECIMEN_CODE = """
 #!/usr/bin/env python
@@ -34,7 +35,7 @@ late_variable = 100
 b = BaseClass(12)
 """ 
 
-fixture_dir = os.path.join(os.path.dirname(__file__),'fixtures','fake_project')
+fixture_dir = os.path.join(os.path.dirname(__file__),'..','fixtures','fake_project')
 main_file = os.path.join(fixture_dir,'main.py')
 submod_file =os.path.join(fixture_dir, 'submod', 'submod1.py')
 
@@ -45,7 +46,7 @@ class FakeDocument():
 
 class TestModuleType(unittest.TestCase):
     def createModule(self, text, location=""):
-        return ModuleType.from_text(text, location, FakeDocument(location))
+        return modules.ModuleType.from_text(text, location, FakeDocument(location))
 
     def checkModule(self, text, result, location=""):
         module = self.createModule(text, location)
@@ -119,7 +120,7 @@ class TestModuleTypeParser(unittest.TestCase):
         #def b(f):
         #    pass
         #c=2
-        scope_list = [Scope('__main__',0,0, line_end=4), Scope('def',2,0)]
+        scope_list = [scopes.Scope('__main__',0,0, line_end=4), Scope('def',2,0)]
         lines = [(0,0),(1,0),(2,4),(3,0)]
         parser=ModuleTypeParser()
         new_scopes = list(parser.find_full_scopes(scope_list, lines, 4))
@@ -129,7 +130,7 @@ class TestModuleTypeParser(unittest.TestCase):
         #a = 1
         #def b(f):
         #    pass
-        scope_list = [Scope('__main__',0,0, line_end=3), Scope('def',2,0)]
+        scope_list = [scopes.Scope('__main__',0,0, line_end=3), scopes.Scope('def',2,0)]
         lines = [(0,0),(1,0),(2,4)]
         parser=ModuleTypeParser()
         new_scopes = list(parser.find_full_scopes(scope_list, lines, 3))
