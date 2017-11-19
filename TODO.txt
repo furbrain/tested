@@ -19,4 +19,12 @@ Add to expressions: lambdas, bytes, starred function args...
 Refactoring... DONE
 Refactoring part 2 - try and simplify all the structures...
 
+structures:
 
+lvl1: utils inferred_types scopes
+
+lvl2: complex types: functions, classes, compound types
+
+lvl3: builtins - this accepts a request for a type (as a string) and returns the relevant thingy
+
+lvl3: parser - reads files, creates functions and classes and gives them their attributes
