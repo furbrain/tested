@@ -67,7 +67,7 @@ class Scope():
             return self.parent.get_module()
             
     def create_scope_list(self, lines):
-        scope_list = scopes.ScopeList()
+        scope_list = ScopeList()
         for scope in self.get_all_children():
             indent = scope.indent
             line_start = scope.line_start
