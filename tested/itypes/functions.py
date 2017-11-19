@@ -4,13 +4,6 @@ from . import basics, builtins
 from .. import utils
 
 class FunctionType(basics.InferredType):
-    @classmethod
-    def from_lambda_node(cls, node, scope):
-        arg_names = [arg.arg for arg in node.args.args]
-        docstring = "Anonymous lambda function"
-        self = cls('__lambda__', arg_names, expressions.get_expression_type(node.body, scope), docstring)
-        return self
-
     def __init__(self, name, args, returns, docstring):
         super().__init__()
         self.name = name
