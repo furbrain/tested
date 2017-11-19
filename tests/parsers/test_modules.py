@@ -1,9 +1,11 @@
 import unittest
 import os.path
 
-from tested.itypes import modules
+from tested.parsers import modules
 from tested import scopes
-#from tested.languages.python3 import modules.ModuleType, modules.ModuleTypeParser, LineNumberGetter, Scope
+
+#import logging
+#logging.basicConfig(level=logging.DEBUG)
 
 SPECIMEN_CODE = """
 #!/usr/bin/env python
@@ -37,7 +39,7 @@ b = BaseClass(12)
 
 fixture_dir = os.path.join(os.path.dirname(__file__),'..','fixtures','fake_project')
 main_file = os.path.join(fixture_dir,'main.py')
-submod_file =os.path.join(fixture_dir, 'submod', 'submod1.py')
+submod_file = os.path.join(fixture_dir, 'submod', 'submod1.py')
 
 class FakeDocument():
     def __init__(self, location):
@@ -46,11 +48,11 @@ class FakeDocument():
 
 class TestModuleType(unittest.TestCase):
     def createModule(self, text, location=""):
-        return modules.ModuleType.from_text(text, location, FakeDocument(location))
+        return modules.module_from_text(text, location, FakeDocument(location))
 
     def checkModule(self, text, result, location=""):
         module = self.createModule(text, location)
-        answer = module.get_outer_scope().context
+        answer = module.scope.context
         for k, v in result.items():
             self.assertEqual(v,answer[k])
 

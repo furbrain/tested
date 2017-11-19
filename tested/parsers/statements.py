@@ -1,7 +1,7 @@
 import ast
 
 from .. import itypes
-from . import functions, classes, expressions, assignment
+from . import functions, classes, expressions, assignment, modules
 
 
 def parse_statements(statements, scope=None, class_type=None):
@@ -67,19 +67,17 @@ class StatementBlockTypeParser(ast.NodeVisitor):
         classes.apply_scope_to_class(class_, class_scope)
 
     def visit_Import(self, node):
-        from .modules import ModuleType
         for alias in node.names:
             name = alias.asname or alias.name
-            self.scope[name] = ModuleType.from_name(alias.name, self.scope)
+            self.scope[name] = modules.module_from_name(alias.name, self.scope)
 
     def visit_ImportFrom(self, node):
-        from .modules import ModuleType
-        module = ModuleType.from_name(node.module, self.scope, node.level)
+        module = modules.module_from_name(node.module, self.scope, node.level)
         for alias in node.names:
             name = alias.asname or alias.name
             if not module.has_attr(alias.name):
-                if hasattr(module, 'outer_scope'):
-                    module.set_attr(alias.name, ModuleType.from_name(alias.name, module.outer_scope, level=1))
+                if hasattr(module, 'scope'):
+                    module.set_attr(alias.name, modules.module_from_name(alias.name, module.scope, level=1))
             self.scope[name] = module.get_attr(alias.name)
             
     def visit_Return(self, node):
