@@ -23,6 +23,31 @@ class TestScopeMatches(unittest.TestCase):
         sc2 = scopes.Scope('sc2', line_start=4, indent=0, parent=sc1)
         self.assertIn(sc2,sc1.get_all_children())
 
+    def testFindFullScopes(self):
+        #a = 1
+        #def b(f):
+        #    pass
+        #c=2
+        scp1 = scopes.Scope('__main__',0,-1, line_end=4)
+        scp2 = scopes.Scope('def',2,0, parent=scp1)
+        lines = [(0,0),(1,0),(2,4),(3,0)]
+        new_scopes = list(scp1.create_scope_list(lines))
+        self.assertEqual(new_scopes[1].line_end,3)
+
+    def testFindFullScopesHangingScope(self):
+        #a = 1
+        #def b(f):
+        #    pass
+        scp1 = scopes.Scope('__main__',0,-1, line_end=3)
+        scp2 = scopes.Scope('def',2,0, parent=scp1)
+        lines = [(0,0),(1,0),(2,4)]
+        new_scopes = list(scp1.create_scope_list(lines))
+        self.assertEqual(new_scopes[1].line_end,3)
+
+
+
+
+
 class TestScopeList(unittest.TestCase):
     def checkScope(self, scope_list, position, match):
         s = scopes.ScopeList()

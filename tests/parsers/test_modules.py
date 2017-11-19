@@ -86,11 +86,10 @@ class TestModuleType(unittest.TestCase):
     def testImportAttributeFromModule(self):
         self.checkModule("from .submod2 import submod2_var", {'submod2_var': '<float>'}, location=submod_file)
         
-@unittest.skip("should be elsewhere")        
-class TestModuleTypeParser(unittest.TestCase):
+class TestIndentation(unittest.TestCase):
     def setUpSpecimenModule(self):
-        parser = ModuleTypeParser()
-        return parser.parse_module(SPECIMEN_CODE, None)
+        mod = modules.module_from_text(SPECIMEN_CODE, '', None)
+        return mod.scope_list
         
     def getScopeStarting(self, scopes, line_start):
         possible_scopes = [x for x in scopes if x.line_start == line_start]
@@ -117,27 +116,6 @@ class TestModuleTypeParser(unittest.TestCase):
         self.assertIn('antelope',ctx)
         self.assertIn('late_variable',ctx)
         
-    def testFindFullScopes(self):
-        #a = 1
-        #def b(f):
-        #    pass
-        #c=2
-        scope_list = [scopes.Scope('__main__',0,0, line_end=4), Scope('def',2,0)]
-        lines = [(0,0),(1,0),(2,4),(3,0)]
-        parser=ModuleTypeParser()
-        new_scopes = list(parser.find_full_scopes(scope_list, lines, 4))
-        self.assertEqual(new_scopes[1].line_end,3)
-
-    def testFindFullScopesHangingScope(self):
-        #a = 1
-        #def b(f):
-        #    pass
-        scope_list = [scopes.Scope('__main__',0,0, line_end=3), scopes.Scope('def',2,0)]
-        lines = [(0,0),(1,0),(2,4)]
-        parser=ModuleTypeParser()
-        new_scopes = list(parser.find_full_scopes(scope_list, lines, 3))
-        self.assertEqual(new_scopes[1].line_end,3)
-
     def testClassMethodScopeIsComplete(self):
         scopes = self.setUpSpecimenModule()
         ctx = self.getScopeStarting(scopes, 22)
