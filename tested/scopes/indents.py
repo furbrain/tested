@@ -4,7 +4,7 @@ class IndentGetter(ast.NodeVisitor):
     @classmethod
     def get_lines(cls, text_or_node):
         if isinstance(text_or_node,str):
-            node = ast.parse(text)
+            node = ast.parse(text_or_node)
         else:
             node = text_or_node
         parser = cls()
