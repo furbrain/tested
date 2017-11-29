@@ -19,7 +19,8 @@ def assign_to_node(target, value, scope):
             for i, subtarget in enumerate(target.elts):
                 if utils.is_ast_starred(subtarget):
                     elements = value.get_slice_from(i)
-                    assign_to_node(subtarget, elements, scope)
+                    element_list = itypes.create_list(*elements)
+                    assign_to_node(subtarget, element_list, scope)
                 else:
                     assign_to_node(subtarget, value.get_item(i), scope)
             return
@@ -53,7 +54,7 @@ class Assigner(ast.NodeVisitor):
             types.add_item(self.value)
         else:
             for val in self.value:
-                if isinstance(val, (itypes.InferredList, itypes.InferredTuple)):
+                if itypes.is_inferred_sequence(val):
                     types.add_item(val.get_item(0))
 
     def visit_Call(self, node):

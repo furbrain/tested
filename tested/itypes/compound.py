@@ -1,6 +1,9 @@
 from . import basics
 from .. import utils
 
+def is_inferred_sequence(node):
+    return isinstance(node, (InferredList, InferredTuple))
+
 class BaseCompoundType(basics.InferredType):
     """This is the base class for other classes that can hold other objects"""
     def __init__(self):
