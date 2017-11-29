@@ -82,5 +82,14 @@ class TestAssignment(unittest.TestCase):
         mytuple = itypes.create_list(self.int, self.str, self.float)    
         assignment.assign_to_node('(a, *b)', mytuple, context)
         self.assertEqual(context, {'a':'<float> | <int> | <str>', 'b':'[<float> | <int> | <str>]'})
+        
+    def testAssignmentToStarredFromStarred(self):
+        context = { 'x': self.int,
+                    'y': itypes.create_tuple(self.float, self.str, self.int)}
+        assignment.assign_to_node('(a, b, *c)', '(x, *y)', context)
+        self.assertEqual(context['a'], '<int>')
+        self.assertEqual(context['b'], '<float>')
+        self.assertEqual(context['c'], '[<int> | <str>]')
+        
 
 

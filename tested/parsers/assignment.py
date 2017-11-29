@@ -6,14 +6,21 @@ from .. import itypes, utils
 def assign_to_node(target, value, scope):
     if isinstance(target, str):
         target = ast.parse(target, mode="eval").body
+    if isinstance(value, str):
+        value = ast.parse(value, mode="eval").body
     if utils.is_ast_sequence(target):
         if utils.is_ast_node(value) and utils.is_ast_sequence(value):
+            values = []
+            for elt in value.elts:
+                if utils.is_ast_starred(elt):
+                    values.extend(expressions.get_expression_type(elt.value, scope).get_star_expansion())
+                else:
+                    values.append(expressions.get_expression_type(elt, scope))
             for i, subtarget in enumerate(target.elts):
                 if utils.is_ast_starred(subtarget):
-                    elements = [expressions.get_expression_type(x) for x in value.elts[i:]]
-                    assign_to_node(subtarget, itypes.create_list(*elements), scope)
+                    assign_to_node(subtarget, itypes.create_list(*values[i:]), scope)
                 else:
-                    assign_to_node(subtarget, value.elts[i], scope)
+                    assign_to_node(subtarget, values[i], scope)
             return
         elif itypes.is_inferred_type(value):
             for i, subtarget in enumerate(target.elts):
